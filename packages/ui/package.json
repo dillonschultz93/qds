@@ -1,0 +1,57 @@
+{
+  "name": "@quieto/ui",
+  "version": "0.0.0",
+  "description": "QDS web components — Lit elements styled entirely by @quieto/design-tokens.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Dillon Schultz",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dillonschultz93/qds.git",
+    "directory": "packages/ui"
+  },
+  "keywords": ["web-components", "lit", "design-system", "custom-elements"],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./qds-button.js": {
+      "types": "./dist/components/qds-button/qds-button.d.ts",
+      "default": "./dist/components/qds-button/qds-button.js"
+    },
+    "./qds-stack.js": {
+      "types": "./dist/components/qds-stack/qds-stack.d.ts",
+      "default": "./dist/components/qds-stack/qds-stack.js"
+    },
+    "./custom-elements.json": "./custom-elements.json"
+  },
+  "files": ["dist", "custom-elements.json"],
+  "customElements": "custom-elements.json",
+  "//sideEffects": "Defining a custom element IS a side effect, so every module that calls customElements.define must be listed — including the index barrel, which registers everything by re-exporting the component modules. Omitting index.js lets a bundler tree-shake `import '@quieto/ui'` down to nothing: no error, no elements registered, and the page shows un-upgraded markup.",
+  "sideEffects": ["./dist/index.js", "./dist/**/qds-*.js"],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "tsc --build && npm run analyze",
+    "dev": "tsc --build --watch --preserveWatchOutput",
+    "analyze": "cem analyze --litelement --globs \"src/**/*.ts\" --exclude \"src/**/*.test.ts\"",
+    "test": "wtr --coverage",
+    "test:watch": "wtr --watch",
+    "type-check": "tsc --build --dry",
+    "clean": "rm -rf dist custom-elements.json .turbo tsconfig.tsbuildinfo"
+  },
+  "dependencies": {
+    "@quieto/design-tokens": "workspace:*",
+    "lit": "^3.3.3"
+  },
+  "devDependencies": {
+    "@custom-elements-manifest/analyzer": "^0.11.0",
+    "@open-wc/testing": "^4.0.0",
+    "@web/dev-server-esbuild": "^2.0.0",
+    "@web/test-runner": "^1.0.0",
+    "@web/test-runner-playwright": "^0.11.1",
+    "typescript": "5.9.3"
+  }
+}

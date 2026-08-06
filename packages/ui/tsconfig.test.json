@@ -1,0 +1,27 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    /**
+     * These two are RESTATED, not inherited, and must stay in sync with
+     * tsconfig.base.json.
+     *
+     * @web/dev-server-esbuild reads this file and hands its raw text to esbuild as
+     * `tsconfigRaw`, and esbuild's `tsconfigRaw` does not resolve `extends` — it
+     * only reads the literal object given. Relying on the extends chain here
+     * silently yields standard decorators instead of legacy ones, and Lit then
+     * fails at import time with "Unsupported decorator location: field" because
+     * its standard-decorator path requires the `accessor` keyword.
+     *
+     * The `extends` above is still useful: editors and `tsc` do follow it.
+     */
+    "experimentalDecorators": true,
+    "useDefineForClassFields": false,
+
+    "composite": false,
+    "noEmit": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": []
+}
