@@ -38,10 +38,6 @@
       "tight": { "$value": "-0.02em", "$type": "dimension" },
       "normal": { "$value": "0em", "$type": "dimension" },
       "wide": { "$value": "0.04em", "$type": "dimension" }
-    },
-    "text-transform": {
-      "none": { "$value": "none", "$type": "other" },
-      "uppercase": { "$value": "uppercase", "$type": "other" }
     }
   }
 }
