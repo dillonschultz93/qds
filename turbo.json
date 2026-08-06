@@ -1,0 +1,51 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "ui": "tui",
+  "tasks": {
+    "validate": {
+      "inputs": ["tokens/**", "nomenclature.js", "validate.js"]
+    },
+    "build": {
+      "dependsOn": ["^build", "validate"],
+      "outputs": [
+        "dist/**",
+        "_site/**",
+        "custom-elements.json",
+        "src/assets/ui.js",
+        "src/assets/ui.js.map",
+        /**
+         * tsconfig.tsbuildinfo MUST be listed.
+         *
+         * `tsc --build` decides whether to emit by comparing source timestamps
+         * against this file, not against dist/. If it is left out of `outputs` it
+         * survives a cache restore or a manual `rm -rf dist`, and the next build is
+         * a no-op: tsc reports success, emits nothing, and every consumer fails to
+         * resolve ./dist/index.js. Listing it ties its lifecycle to dist/.
+         */
+        "tsconfig.tsbuildinfo"
+      ]
+    },
+    "analyze": {
+      "dependsOn": ["build"],
+      "outputs": ["custom-elements.json"]
+    },
+    "test": {
+      "dependsOn": ["^build"],
+      "outputs": []
+    },
+    "type-check": {
+      "dependsOn": ["^build"],
+      "outputs": []
+    },
+    "lint": {
+      "outputs": []
+    },
+    "clean": {
+      "cache": false
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    }
+  }
+}

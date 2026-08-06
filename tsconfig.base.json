@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+
+    /**
+     * Lit 3 decorator configuration.
+     *
+     * `experimentalDecorators: true` selects TypeScript's pre-TC39 decorator
+     * implementation, which Lit documents as the recommended mode — it produces
+     * smaller output than standard decorators, which need generated accessors
+     * and per-instance storage objects.
+     *
+     * `useDefineForClassFields: false` is REQUIRED when targeting ES2022 or
+     * higher. Left at its default, class fields are emitted with
+     * `Object.defineProperty` semantics that shadow Lit's reactive property
+     * accessors, and `@property()` silently stops triggering re-renders.
+     *
+     * TypeScript is pinned to 5.9.3 at the root for this reason: `latest` is now
+     * 7.x (the native port) and its `experimentalDecorators` behavior is not
+     * verified against Lit 3.
+     */
+    "experimentalDecorators": true,
+    "useDefineForClassFields": false,
+
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true
+  }
+}

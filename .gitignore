@@ -141,3 +141,12 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+# Turborepo
+.turbo/
+
+# Eleventy build output
+_site/
+
+# Generated custom elements manifest (rebuilt by `turbo analyze`)
+custom-elements.json
