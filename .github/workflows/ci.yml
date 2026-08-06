@@ -1,0 +1,84 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Validate, build, test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          # Matches the `engines` floor in every package. Node 22 also avoids the
+          # localStorage global that Node 25 exposes, which @lit-labs/ssr-dom-shim
+          # trips over — see the NODE_OPTIONS note in apps/docs/package.json.
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # ~100 MB of browsers, keyed on Playwright's version so a dependency-only
+      # change does not re-download them.
+      - name: Resolve Playwright version
+        id: playwright
+        run: echo "version=$(node -p "require('playwright/package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+
+      - name: Install Chromium
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: pnpm --filter docs exec playwright install --with-deps chromium
+
+      # Run explicitly rather than only as a build dependency, so a nomenclature
+      # violation is reported as its own failed step. Most violations arrive from
+      # Figma via Token Studio's Git sync, and this is what tells a designer that a
+      # role they invented is not in the vocabulary.
+      - name: Validate token nomenclature
+        run: pnpm validate
+
+      - name: Build
+        run: pnpm build
+
+      - name: Test
+        run: pnpm test
+
+      # Guards the failures a green build cannot catch: components that never
+      # upgrade, render twice, or get tree-shaken out of the bundle entirely. All of
+      # those produce a page with no console error and passing DOM queries.
+      - name: Verify docs site in a browser
+        run: node verify.mjs
+        working-directory: apps/docs
+
+      - name: Check the working tree is clean
+        # The anatomy SVGs are generated but committed, so they must match what the
+        # build produces — otherwise the diagrams and the vocabulary have drifted.
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "::error::The build modified committed files. Run 'pnpm build' and commit the result."
+            git status --short
+            git diff
+            exit 1
+          fi
+
+      - name: Upload built site
+        uses: actions/upload-artifact@v4
+        with:
+          name: docs-site
+          path: apps/docs/_site
+          retention-days: 7
