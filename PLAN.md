@@ -1,0 +1,606 @@
+# QDS — Design System Monorepo: Plan of Record
+
+This is the agreed plan for building QDS, plus what changed once it met reality.
+It is a planning document, not a specification: the normative spec for the token
+naming system is [`packages/design-tokens/docs/nomenclature.md`](packages/design-tokens/docs/nomenclature.md).
+
+## Status at a glance
+
+| Phase | Scope | Status |
+| --- | --- | --- |
+| 0 | Monorepo scaffolding — pnpm workspaces, Turborepo, tsconfig, Changesets | **Done** |
+| 1a | `nomenclature.js`, `transforms/name-qds.js`, `validate.js` | **Done** — 20 tests passing |
+| 1b | Token source + Style Dictionary build | **Done** — 267 source tokens, 261 built, 56 mode-varying |
+| 1c | Spec migration, prefix correction, generated anatomy diagrams | **Done** |
+| 2 | `@quieto/ui` — Lit components | **Done** — 22 browser tests, 100% coverage |
+| 3 | `apps/docs` — Eleventy site | **Done** — 6 pages, 17 browser checks |
+| 4 | CI and release workflows | **Done** |
+
+All phases are complete and verified from a clean clone: `pnpm build` → `pnpm test`
+→ `node verify.mjs` all pass, and the working tree stays clean after a build.
+
+---
+
+## Context
+
+`~/dev-env/projects/qds` began as a near-empty repo (`.gitignore`, `LICENSE`,
+`README.md`, `docs/design-tokens-nomenclature.md`, remote
+`git@github.com:dillonschultz93/qds.git`). The goal is a three-part design system
+in one repo:
+
+1. **Design tokens** — DTCG source, Style Dictionary build, output to Figma/Token Studio and web CSS variables
+2. **Component library** — Lit web components consuming those tokens
+3. **Documentation site** — Eleventy, documenting both
+
+Separately these have no single source of truth linking a token to the component
+that uses it to the doc that describes it. A monorepo gives one dependency graph
+(`tokens → ui → docs`), one release flow, and one CI run.
+
+`docs/design-tokens-nomenclature.md` already specified a complete three-tier
+naming grammar with controlled vocabularies. **That document is normative** — the
+token package enforces it mechanically, and the docs site renders it from the same
+source the enforcement reads.
+
+Toolchain: Node v25.2.0, pnpm 11.5.3, npm 11.19.0.
+
+### Decisions
+
+| Decision | Choice |
+| --- | --- |
+| Monorepo | pnpm workspaces + Turborepo |
+| Component base | Lit 3 |
+| Theming | Three tiers (primitive → semantic → component) + light/dark modes |
+| Release | npm via Changesets |
+| Scope | `@quieto/*` — `@quieto/design-tokens`, `@quieto/ui`, private `docs` |
+| Token package | Self-contained Style Dictionary build (no dependency on the published `@quieto/tokens` CLI) |
+| Figma direction | Token Studio multi-file layout **is** the source; the plugin syncs the folder from Git bidirectionally |
+| Global prefix | `--qds-` for CSS vars, `qds-` for element names |
+| Category vocabularies | Per-tier as written in the spec; primitive and semantic lists stay intentionally different |
+
+### Two notes worth flagging
+
+**The Figma direction inverts the original framing.** The original ask was for
+Style Dictionary to *output* tokens for Figma/Token Studio. Instead
+`packages/design-tokens/tokens/` is authored **in Token Studio's own multi-file
+layout**, so the plugin reads it straight from Git — no emitter to write or
+maintain, and edits round-trip from Figma back into the repo. Style Dictionary's
+job narrows to building the CSS and a JS export. Less code, officially supported
+path; the cost is that the source folder follows Token Studio's conventions.
+
+**`@quieto/tokens` v0.4.1** (the already-published style-dictionary CLI) is
+deliberately **not** a dependency here — recorded so the name collision behind
+`@quieto/design-tokens` reads as a known choice rather than an accident.
+
+---
+
+## Target structure
+
+```
+qds/
+├── package.json                 # private root
+├── pnpm-workspace.yaml
+├── turbo.json
+├── tsconfig.base.json
+├── .changeset/config.json
+├── .github/workflows/{ci,release}.yml
+├── packages/
+│   ├── design-tokens/           # @quieto/design-tokens
+│   │   ├── docs/
+│   │   │   ├── nomenclature.md       # the spec
+│   │   │   └── anatomy/{generate.js,*.svg}
+│   │   ├── nomenclature.js           # machine-readable vocabularies
+│   │   ├── lib/references.js         # shared DTCG reference extraction
+│   │   ├── tokens/                   # SOURCE OF TRUTH (Token Studio layout)
+│   │   │   ├── $metadata.json
+│   │   │   ├── $themes.json
+│   │   │   ├── primitive/{color,typography,spacing,border,shadow,animation}.json
+│   │   │   ├── semantic/{base,light,dark}.json
+│   │   │   └── component/button.json
+│   │   ├── transforms/name-qds.js    # the naming grammar, as code
+│   │   ├── validate.js               # grammar + reference-direction linter
+│   │   ├── build.js
+│   │   └── dist/                     # gitignored, built
+│   ├── ui/                      # @quieto/ui
+│   │   ├── src/
+│   │   │   ├── index.ts
+│   │   │   ├── internal/qds-element.ts
+│   │   │   └── components/{qds-button,qds-stack}/
+│   │   ├── custom-elements.json      # generated by CEM analyzer
+│   │   ├── custom-elements-manifest.config.js
+│   │   └── web-test-runner.config.js
+└── apps/
+    └── docs/                    # private, Eleventy
+        ├── eleventy.config.js
+        └── src/{_data,_includes,_layouts,pages,assets}
+```
+
+`packages/` holds publishable libraries; `apps/` holds deployables.
+
+**On moving the spec**: `docs/design-tokens-nomenclature.md` →
+`packages/design-tokens/docs/nomenclature.md`. It avoids a confusing root `docs/`
+vs. `apps/docs/` collision, and puts the prose next to `nomenclature.js` and
+`validate.js` — the three must stay in sync, so they sit together.
+
+---
+
+## Phase 0 — Repo scaffolding — **done**
+
+**`pnpm-workspace.yaml`** — `packages/*` and `apps/*`.
+
+**Root `package.json`** — `"private": true`, `"packageManager": "pnpm@11.5.3"`,
+scripts delegating to turbo (`build`, `dev`, `test`, `lint`, `validate`,
+`analyze`, `changeset`, `release`).
+
+**`turbo.json`** — the dependency graph is the point:
+
+```json
+{
+  "tasks": {
+    "validate": { "inputs": ["tokens/**", "nomenclature.js", "validate.js"] },
+    "build":    {
+      "dependsOn": ["^build", "validate"],
+      "outputs": ["dist/**", "_site/**", "custom-elements.json",
+                  "src/assets/ui.js", "src/assets/ui.js.map",
+                  "tsconfig.tsbuildinfo"]
+    },
+    "analyze":  { "dependsOn": ["build"], "outputs": ["custom-elements.json"] },
+    "test":     { "dependsOn": ["^build"] },
+    "dev":      { "cache": false, "persistent": true }
+  }
+}
+```
+
+`^build` makes `docs` wait on `ui`, which waits on `design-tokens` — ordering
+becomes automatic. `validate` gating `build` means a token that violates the
+nomenclature fails the build rather than silently shipping.
+
+**`tsconfig.tsbuildinfo` must be listed as an output.** `tsc --build` decides
+whether to emit by comparing sources against that file rather than against `dist/`,
+so if it survives a cache restore or an `rm -rf dist` the next build is a silent
+no-op: tsc reports success, emits nothing, and every consumer fails to resolve
+`./dist/index.js`. Listing it ties its lifecycle to `dist/`. (Found the hard way —
+see *Deviations*.)
+
+**`tsconfig.base.json`** — the Lit decorator settings are a known footgun, so they
+are set once at the base: `experimentalDecorators: true` and
+`useDefineForClassFields: false`. Left at its default, class fields are emitted
+with `Object.defineProperty` semantics that shadow Lit's reactive property
+accessors, and `@property()` silently stops triggering re-renders.
+
+**TypeScript is pinned to `5.9.3`, not latest.** npm's `typescript@latest` is now
+`7.0.2` (the native port). Lit 3's decorator support is documented against 5.x and
+`experimentalDecorators` behavior under TS 7 is unverified. Treat TS 7 as a
+deliberate later upgrade.
+
+**Changesets** — `"access": "public"` with `"ignore": ["docs"]` so the private site
+never gets versioned.
+
+---
+
+## Phase 1 — `@quieto/design-tokens` — **done**
+
+Three artifacts implement the spec: a **vocabulary module**, a **name transform**,
+and a **validator**.
+
+### 1a. `nomenclature.js` — the vocabularies, machine-readable
+
+Every controlled list in the spec becomes data in one module — per-tier
+categories, sub-categories, properties, roles, states. This is the keystone:
+`validate.js` enforces it, `transforms/name-qds.js` builds names from it, the
+anatomy diagrams display its counts, and the docs site renders its tables. The
+naming system therefore cannot drift from its own documentation.
+
+`primitive.categories` and `semantic.categories` stay deliberately different —
+primitives describe raw values (`border.radius.md`, `shadow.blur.200`), semantics
+describe intent (`radius.default`, `elevation.raised`). Comments say so, to stop a
+future reader from "fixing" it.
+
+### 1b. `transforms/name-qds.js` — the grammar as a custom transform
+
+**The piece that cannot be done with built-in transforms.** The spec puts the tier
+identifier in the CSS name but *not* in the JSON/Figma path:
+
+| Tier | JSON path | CSS variable |
+| --- | --- | --- |
+| Primitive | `color.blue.400` | `--qds-color-blue-400` |
+| Semantic | `color.background.default.hover` | `--qds-semantic-color-background-default-hover` |
+| Component | `button.primary.color.background.hover` | `--qds-component-button-primary-color-background-hover` |
+
+Style Dictionary derives names from token paths, so `name/kebab` + `prefix` alone
+emits `--qds-color-background-default-hover` for that semantic token — **silently
+dropping the `semantic` segment**. The tier comes from the token's `filePath`
+instead.
+
+```
+tier ← the tier directory in the token's filePath (primitive | semantic | component)
+the rest of the set name is ALWAYS discarded
+primitive → --qds-{...token.path}
+semantic  → --qds-semantic-{...token.path}
+component → --qds-component-{...token.path}
+```
+
+**Mode-stripping is the most important rule here.** `semantic/light.json` and
+`semantic/dark.json` must produce *identical* variable names, differing only in the
+selector they are emitted under. If the mode leaked into the name you would get
+`--qds-semantic-light-color-…` and `--qds-semantic-dark-color-…` — two variables
+no stylesheet could switch between, making theming structurally impossible rather
+than merely broken. Discarding the whole set-name remainder makes this the default
+rather than something to remember. It has a dedicated regression test.
+
+Primitives get **no** tier identifier while semantics and components do —
+asymmetric, but it is what the spec says, and it keeps the most-referenced tier's
+names short.
+
+### 1c. `validate.js` — enforcement
+
+Runs before every build (wired in `turbo.json`). Four classes of check:
+
+1. **Grammar** — every segment against its tier's vocabulary, with the allowed values named in the error.
+2. **Reference direction** — primitives hold raw values only; semantics alias primitives; components alias semantics or primitives.
+3. **Theme completeness** — `semantic/light` and `semantic/dark` must define the same keys.
+4. **Structure** — no node is both a token and a group; every set on disk is registered in `$metadata.json`, and vice versa.
+
+This matters most for tokens arriving *from* Figma: Token Studio syncs `tokens/`
+bidirectionally, so a role invented in the plugin lands here as a pull request,
+and CI reports that it is not in the vocabulary.
+
+### 1d. Source layout (Token Studio multi-file)
+
+`$metadata.json` carries `tokenSetOrder`; `$themes.json` defines Light and Dark as
+one `mode` group so `permutateThemes` yields exactly two builds. `"source"` sets
+resolve references without being exported as Figma variables; `"enabled"` sets are
+exported.
+
+Because light/dark differ *only* at the semantic tier, adding a mode never touches
+primitives or components.
+
+### 1e. Build (`build.js`)
+
+`style-dictionary@5.5.0` with `@tokens-studio/sd-transforms@2.0.3` (peer dep
+`style-dictionary@^5.0.0` — matches).
+
+Per theme, a CSS platform with `transformGroup: 'tokens-studio'` plus `name/qds`
+appended (Style Dictionary concatenates `transforms` onto `transformGroup`, and the
+last name transform wins), `preprocessors: ['tokens-studio']`, and
+`expand: { include: ['typography'] }`.
+
+**`options.outputReferences: true` is the part not to break.** It emits
+`--qds-semantic-color-background-primary-rest: var(--qds-color-blue-600)` rather
+than flattening to a hex. Without it the three-tier structure is erased from the
+CSS, theming stops working, and the whole nomenclature becomes decorative.
+
+Outputs:
+
+- `dist/css/qds.css` — light under `:root`, dark overrides under `[data-theme="dark"]`, plus a `prefers-color-scheme` block. The single file consumers load.
+- `dist/css/qds.{light,dark}.css` — one complete mode each, standalone.
+- `dist/js/tokens.js` + `.d.ts` — typed manifest.
+- `dist/tokens.json` — the same manifest as data, for the docs site.
+- `dist/nomenclature.json` — the vocabularies, so the docs site need not reach across packages.
+
+Dark mode ships as `[data-theme="dark"]` plus a `@media (prefers-color-scheme: dark)`
+block guarded by `:root:not([data-theme="light"])`, so an explicit user choice
+always beats the OS setting.
+
+### 1f. Spec cleanup
+
+- The prose used `--quieto-` in the Anatomy sections and `--ds-` in the Examples bullets; both are now `--qds-`.
+- The three referenced PNGs did not exist, and were **Obsidian wikilink embeds** (`![[Primitive Tokens Anatomy.png]]`) that no standard Markdown renderer resolves. They are now generated as theme-aware inline SVG from `nomenclature.js`.
+
+### 1g. Figma wiring (manual, one-time)
+
+Token Studio → Settings → Sync → GitHub, repo `dillonschultz93/qds`, path
+`packages/design-tokens/tokens`, **Folder** mode, format **W3C DTCG**.
+Bidirectional from then on.
+
+---
+
+## Phase 2 — `@quieto/ui` — **done**
+
+**Build**: plain `tsc` → ESM, no bundler — what Lit recommends for publishing
+component libraries, since consumers bundle. Every component separately importable
+so consumers tree-shake.
+
+**Token consumption**: components reference `var(--qds-component-*)` in `static
+styles`, with hardcoded fallbacks as the second `var()` argument. CSS custom
+properties inherit through shadow DOM, so nothing needs injecting per shadow root.
+Consumers load `@quieto/design-tokens/css` **once** at document level.
+
+Each component's `--qds-component-{name}-*` tokens are its public styling API —
+so the nomenclature's component tier and the library's theming surface are the
+same thing.
+
+**Note on variants in CSS**: CSS cannot interpolate an attribute value into a
+variable name, so there is no way to write
+`var(--qds-component-button-{variant}-…)`. Each variant block remaps a fixed set
+of private properties (`--_bg`, `--_fg`, …) and the element rules are written once
+against those.
+
+**First components** — enough to prove the pipeline without building a whole
+library:
+
+- `qds-button` — variants (`primary`/`secondary`/`ghost`/`danger`), sizes, `disabled`, `loading`, `full-width`. Exercises the full primitive → semantic → component chain *and* the `state` segment of the grammar. Uses `delegatesFocus` for native-like focus, and `formAssociated` + `attachInternals().form` so a shadow-DOM button can actually submit the form around it.
+- `qds-stack` — layout primitive driven purely by spacing tokens; proves non-color categories flow through the transform. `gap` is constrained to scale steps so an arbitrary value cannot be passed in.
+
+**JSDoc is load-bearing.** CEM extracts `@slot`, `@fires`, `@csspart`, `@cssprop`
+into `custom-elements.json`, which becomes the docs site's API tables.
+Undocumented here means undocumented downstream.
+
+**Tests**: `@web/test-runner` + `@open-wc/testing` on the Playwright launcher —
+real browsers. Not vitest/jsdom: shadow DOM, `adoptedStyleSheets`,
+`delegatesFocus`, `:focus-visible`, and computed styles from inherited custom
+properties are exactly what jsdom models poorly, and they are the substance of a
+component library.
+
+**Outcome**: 22 tests green in Chromium at 100% statement coverage.
+`custom-elements.json` reports 7 properties, 3 slots, 1 event, 2 CSS parts and 9
+CSS custom properties for `qds-button`.
+
+---
+
+## Phase 3 — `apps/docs` (Eleventy) — **done**
+
+`@11ty/eleventy@3.1.6`, ESM `eleventy.config.js`, private (never published).
+
+**`@lit-labs/eleventy-plugin-lit@1.0.6`** server-renders components at build time
+into declarative shadow DOM, then hydrates — components appear fully styled in the
+initial HTML, with no flash of unstyled custom element.
+
+**Everything generates from the packages** — the payoff of the monorepo:
+
+- **`src/_data/nomenclature.js`** — reads `@quieto/design-tokens/nomenclature`, rendering the categories/properties/roles/states tables. The naming reference page *is* the vocabulary the validator enforces, so the docs cannot describe rules the build does not apply.
+- **`src/_data/components.js`** — reads `packages/ui/custom-elements.json` for per-component property/slot/event/CSS-part tables. API docs cannot drift from the code. One paginated template renders them all, so adding a component produces a page with no work beyond an entry in `src/_data/examples.js`.
+- **`src/_data/tokens.js`** — reads `packages/design-tokens/dist/tokens.json` for the token reference: swatches, rendered ramps, resolved values in both modes, and **each token's full reference chain**. Use the `referenceNames` field for the chain (see Deviations below) rather than re-deriving it.
+
+**`{% example %}` paired shortcode** — renders markup live *and* shows highlighted
+source from one block, so demos cannot disagree with the code shown.
+
+**Site structure**: Getting Started / Nomenclature (the spec + generated vocabulary
+tables + anatomy SVGs) / Tokens (per tier) / Components (one page each) /
+Guidelines. Plus a theme toggle flipping `data-theme` on `<html>`, which doubles as
+a live check that dark-mode token output works.
+
+**Note for the anatomy SVGs**: inline them rather than using `<img>`. An `<img>`
+cannot see the page's `data-theme`, only the OS `prefers-color-scheme`, so a
+reader who toggles the site theme against their OS setting would get an
+unreadable diagram. The SVGs are already scoped to `.qds-anatomy` so their
+inlined `<style>` will not leak into the page.
+
+---
+
+## Phase 4 — CI and release — **done**
+
+**`.github/workflows/ci.yml`** — `pnpm install --frozen-lockfile`, then `validate`,
+`build`, `test`, and `node verify.mjs` against the built site. Turborepo's cache
+skips unchanged packages, and Playwright's browsers are cached on their version.
+Validation runs as its own step rather than only as a build dependency, so a
+nomenclature violation — from the repo *or* synced down from Figma — is reported as
+itself.
+
+Node 22, not 25: it matches the `engines` floor and avoids the `localStorage`
+global the Lit SSR shim trips over (see *Deviations*).
+
+A final step asserts the working tree is clean after building, which catches drift
+in generated files that are committed — the anatomy diagrams are built from
+`nomenclature.js`, so if they no longer match, the diagrams and the enforced
+vocabulary have diverged.
+
+**`.github/workflows/release.yml`** — `changesets/action` on `main`: opens a
+"Version Packages" PR, publishes `@quieto/design-tokens` + `@quieto/ui` on merge.
+Needs an `NPM_TOKEN` secret; `npm whoami` returned 401 locally, so the session
+needs `npm login` before any manual publish.
+
+**Docs deploy** — `apps/docs/_site` is a static build for
+Pages/Netlify/Cloudflare. Host is undecided; the plan only guarantees a static
+output directory.
+
+---
+
+## Deviations discovered during implementation
+
+Recorded because each one changed the design, and none was visible from the plan.
+
+### `rest` was added to the state vocabulary
+
+DTCG forbids a node from being both a token and a group, so
+`color.background.primary` cannot carry a `$value` *and* contain a `hover` child.
+A role with states therefore cannot also hold its resting value at the role node.
+`rest` gives the resting value an explicit state, making one rule cover every case:
+
+> A role node is either a token or a state group, never both.
+
+`validate.js` rejects nodes that violate it, because DTCG parsers silently *drop*
+the nested children rather than erroring — the states would simply vanish from the
+build.
+
+### `semantic/base.json` was added for mode-invariant semantics
+
+The plan had only `semantic/light.json` and `semantic/dark.json`. But typography,
+radius, border width, and animation duration do not change between modes, and the
+theme-completeness check would have forced them to be duplicated across both
+files — enforcing the duplication rather than preventing the drift. They now live
+in `semantic/base.json`, enabled in both themes.
+
+### The manifest resolves reference *names*, not just paths
+
+A reference is a bare token path: `{color.background.primary.rest}` gives no clue
+whether the target is a primitive (`--qds-color-…`) or a semantic
+(`--qds-semantic-color-…`) variable, since only the source file carries the tier.
+Every consumer would have had to reimplement that guess. `build.js` now resolves
+each reference to its actual variable name and emits `referenceNames` alongside
+`references`, so rendering a chain is a lookup. `build.js` fails if any reference
+cannot be resolved.
+
+`references` is also an array per mode rather than a single string, so composite
+tokens (a `shadow`'s five sub-fields) report all of theirs.
+
+### A raw value at the semantic tier is an error, not a warning
+
+Originally a warning, on the theory that composites might legitimately have no
+primitive to alias. The real token set produced zero such warnings — every
+semantic token does alias something, because `extractReferences` walks into
+composite sub-fields. With no legitimate exception to protect, it became an error:
+a semantic token holding a literal is exactly how one-off values bypass the
+palette.
+
+### Two vocabulary gaps are now documented rather than worked around
+
+- **No inverse/on-color role.** Nothing in the role vocabulary names "content on a filled surface" — white text on a primary button. Component tokens currently reach past the semantic tier straight to a primitive (`"{color.neutral.50}"`), which is legal but means a component hardcodes a palette step. Worth deciding before the library grows past a handful of filled surfaces.
+- **Shadow color has no alpha.** `elevation.*` composes shadow primitives with a solid neutral, because the palette has no translucent colors. Readable, but softer than a real alpha shadow.
+
+Both are recorded in the spec's *Known gaps* section.
+
+### The anatomy SVGs needed two non-obvious fixes
+
+Found by rendering them rather than by reading them:
+
+- An inlined SVG's `<style>` is **not** scoped to the SVG — it applies to the whole document. Every selector is now scoped to `.qds-anatomy` and the custom properties are set on the svg element, not `:root`.
+- The theme override must match `data-theme` on **any ancestor**, not `:root` specifically. Scoped to `:root[data-theme]`, a theme set on a wrapper element falls through to the `prefers-color-scheme` media query — and a reader on a dark-mode OS viewing a light section gets a dark palette on a light background, which renders the labels invisible.
+
+The generator also asserts that no left angle bracket appears in the stylesheet: an
+SVG is parsed as XML, so one inside a CSS comment makes the whole file
+unparseable. (This was caught by the check catching itself.)
+
+### `permutateThemes` keys off theme `name`, not `id`
+
+It returns `Light`/`Dark` (the plugin's display labels), not `light`/`dark`.
+`build.js` lowercases them back to the mode identifiers used by file names and
+selectors.
+
+### Four silent failures, all found by driving a browser
+
+These are the reason `apps/docs/verify.mjs` exists. Every one produced a page with
+no console error, no failed network request, and passing DOM queries — a green
+build proved nothing about any of them.
+
+- **Bare specifiers left every element un-upgraded.** The library publishes
+  unbundled ESM (`import { html } from 'lit'`), which is correct for a package
+  consumers bundle, but a browser cannot resolve a bare specifier. The docs site
+  now bundles the components. The confusing part is that the page still *looks*
+  right, because the server-rendered markup is there — it is simply inert.
+- **Every component rendered twice.** Lit needs
+  `@lit-labs/ssr-client/lit-element-hydrate-support.js` evaluated before anything
+  imports lit; without it, an element with server-rendered content in its shadow
+  root renders a second copy alongside rather than adopting it. `apps/docs/client.js`
+  exists solely to fix that import order. Only a screenshot revealed it: every DOM
+  assertion passed, because `querySelector` finds the first copy.
+- **The whole library was tree-shaken away.** `sideEffects` listed
+  `./dist/**/qds-*.js` but not `./dist/index.js`, so a side-effect-only
+  `import '@quieto/ui'` was dropped entirely. This was a real packaging bug
+  affecting any consumer, not just the docs site.
+- **Anatomy diagrams rendered as empty boxes.** markdown-it ends an HTML block at
+  the first blank line, so the inlined multi-line SVG got split and its `<text>`
+  elements landed outside the `<svg>`. Blank lines are now stripped on the way in.
+
+`bundle-components.js` now asserts on its own output — no bare imports, the
+elements present, the hydrate shim present — because each of those failures is
+silent at runtime.
+
+### Node 25 exposes a `localStorage` global that breaks Lit SSR
+
+Node 25 defines `localStorage`, and reading it throws unless `--localstorage-file`
+is given. `@lit-labs/ssr-dom-shim` copies globals when constructing its `Window`
+shim and trips over it, crashing the Eleventy SSR worker.
+`--no-experimental-webstorage` makes the global `undefined`, which the shim handles,
+and is cleaner than pointing at a scratch database file. CI pins Node 22, which
+does not have the global at all. Remove the flag once the shim guards the access.
+
+### One reported failure was a test artifact, not a bug
+
+Mid-implementation, dark mode appeared not to reach inside shadow DOM. It does. The
+check read the computed style in the same task as the theme toggle: a custom
+property change invalidates immediately, but the dependent `background-color` recalc
+inside a shadow tree is deferred a frame, so the read returned the previous paint's
+value. `verify.mjs` now waits two animation frames after a toggle. Recorded because
+the same mistake will look like a product bug next time.
+
+---
+
+## Verification
+
+```bash
+pnpm install
+pnpm build                      # validate → tokens → ui → docs, ordered by turbo
+```
+
+**Nomenclature enforcement** — the distinctive part, so it is tested
+adversarially. `packages/design-tokens/validate.test.js` mutates a throwaway copy
+of `tokens/` once per rule and asserts rejection *for the right reason*: unknown
+role, unknown hue, unknown component property, token-and-group node, reference in
+a primitive, raw value at the semantic tier, semantic reaching up to a component,
+dangling reference, mode-incomplete theme, unregistered set, and a set registered
+with no file.
+
+```bash
+pnpm --filter @quieto/design-tokens test      # 20 tests
+```
+
+**Naming grammar** — all three tiers must emit with their tier identifiers:
+
+```bash
+cd packages/design-tokens/dist/css
+grep -E -- '--qds-color-blue-400:' qds.css
+grep -E -- '--qds-semantic-color-background-default:' qds.css
+grep -E -- '--qds-component-button-primary-color-background-hover:' qds.css
+
+# mode-stripping: must be 0
+grep -cE '^\s*--qds-[a-z0-9-]*(light|dark)' qds.css
+```
+
+A missing `semantic`/`component` segment means the custom transform is not
+applied; any `--qds-semantic-light-*` means mode-stripping is broken.
+
+**Reference chain preserved** — a flattened hex means `outputReferences` is off:
+
+```bash
+grep -E -- '--qds-semantic-color-background-primary-rest:' qds.css
+# expect: var(--qds-color-blue-600)
+```
+
+**Components**:
+
+```bash
+pnpm --filter @quieto/ui test
+pnpm --filter @quieto/ui analyze
+# qds-button and qds-stack present in custom-elements.json,
+# with attributes/slots/cssProperties populated
+```
+
+**Docs** — automated, since these are the checks a build cannot make:
+
+```bash
+pnpm --filter docs verify       # builds, serves _site, drives Chromium: 17 checks
+pnpm --filter docs dev          # http://localhost:8080 to look at it
+```
+
+`apps/docs/verify.mjs` starts its own static server, so it needs nothing else
+running. It asserts:
+
+1. `qds-button` is upgraded and its shadow root was **adopted** from the SSR'd declarative shadow DOM
+2. Hydration does not duplicate — exactly one inner button per host
+3. The button's background resolves through the token chain rather than a hardcoded fallback
+4. The theme toggle cycles system → light → dark, and dark changes colours both on the page and inside shadow DOM
+5. API tables are populated from `custom-elements.json`
+6. `qds-click` fires normally and is suppressed while loading or disabled
+7. A loading button keeps its accessible name
+8. A shadow-DOM button submits the form around it
+9. The token page renders full-depth reference chains, with swatches
+10. All three anatomy diagrams are inlined, contain text, and follow the page theme
+11. No unrendered Obsidian wikilinks survive
+12. Console is clean on every page
+
+**Release dry run**:
+
+```bash
+pnpm changeset && pnpm changeset version    # interlinked bumps; docs untouched
+pnpm -r publish --dry-run
+```
+
+---
+
+## Sequencing
+
+Phase 1 → 2 → 3 is strictly ordered: docs consumes the components' manifest and
+the tokens' output. Within Phase 1, `nomenclature.js` → `transforms/name-qds.js` →
+`validate.js` came **before** any real tokens were authored, so the first token
+written was already checked against the spec. Phase 0 came first so every later
+phase inherits caching and build ordering. Phase 4 can land any time after Phase 1.
