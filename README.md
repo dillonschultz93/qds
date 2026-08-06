@@ -18,11 +18,14 @@ pnpm --filter docs dev    # http://localhost:8080
 ## How it fits together
 
 Tokens are authored as DTCG JSON in
-[`packages/design-tokens/tokens/`](packages/design-tokens/tokens), in **Token
-Studio's multi-file layout**. The Figma plugin syncs that folder directly from
-Git, bidirectionally — there is no export step, and designer edits arrive as pull
-requests. Style Dictionary's job is narrower than usual: it builds the CSS custom
-properties and a typed JS manifest.
+[`packages/design-tokens/tokens.json`](packages/design-tokens/tokens.json), in
+**Tokens Studio's single-file format** — each token set is a top-level key. The
+Figma plugin syncs that file directly from Git, bidirectionally, so there is no
+export step and designer edits arrive as pull requests. Style Dictionary's job is
+narrower than usual: it builds the CSS custom properties and a typed JS manifest.
+
+Single-file rather than the folder layout because multi-file sync requires a Tokens
+Studio Pro licence.
 
 Three tiers, each referencing only the one beneath it:
 
@@ -92,8 +95,12 @@ never versioned.
 
 ## Figma setup (one-time)
 
-In Token Studio: **Settings → Sync → GitHub**, repo `dillonschultz93/qds`, path
-`packages/design-tokens/tokens`, **Folder** mode, format **W3C DTCG**.
+In Tokens Studio: **Settings → Sync → GitHub**, repo `dillonschultz93/qds`, file
+path `packages/design-tokens/tokens.json`, **Single file** mode, format
+**W3C DTCG**.
+
+The GitHub token needs write access to push back: a classic PAT needs `repo`
+scope, a fine-grained one needs **Contents: Read and write**.
 
 ## License
 

@@ -1,7 +1,7 @@
 {
   "name": "@quieto/design-tokens",
   "version": "0.0.0",
-  "description": "QDS design tokens — three-tier DTCG source, Style Dictionary build, Token Studio sync.",
+  "description": "QDS design tokens \u2014 three-tier DTCG source, Style Dictionary build, Token Studio sync.",
   "type": "module",
   "license": "MIT",
   "author": "Dillon Schultz",
@@ -10,7 +10,13 @@
     "url": "git+https://github.com/dillonschultz93/qds.git",
     "directory": "packages/design-tokens"
   },
-  "keywords": ["design-tokens", "dtcg", "style-dictionary", "tokens-studio", "css-variables"],
+  "keywords": [
+    "design-tokens",
+    "dtcg",
+    "style-dictionary",
+    "tokens-studio",
+    "css-variables"
+  ],
   "exports": {
     ".": {
       "types": "./dist/js/tokens.d.ts",
@@ -20,10 +26,17 @@
     "./css/light": "./dist/css/qds.light.css",
     "./css/dark": "./dist/css/qds.dark.css",
     "./nomenclature": "./nomenclature.js",
-    "./tokens/*": "./tokens/*"
+    "./tokens.json": "./tokens.json"
   },
-  "files": ["dist", "tokens", "nomenclature.js", "docs"],
-  "sideEffects": ["./dist/css/*.css"],
+  "files": [
+    "dist",
+    "tokens.json",
+    "nomenclature.js",
+    "docs"
+  ],
+  "sideEffects": [
+    "./dist/css/*.css"
+  ],
   "engines": {
     "node": ">=22"
   },

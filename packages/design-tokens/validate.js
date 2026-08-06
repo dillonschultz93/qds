@@ -4,7 +4,7 @@
  *
  * Wired ahead of `build` in turbo.json, so a token that violates the grammar
  * fails the build instead of shipping. That matters most for tokens arriving
- * from Figma: Token Studio syncs this folder bidirectionally, so a designer
+ * from Figma: Tokens Studio syncs `tokens.json` bidirectionally, so a designer
  * inventing `color.background.brand` lands here as a pull request, and CI is
  * what tells them `brand` is not a registered role.
  *
@@ -14,13 +14,17 @@
  *   2. Reference direction — primitives raw, semantics → primitives,
  *                            components → semantics or primitives
  *   3. Theme completeness  — light and dark define the same keys
- *   4. Set registration    — every file on disk appears in $metadata.json
+ *   4. Set registration    — sets and $metadata.tokenSetOrder agree
  *
- * Run: `node validate.js` (or `pnpm validate`). Exits 1 on any error.
+ * Sets are validated INDIVIDUALLY, before any merge. The build merges them so
+ * cross-set references resolve, but a merge also lets a later set silently mask an
+ * invalid token in an earlier one, so the grammar is checked on the source as
+ * written.
+ *
+ * Run: `node validate.js [tokens.json]` (or `pnpm validate`). Exits 1 on any error.
  */
 
-import { readFile, readdir } from 'node:fs/promises';
-import { join, relative, dirname, resolve } from 'node:path';
+import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import {
@@ -33,15 +37,16 @@ import {
   isKebabCase,
 } from './nomenclature.js';
 import { extractReferences } from './lib/references.js';
+import { loadTokensFile } from './lib/source.js';
 
 const PACKAGE_DIR = dirname(fileURLToPath(import.meta.url));
 
 /**
- * Defaults to this package's `tokens/`. Overridable by argument so the rules can
- * be exercised against throwaway copies — a validator nobody has watched fail is
- * only assumed to work.
+ * Defaults to this package's `tokens.json`. Overridable by argument so the rules
+ * can be exercised against throwaway copies — a validator nobody has watched fail
+ * is only assumed to work.
  */
-const TOKENS_DIR = process.argv[2] ? resolve(process.argv[2]) : join(PACKAGE_DIR, 'tokens');
+const TOKENS_FILE = process.argv[2] ? resolve(process.argv[2]) : join(PACKAGE_DIR, 'tokens.json');
 
 /** @typedef {{ setName: string, tier: string, mode: string|null, path: string[], key: string, value: unknown, type: string|undefined }} Token */
 
@@ -63,23 +68,6 @@ const oneOf = (list) => {
 // ---------------------------------------------------------------------------
 // Loading
 // ---------------------------------------------------------------------------
-
-/** Recursively collect `*.json` set files under tokens/, excluding `$*.json`. */
-async function findSetFiles(dir) {
-  const entries = await readdir(dir, { withFileTypes: true });
-  const files = [];
-
-  for (const entry of entries) {
-    const full = join(dir, entry.name);
-    if (entry.isDirectory()) {
-      files.push(...(await findSetFiles(full)));
-    } else if (entry.name.endsWith('.json') && !entry.name.startsWith('$')) {
-      files.push(full);
-    }
-  }
-
-  return files;
-}
 
 /**
  * Flatten a DTCG token tree into leaf tokens. A node is a token when it carries
@@ -391,31 +379,27 @@ function validateReferences(token, tierByPath) {
 // ---------------------------------------------------------------------------
 
 async function main() {
-  const metadata = JSON.parse(await readFile(join(TOKENS_DIR, '$metadata.json'), 'utf8'));
-  const setOrder = metadata.tokenSetOrder ?? [];
+  const { sets, setOrder } = await loadTokensFile(TOKENS_FILE);
+  const setNames = Object.keys(sets);
 
-  const files = await findSetFiles(TOKENS_DIR);
-
-  // A set on disk but absent from tokenSetOrder loads in neither Token Studio
-  // nor the build — it silently does nothing, which is worse than an error.
-  const onDisk = files.map((file) =>
-    relative(TOKENS_DIR, file).replace(/\.json$/, ''),
-  );
-  for (const setName of onDisk) {
+  // A set present in the file but absent from tokenSetOrder loads in neither
+  // Tokens Studio nor the build — it silently does nothing, which is worse than an
+  // error. The reverse is equally quiet, so both directions are checked.
+  for (const setName of setNames) {
     if (!setOrder.includes(setName)) {
       errors.push({
         setName,
         token: '—',
-        message: 'set exists on disk but is missing from $metadata.json tokenSetOrder',
+        message: 'set exists in tokens.json but is missing from $metadata.tokenSetOrder',
       });
     }
   }
   for (const setName of setOrder) {
-    if (!onDisk.includes(setName)) {
+    if (!setNames.includes(setName)) {
       errors.push({
         setName,
         token: '—',
-        message: 'set listed in $metadata.json tokenSetOrder but no such file exists',
+        message: 'set listed in $metadata.tokenSetOrder but not present in tokens.json',
       });
     }
   }
@@ -423,23 +407,24 @@ async function main() {
   /** @type {Token[]} */
   const tokens = [];
 
-  for (const file of files) {
-    const setName = relative(TOKENS_DIR, file).replace(/\.json$/, '');
+  for (const setName of setNames) {
     const [tierSegment, ...restOfSet] = setName.split('/');
 
     if (!TIERS.includes(tierSegment)) {
       errors.push({
         setName,
         token: '—',
-        message: `set is not under a tier directory. Expected tokens/{${TIERS.join('|')}}/…`,
+        message:
+          `set name must start with a tier. Expected {${TIERS.join('|')}}/… ` +
+          '— the tier is read from the set name, since a single source file gives ' +
+          'every token the same path.',
       });
       continue;
     }
 
     const mode = restOfSet.find((segment) => MODES.includes(segment)) ?? null;
-    const tree = JSON.parse(await readFile(file, 'utf8'));
 
-    for (const leaf of flatten(tree, [], [], setName)) {
+    for (const leaf of flatten(sets[setName], [], [], setName)) {
       tokens.push({ ...leaf, setName, tier: tierSegment, mode, key: leaf.path.join('.') });
     }
   }
@@ -516,7 +501,7 @@ async function main() {
   }
 
   console.log(
-    `✓ ${tokens.length} tokens across ${files.length} sets conform to the QDS nomenclature.`,
+    `✓ ${tokens.length} tokens across ${setNames.length} sets conform to the QDS nomenclature.`,
   );
 }
 

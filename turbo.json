@@ -3,7 +3,7 @@
   "ui": "tui",
   "tasks": {
     "validate": {
-      "inputs": ["tokens/**", "nomenclature.js", "validate.js"]
+      "inputs": ["tokens.json", "nomenclature.js", "validate.js", "lib/**"]
     },
     "build": {
       "dependsOn": ["^build", "validate"],

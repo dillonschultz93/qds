@@ -38,10 +38,9 @@ export const TIER_IDENTIFIERS = {
 };
 
 /**
- * Theme modes. These name the *files* at the semantic tier
- * (`tokens/semantic/light.json`) but never appear in a token name — the mode is
- * expressed by the CSS selector the token is emitted under. See
- * `transforms/name-qds.js`.
+ * Theme modes. These name token *sets* at the semantic tier (`semantic/light`) but
+ * never appear in a token name — the mode is expressed by the CSS selector the
+ * token is emitted under. See `transforms/name-qds.js`.
  */
 export const MODES = ['light', 'dark'];
 
@@ -129,7 +128,7 @@ export const primitive = {
  *
  * Grammar: {prefix}-semantic-{category}-{property}-{role}-{state?}
  * Example: --qds-semantic-color-background-default-hover
- *          (from color.background.default.hover in semantic/light.json)
+ *          (from color.background.default.hover in the semantic/light set)
  */
 export const semantic = {
   /**

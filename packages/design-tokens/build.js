@@ -1,13 +1,18 @@
 #!/usr/bin/env node
 /**
- * Builds the QDS token outputs from the Token Studio source in `tokens/`.
+ * Builds the QDS token outputs from `tokens.json`.
  *
  * ## What this does and does not produce
  *
- * It does NOT emit anything for Figma. `tokens/` is already in Token Studio's
- * multi-file layout, so the plugin syncs that folder straight from Git —
- * bidirectionally. There is no emitter to keep in step with the plugin's format,
- * and designer edits flow back into the repo as pull requests.
+ * It does NOT emit anything for Figma. `tokens.json` is already in Tokens Studio's
+ * single-file format, so the plugin syncs it straight from Git — bidirectionally.
+ * There is no emitter to keep in step with the plugin's format, and designer edits
+ * flow back into the repo as pull requests.
+ *
+ * Single-file rather than the folder layout because multi-file sync requires a
+ * Tokens Studio Pro licence. The cost lands in `lib/source.js`: the sets must be
+ * merged before Style Dictionary sees them, and merging is what erases each
+ * token's tier, so provenance is stamped on during the merge.
  *
  * So Style Dictionary's job here is narrow: turn the DTCG source into CSS custom
  * properties and a JS/JSON manifest.
@@ -41,13 +46,14 @@ import StyleDictionary from 'style-dictionary';
 import { formattedVariables } from 'style-dictionary/utils';
 import { register, permutateThemes } from '@tokens-studio/sd-transforms';
 
-import { nameQds } from './transforms/name-qds.js';
+import { nameQds, setNameOf } from './transforms/name-qds.js';
 import * as nomenclature from './nomenclature.js';
 import { MODES, TIERS } from './nomenclature.js';
 import { extractReferences } from './lib/references.js';
+import { loadTokensFile, mergeSets } from './lib/source.js';
 
 const PACKAGE_DIR = dirname(fileURLToPath(import.meta.url));
-const TOKENS_DIR = join(PACKAGE_DIR, 'tokens');
+const TOKENS_FILE = join(PACKAGE_DIR, 'tokens.json');
 const DIST_DIR = join(PACKAGE_DIR, 'dist');
 
 // Registers the Tokens Studio transforms, preprocessor, and the `tokens-studio`
@@ -82,7 +88,7 @@ StyleDictionary.registerFormat({
   format: ({ dictionary }) =>
     JSON.stringify(
       dictionary.allTokens.map((token) => {
-        const segments = (token.filePath ?? '').split('/');
+        const set = setNameOf(token);
 
         return {
           name: token.name,
@@ -93,8 +99,8 @@ StyleDictionary.registerFormat({
           // survive into the manifest. Walks composites, whose references live in
           // sub-fields rather than a top-level string.
           references: extractReferences(token.original?.$value ?? token.original?.value),
-          tier: TIERS.find((tier) => segments.includes(tier)) ?? null,
-          set: segments.slice(segments.indexOf('tokens') + 1).join('/').replace(/\.json$/, ''),
+          tier: TIERS.find((tier) => set?.startsWith(tier)) ?? null,
+          set: set ?? null,
           description: token.$description ?? token.description ?? null,
         };
       }),
@@ -104,19 +110,23 @@ StyleDictionary.registerFormat({
 });
 
 /** True for tokens belonging to a mode-specific semantic set. */
-const isModeToken = (token, mode) =>
-  (token.filePath ?? '').includes(`/semantic/${mode}.json`);
+const isModeToken = (token, mode) => setNameOf(token) === `semantic/${mode}`;
 
 /**
  * One Style Dictionary build per theme permutation.
  *
- * @param {string} theme  Theme name from permutateThemes, e.g. `light`.
- * @param {string[]} sets Token set names, source sets included — dropping them
- *                        would leave every semantic alias unresolvable.
+ * Tokens are passed in memory rather than by file path. With a single source file
+ * the sets have to be merged before Style Dictionary sees them — cross-set
+ * references like `{color.blue.600}` cannot resolve until every set shares one
+ * namespace — so the merge happens in `mergeSets`, which also stamps each token
+ * with the set it came from so the tier survives.
+ *
+ * @param {string} theme  Mode name, e.g. `light`.
+ * @param {object} tokens Merged token tree for this theme.
  */
-function configFor(theme, sets) {
+function configFor(theme, tokens) {
   return {
-    source: sets.map((set) => join(TOKENS_DIR, `${set}.json`)),
+    tokens,
     preprocessors: ['tokens-studio'],
     // Composite typography becomes one CSS `font` shorthand unless expanded, and
     // a shorthand cannot be overridden a property at a time. Shadows are left
@@ -156,22 +166,21 @@ const BANNER = `/**
  * Quieto Design System — design tokens
  * GENERATED FILE. Do not edit.
  *
- * Source: packages/design-tokens/tokens/ (DTCG, Token Studio multi-file layout)
+ * Source: packages/design-tokens/tokens.json (DTCG, Tokens Studio single-file)
  * Regenerate: pnpm --filter @quieto/design-tokens build
  */
 `;
 
 async function main() {
-  const themeDefinitions = JSON.parse(await readFile(join(TOKENS_DIR, '$themes.json'), 'utf8'));
+  const { sets, themes: themeDefinitions, setOrder } = await loadTokensFile(TOKENS_FILE);
 
   // permutateThemes keys off each theme's `name` ("Light"), which is the
   // human-readable label shown in the plugin. Lowercase it to get back to the
   // mode identifiers used by file names, selectors, and the CSS output.
   const themes = Object.fromEntries(
-    Object.entries(permutateThemes(themeDefinitions, { separator: '-' })).map(([name, sets]) => [
-      name.toLowerCase(),
-      sets,
-    ]),
+    Object.entries(permutateThemes(themeDefinitions, { separator: '-' })).map(
+      ([name, setNames]) => [name.toLowerCase(), setNames],
+    ),
   );
   const themeNames = Object.keys(themes);
 
@@ -191,8 +200,11 @@ async function main() {
   await mkdir(join(DIST_DIR, 'css'), { recursive: true });
   await mkdir(join(DIST_DIR, 'js'), { recursive: true });
 
-  for (const [theme, sets] of Object.entries(themes)) {
-    const sd = new StyleDictionary(configFor(theme, sets));
+  for (const [theme, themeSets] of Object.entries(themes)) {
+    // Follow $metadata.tokenSetOrder rather than the theme's own key order, so the
+    // build resolves overrides exactly as the plugin does.
+    const ordered = setOrder.filter((set) => themeSets.includes(set));
+    const sd = new StyleDictionary(configFor(theme, mergeSets(ordered, sets)));
     await sd.buildAllPlatforms();
   }
 

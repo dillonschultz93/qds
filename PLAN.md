@@ -9,8 +9,8 @@ naming system is [`packages/design-tokens/docs/nomenclature.md`](packages/design
 | Phase | Scope | Status |
 | --- | --- | --- |
 | 0 | Monorepo scaffolding — pnpm workspaces, Turborepo, tsconfig, Changesets | **Done** |
-| 1a | `nomenclature.js`, `transforms/name-qds.js`, `validate.js` | **Done** — 20 tests passing |
-| 1b | Token source + Style Dictionary build | **Done** — 267 source tokens, 261 built, 56 mode-varying |
+| 1a | `nomenclature.js`, `transforms/name-qds.js`, `validate.js` | **Done** — 23 tests passing |
+| 1b | Token source + Style Dictionary build | **Done** — 265 source tokens, 259 built, 56 mode-varying |
 | 1c | Spec migration, prefix correction, generated anatomy diagrams | **Done** |
 | 2 | `@quieto/ui` — Lit components | **Done** — 22 browser tests, 100% coverage |
 | 3 | `apps/docs` — Eleventy site | **Done** — 6 pages, 17 browser checks |
@@ -53,19 +53,19 @@ Toolchain: Node v25.2.0, pnpm 11.5.3, npm 11.19.0.
 | Release | npm via Changesets |
 | Scope | `@quieto/*` — `@quieto/design-tokens`, `@quieto/ui`, private `docs` |
 | Token package | Self-contained Style Dictionary build (no dependency on the published `@quieto/tokens` CLI) |
-| Figma direction | Token Studio multi-file layout **is** the source; the plugin syncs the folder from Git bidirectionally |
+| Figma direction | Tokens Studio **single-file** format is the source; the plugin syncs `tokens.json` from Git bidirectionally (folder mode needs Pro — see *Deviations*) |
 | Global prefix | `--qds-` for CSS vars, `qds-` for element names |
 | Category vocabularies | Per-tier as written in the spec; primitive and semantic lists stay intentionally different |
 
 ### Two notes worth flagging
 
 **The Figma direction inverts the original framing.** The original ask was for
-Style Dictionary to *output* tokens for Figma/Token Studio. Instead
-`packages/design-tokens/tokens/` is authored **in Token Studio's own multi-file
-layout**, so the plugin reads it straight from Git — no emitter to write or
+Style Dictionary to *output* tokens for Figma/Tokens Studio. Instead
+`packages/design-tokens/tokens.json` is authored **in Tokens Studio's own single-file
+format**, so the plugin reads it straight from Git — no emitter to write or
 maintain, and edits round-trip from Figma back into the repo. Style Dictionary's
 job narrows to building the CSS and a JS export. Less code, officially supported
-path; the cost is that the source folder follows Token Studio's conventions.
+path; the cost is that the source file follows Tokens Studio's conventions.
 
 **`@quieto/tokens` v0.4.1** (the already-published style-dictionary CLI) is
 deliberately **not** a dependency here — recorded so the name collision behind
@@ -88,14 +88,10 @@ qds/
 │   │   ├── docs/
 │   │   │   ├── nomenclature.md       # the spec
 │   │   │   └── anatomy/{generate.js,*.svg}
+│   │   ├── tokens.json               # SOURCE OF TRUTH (Tokens Studio single-file)
 │   │   ├── nomenclature.js           # machine-readable vocabularies
+│   │   ├── lib/source.js             # loads + merges sets, stamps provenance
 │   │   ├── lib/references.js         # shared DTCG reference extraction
-│   │   ├── tokens/                   # SOURCE OF TRUTH (Token Studio layout)
-│   │   │   ├── $metadata.json
-│   │   │   ├── $themes.json
-│   │   │   ├── primitive/{color,typography,spacing,border,shadow,animation}.json
-│   │   │   ├── semantic/{base,light,dark}.json
-│   │   │   └── component/button.json
 │   │   ├── transforms/name-qds.js    # the naming grammar, as code
 │   │   ├── validate.js               # grammar + reference-direction linter
 │   │   ├── build.js
@@ -136,7 +132,7 @@ scripts delegating to turbo (`build`, `dev`, `test`, `lint`, `validate`,
 ```json
 {
   "tasks": {
-    "validate": { "inputs": ["tokens/**", "nomenclature.js", "validate.js"] },
+    "validate": { "inputs": ["tokens.json", "nomenclature.js", "validate.js", "lib/**"] },
     "build":    {
       "dependsOn": ["^build", "validate"],
       "outputs": ["dist/**", "_site/**", "custom-elements.json",
@@ -244,12 +240,15 @@ This matters most for tokens arriving *from* Figma: Token Studio syncs `tokens/`
 bidirectionally, so a role invented in the plugin lands here as a pull request,
 and CI reports that it is not in the vocabulary.
 
-### 1d. Source layout (Token Studio multi-file)
+### 1d. Source layout (Tokens Studio single-file)
 
-`$metadata.json` carries `tokenSetOrder`; `$themes.json` defines Light and Dark as
-one `mode` group so `permutateThemes` yields exactly two builds. `"source"` sets
-resolve references without being exported as Figma variables; `"enabled"` sets are
-exported.
+Each set is a top-level key in `tokens.json`. `$metadata.tokenSetOrder` carries the
+resolution order; `$themes` defines Light and Dark as one `mode` group so
+`permutateThemes` yields exactly two builds. `"source"` sets resolve references
+without being exported as Figma variables; `"enabled"` sets are exported.
+
+This started as the multi-file folder layout and changed once multi-file sync turned
+out to require a Pro licence — see *Deviations*.
 
 Because light/dark differ *only* at the semantic tier, adding a mode never touches
 primitives or components.
@@ -288,9 +287,12 @@ always beats the OS setting.
 
 ### 1g. Figma wiring (manual, one-time)
 
-Token Studio → Settings → Sync → GitHub, repo `dillonschultz93/qds`, path
-`packages/design-tokens/tokens`, **Folder** mode, format **W3C DTCG**.
+Tokens Studio → Settings → Sync → GitHub, repo `dillonschultz93/qds`, file path
+`packages/design-tokens/tokens.json`, **Single file** mode, format **W3C DTCG**.
 Bidirectional from then on.
+
+The GitHub token needs write access to push: a classic PAT needs `repo` scope, a
+fine-grained one needs **Contents: Read and write**.
 
 ---
 
@@ -504,6 +506,49 @@ shim and trips over it, crashing the Eleventy SSR worker.
 and is cleaner than pointing at a scratch database file. CI pins Node 22, which
 does not have the global at all. Remove the flag once the shim guards the access.
 
+### Multi-file sync needs a Tokens Studio Pro licence, so the source is one file
+
+The largest deviation, and it invalidated a decision made during planning.
+
+Folder mode was chosen because it lets the plugin sync the token directory straight
+from Git, which removes the need for an emitter. What was not checked was the
+price: the docs state plainly that *"the Multi-file sync to remote storage feature
+requires a Pro Licence for Tokens Studio."* The file layout and the DTCG format
+were both verified; the licensing was not. The result was a repo the plugin could
+read but not write.
+
+The source is now a single `tokens.json` in Tokens Studio's single-file format,
+where each set is a top-level key alongside `$themes` and `$metadata`.
+
+**This changed how a token's tier is found**, which is the mechanism the whole
+naming grammar rests on. Previously the tier came from the file path
+(`tokens/semantic/light.json` → `semantic`). With one file that is impossible: every
+token shares one path. Nor can the tier come from the token path, which never
+carried it. And the set layer cannot simply be kept, because cross-set references
+are written without a set prefix (`{color.blue.600}`) and only resolve once every
+set shares one namespace — so the sets must be merged, and merging is precisely what
+erases the set.
+
+`lib/source.js` resolves this by stamping each token with its set during the merge,
+under `$extensions['com.quieto.qds']`. `transforms/name-qds.js` reads the tier from
+that stamp and throws if it is absent, rather than emitting a plausible-looking
+variable name with the tier silently missing.
+
+Consequences worth knowing:
+
+- The build passes tokens to Style Dictionary **in memory** rather than by file path, since the merge has to happen first.
+- `validate.js` checks each set **individually, before the merge.** A merge lets a later set silently mask an invalid token in an earlier one, so the grammar is enforced against the source as written.
+- Merge order follows `$metadata.tokenSetOrder`, which is the plugin's own resolution order, so the build and Figma agree on which definition of a token is live.
+- The CSS output is unchanged — same names, same reference chains, same 56 mode-varying tokens.
+
+Also fixed in passing: two tokens carried `$type: "other"`, which is a Tokens
+Studio legacy type and not valid W3C DTCG. Nothing referenced them, so they were
+removed. All remaining types are DTCG-standard.
+
+**Unverified**: that single-file sync is available without a paid plan. The docs
+confirm multi-file requires Pro; the pricing page does not clearly describe a free
+tier. Worth confirming in the plugin before relying on it.
+
 ### One reported failure was a test artifact, not a bug
 
 Mid-implementation, dark mode appeared not to reach inside shadow DOM. It does. The
@@ -531,7 +576,7 @@ dangling reference, mode-incomplete theme, unregistered set, and a set registere
 with no file.
 
 ```bash
-pnpm --filter @quieto/design-tokens test      # 20 tests
+pnpm --filter @quieto/design-tokens test      # 23 tests
 ```
 
 **Naming grammar** — all three tiers must emit with their tier identifiers:

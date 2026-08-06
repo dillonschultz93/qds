@@ -1,24 +1,29 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { buildTokenName, tierFromFilePath, nameQds } from './name-qds.js';
+import { buildTokenName, tierFromSetName, setNameOf, nameQds, EXTENSION_KEY } from './name-qds.js';
 
-test('tier is read from the file path, not the token path', () => {
-  assert.equal(tierFromFilePath('tokens/primitive/color.json'), 'primitive');
-  assert.equal(tierFromFilePath('tokens/semantic/light.json'), 'semantic');
-  assert.equal(tierFromFilePath('tokens/component/button.json'), 'component');
-
-  // Absolute paths must work too — Style Dictionary resolves `source` globs to
-  // absolute paths depending on how the build is invoked.
-  assert.equal(
-    tierFromFilePath('/Users/x/qds/packages/design-tokens/tokens/semantic/dark.json'),
-    'semantic',
-  );
+/** A token as it reaches the transform: stamped with its set by build.js. */
+const token = (setName, path) => ({
+  path,
+  $extensions: { [EXTENSION_KEY]: { set: setName } },
 });
 
-test('a file outside a tier directory fails loudly', () => {
-  assert.throws(() => tierFromFilePath('tokens/misc/extra.json'), /cannot determine tier/);
-  assert.throws(() => tierFromFilePath(undefined), /no filePath/);
+test('tier is read from the set name', () => {
+  assert.equal(tierFromSetName('primitive/color'), 'primitive');
+  assert.equal(tierFromSetName('semantic/light'), 'semantic');
+  assert.equal(tierFromSetName('semantic/base'), 'semantic');
+  assert.equal(tierFromSetName('component/button'), 'component');
+});
+
+test('a set name that does not start with a tier fails loudly', () => {
+  assert.throws(() => tierFromSetName('misc/extra'), /cannot determine tier/);
+  assert.throws(() => tierFromSetName(undefined), /no set name/);
+});
+
+test('the set stamp is read from $extensions', () => {
+  assert.equal(setNameOf(token('semantic/dark', ['a'])), 'semantic/dark');
+  assert.equal(setNameOf({ path: ['a'] }), undefined);
 });
 
 test('the three tiers produce the names in docs/nomenclature.md', () => {
@@ -56,8 +61,8 @@ test('primitives carry no tier identifier', () => {
 test('the mode never reaches the token name', () => {
   const path = ['color', 'background', 'primary', 'rest'];
 
-  const light = nameQds.transform({ filePath: 'tokens/semantic/light.json', path }, {});
-  const dark = nameQds.transform({ filePath: 'tokens/semantic/dark.json', path }, {});
+  const light = nameQds.transform(token('semantic/light', path), {});
+  const dark = nameQds.transform(token('semantic/dark', path), {});
 
   assert.equal(light, dark, 'light and dark must produce identical variable names');
   assert.equal(light, 'qds-semantic-color-background-primary-rest');
@@ -65,15 +70,26 @@ test('the mode never reaches the token name', () => {
   assert.ok(!dark.includes('dark'));
 });
 
-test('the set name is discarded, so it cannot duplicate the token path', () => {
+test('only the tier segment of the set name is used', () => {
+  // `semantic/base` and `semantic/light` differ after the tier, and that
+  // difference must not reach the name either.
+  const path = ['radius', 'default'];
+  assert.equal(
+    nameQds.transform(token('semantic/base', path), {}),
+    nameQds.transform(token('semantic/light', path), {}),
+  );
+  assert.equal(nameQds.transform(token('semantic/base', path), {}), 'qds-semantic-radius-default');
+});
+
+test('the set name never duplicates the token path', () => {
   // Set `primitive/color` and path `color.blue.400` both start with "color".
   assert.equal(
-    nameQds.transform({ filePath: 'tokens/primitive/color.json', path: ['color', 'blue', '400'] }, {}),
+    nameQds.transform(token('primitive/color', ['color', 'blue', '400']), {}),
     'qds-color-blue-400',
   );
   // Set `component/button` and path `button.md.gap` both start with "button".
   assert.equal(
-    nameQds.transform({ filePath: 'tokens/component/button.json', path: ['button', 'md', 'gap'] }, {}),
+    nameQds.transform(token('component/button', ['button', 'md', 'gap']), {}),
     'qds-component-button-md-gap',
   );
 });
@@ -91,7 +107,13 @@ test('segments are normalized to kebab-case', () => {
 
 test('a platform-supplied prefix wins over the default', () => {
   assert.equal(
-    nameQds.transform({ filePath: 'tokens/primitive/color.json', path: ['color', 'red', '500'] }, { prefix: 'acme' }),
+    nameQds.transform(token('primitive/color', ['color', 'red', '500']), { prefix: 'acme' }),
     'acme-color-red-500',
   );
+});
+
+test('an unstamped token fails rather than emitting a name without its tier', () => {
+  // Silently omitting the tier would produce a plausible-looking but wrong
+  // variable, so this must throw.
+  assert.throws(() => nameQds.transform({ path: ['color', 'background', 'default'] }, {}), /no set name/);
 });
