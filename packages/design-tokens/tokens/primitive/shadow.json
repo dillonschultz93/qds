@@ -1,0 +1,23 @@
+{
+  "shadow": {
+    "x": {
+      "0": { "$value": "0rem", "$type": "dimension" }
+    },
+    "y": {
+      "100": { "$value": "0.0625rem", "$type": "dimension" },
+      "200": { "$value": "0.125rem", "$type": "dimension" },
+      "300": { "$value": "0.25rem", "$type": "dimension" },
+      "400": { "$value": "0.625rem", "$type": "dimension" }
+    },
+    "blur": {
+      "100": { "$value": "0.125rem", "$type": "dimension" },
+      "200": { "$value": "0.25rem", "$type": "dimension" },
+      "300": { "$value": "0.5rem", "$type": "dimension" },
+      "400": { "$value": "0.9375rem", "$type": "dimension" }
+    },
+    "spread": {
+      "0": { "$value": "0rem", "$type": "dimension" },
+      "100": { "$value": "-0.0625rem", "$type": "dimension" }
+    }
+  }
+}

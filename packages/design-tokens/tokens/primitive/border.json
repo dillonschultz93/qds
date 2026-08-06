@@ -1,0 +1,17 @@
+{
+  "border": {
+    "radius": {
+      "none": { "$value": "0rem", "$type": "dimension" },
+      "sm": { "$value": "0.125rem", "$type": "dimension" },
+      "md": { "$value": "0.375rem", "$type": "dimension" },
+      "lg": { "$value": "0.5rem", "$type": "dimension" },
+      "xl": { "$value": "0.75rem", "$type": "dimension" },
+      "full": { "$value": "624.9375rem", "$type": "dimension" }
+    },
+    "width": {
+      "none": { "$value": "0rem", "$type": "dimension" },
+      "thin": { "$value": "0.0625rem", "$type": "dimension" },
+      "thick": { "$value": "0.125rem", "$type": "dimension" }
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "tokenSetOrder": [
+    "primitive/color",
+    "primitive/typography",
+    "primitive/spacing",
+    "primitive/border",
+    "primitive/shadow",
+    "primitive/animation",
+    "semantic/base",
+    "semantic/light",
+    "semantic/dark",
+    "component/button"
+  ]
+}

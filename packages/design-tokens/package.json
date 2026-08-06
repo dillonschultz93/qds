@@ -1,0 +1,42 @@
+{
+  "name": "@quieto/design-tokens",
+  "version": "0.0.0",
+  "description": "QDS design tokens — three-tier DTCG source, Style Dictionary build, Token Studio sync.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Dillon Schultz",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dillonschultz93/qds.git",
+    "directory": "packages/design-tokens"
+  },
+  "keywords": ["design-tokens", "dtcg", "style-dictionary", "tokens-studio", "css-variables"],
+  "exports": {
+    ".": {
+      "types": "./dist/js/tokens.d.ts",
+      "import": "./dist/js/tokens.js"
+    },
+    "./css": "./dist/css/qds.css",
+    "./css/light": "./dist/css/qds.light.css",
+    "./css/dark": "./dist/css/qds.dark.css",
+    "./nomenclature": "./nomenclature.js",
+    "./tokens/*": "./tokens/*"
+  },
+  "files": ["dist", "tokens", "nomenclature.js", "docs"],
+  "sideEffects": ["./dist/css/*.css"],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "validate": "node validate.js",
+    "docs:anatomy": "node docs/anatomy/generate.js",
+    "build": "node docs/anatomy/generate.js && node build.js",
+    "dev": "node build.js --watch",
+    "test": "node --test",
+    "clean": "rm -rf dist .turbo"
+  },
+  "dependencies": {
+    "@tokens-studio/sd-transforms": "^2.0.3",
+    "style-dictionary": "^5.5.0"
+  }
+}

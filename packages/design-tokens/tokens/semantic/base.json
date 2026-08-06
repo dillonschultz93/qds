@@ -1,0 +1,127 @@
+{
+  "typography": {
+    "display": {
+      "$type": "typography",
+      "$description": "Largest type. Marketing headers and hero sections only.",
+      "$value": {
+        "fontFamily": "{typography.font-family.sans}",
+        "fontSize": "{typography.font-size.900}",
+        "fontWeight": "{typography.font-weight.bold}",
+        "lineHeight": "{typography.line-height.tight}",
+        "letterSpacing": "{typography.letter-spacing.tight}"
+      }
+    },
+    "headline": {
+      "$type": "typography",
+      "$description": "Page-level heading. One per view.",
+      "$value": {
+        "fontFamily": "{typography.font-family.sans}",
+        "fontSize": "{typography.font-size.700}",
+        "fontWeight": "{typography.font-weight.semibold}",
+        "lineHeight": "{typography.line-height.tight}",
+        "letterSpacing": "{typography.letter-spacing.tight}"
+      }
+    },
+    "title": {
+      "$type": "typography",
+      "$description": "Section and card headings.",
+      "$value": {
+        "fontFamily": "{typography.font-family.sans}",
+        "fontSize": "{typography.font-size.500}",
+        "fontWeight": "{typography.font-weight.semibold}",
+        "lineHeight": "{typography.line-height.snug}",
+        "letterSpacing": "{typography.letter-spacing.normal}"
+      }
+    },
+    "body": {
+      "$type": "typography",
+      "$description": "Default running text.",
+      "$value": {
+        "fontFamily": "{typography.font-family.sans}",
+        "fontSize": "{typography.font-size.300}",
+        "fontWeight": "{typography.font-weight.regular}",
+        "lineHeight": "{typography.line-height.normal}",
+        "letterSpacing": "{typography.letter-spacing.normal}"
+      }
+    },
+    "label": {
+      "$type": "typography",
+      "$description": "Form labels and button text.",
+      "$value": {
+        "fontFamily": "{typography.font-family.sans}",
+        "fontSize": "{typography.font-size.200}",
+        "fontWeight": "{typography.font-weight.medium}",
+        "lineHeight": "{typography.line-height.snug}",
+        "letterSpacing": "{typography.letter-spacing.normal}"
+      }
+    },
+    "meta": {
+      "$type": "typography",
+      "$description": "Secondary information: timestamps, captions, helper text.",
+      "$value": {
+        "fontFamily": "{typography.font-family.sans}",
+        "fontSize": "{typography.font-size.100}",
+        "fontWeight": "{typography.font-weight.regular}",
+        "lineHeight": "{typography.line-height.normal}",
+        "letterSpacing": "{typography.letter-spacing.wide}"
+      }
+    },
+    "data": {
+      "$type": "typography",
+      "$description": "Tabular figures, code, and identifiers.",
+      "$value": {
+        "fontFamily": "{typography.font-family.mono}",
+        "fontSize": "{typography.font-size.200}",
+        "fontWeight": "{typography.font-weight.regular}",
+        "lineHeight": "{typography.line-height.normal}",
+        "letterSpacing": "{typography.letter-spacing.normal}"
+      }
+    }
+  },
+  "radius": {
+    "subtle": {
+      "$value": "{border.radius.sm}",
+      "$type": "dimension",
+      "$description": "Minimal rounding: inputs, tags, nested surfaces."
+    },
+    "default": {
+      "$value": "{border.radius.md}",
+      "$type": "dimension",
+      "$description": "Standard rounding for interactive controls."
+    },
+    "primary": {
+      "$value": "{border.radius.lg}",
+      "$type": "dimension",
+      "$description": "Prominent surfaces: cards, dialogs, popovers."
+    }
+  },
+  "border": {
+    "subtle": {
+      "$value": "{border.width.none}",
+      "$type": "dimension",
+      "$description": "No visible border; the surface is separated by color alone."
+    },
+    "default": {
+      "$value": "{border.width.thin}",
+      "$type": "dimension",
+      "$description": "Standard hairline border."
+    },
+    "primary": {
+      "$value": "{border.width.thick}",
+      "$type": "dimension",
+      "$description": "Emphasized border, used for focus rings."
+    }
+  },
+  "animation": {
+    "default": {
+      "$value": "{animation.duration.fast}",
+      "$type": "duration",
+      "$description": "Standard transition for interactive state changes."
+    },
+    "subtle": {
+      "$value": "{animation.duration.normal}",
+      "$type": "duration",
+      "$description": "Larger movements: disclosure, entrance, exit."
+    }
+  }
+}
