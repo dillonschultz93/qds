@@ -1,0 +1,112 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="qds-anatomy" viewBox="0 0 723 185" width="723" height="185" role="img" aria-label="Semantic token anatomy: --qds-semantic-color-background-default-hover">
+  <title>Semantic token anatomy</title>
+  <desc>Tier 2 — intent, referencing primitives. Light and dark differ only here. Anatomy of --qds-semantic-color-background-default-hover: qds is the global prefix; semantic is the tier identifier; color is the category; background is the property; default is the role; hover is the state.</desc>
+  <style>
+    /* Light is the base. */
+    .qds-anatomy { --fg: #0f172a; --muted: #64748b;
+      --h0: #64748b; --h0-bg: #64748b1f;
+      --h1: #7c3aed; --h1-bg: #7c3aed1f;
+      --h2: #2563eb; --h2-bg: #2563eb1f;
+      --h3: #0d9488; --h3-bg: #0d94881f;
+      --h4: #b45309; --h4-bg: #b453091f;
+      --h5: #be123c; --h5-bg: #be123c1f; }
+
+    /* Standalone or OS-dark. Applies when nothing has stated a preference. */
+    @media (prefers-color-scheme: dark) {
+      .qds-anatomy { --fg: #f1f5f9; --muted: #94a3b8;
+      --h0: #94a3b8; --h0-bg: #94a3b829;
+      --h1: #a78bfa; --h1-bg: #a78bfa29;
+      --h2: #60a5fa; --h2-bg: #60a5fa29;
+      --h3: #2dd4bf; --h3-bg: #2dd4bf29;
+      --h4: #fbbf24; --h4-bg: #fbbf2429;
+      --h5: #fb7185; --h5-bg: #fb718529; }
+    }
+
+    /*
+     * An explicit theme must beat the OS, in both directions.
+     *
+     * Matched on any ancestor rather than :root specifically, so this works
+     * whether the theme is set on the html element (the docs site's toggle), on a
+     * section wrapping one example, or on the svg itself. Scoping these to
+     * :root[data-theme] instead would silently fall through to the media query
+     * whenever the attribute sits anywhere else — and a reader on a dark-mode OS
+     * viewing a light-themed section would get a dark palette on a light
+     * background, which renders the labels invisible.
+     *
+     * Note: no left angle bracket may appear anywhere in this stylesheet. An SVG
+     * is parsed as XML, so even inside a CSS comment one is read as the start of
+     * a tag and the whole file fails to parse.
+     */
+    [data-theme="dark"] .qds-anatomy,
+    .qds-anatomy[data-theme="dark"] { --fg: #f1f5f9; --muted: #94a3b8;
+      --h0: #94a3b8; --h0-bg: #94a3b829;
+      --h1: #a78bfa; --h1-bg: #a78bfa29;
+      --h2: #60a5fa; --h2-bg: #60a5fa29;
+      --h3: #2dd4bf; --h3-bg: #2dd4bf29;
+      --h4: #fbbf24; --h4-bg: #fbbf2429;
+      --h5: #fb7185; --h5-bg: #fb718529; }
+    [data-theme="light"] .qds-anatomy,
+    .qds-anatomy[data-theme="light"] { --fg: #0f172a; --muted: #64748b;
+      --h0: #64748b; --h0-bg: #64748b1f;
+      --h1: #7c3aed; --h1-bg: #7c3aed1f;
+      --h2: #2563eb; --h2-bg: #2563eb1f;
+      --h3: #0d9488; --h3-bg: #0d94881f;
+      --h4: #b45309; --h4-bg: #b453091f;
+      --h5: #be123c; --h5-bg: #be123c1f; }
+
+    .qds-anatomy text { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+    .qds-anatomy .title { font-size: 13px; font-weight: 600; fill: var(--fg); }
+    .qds-anatomy .subtitle { font-size: 12px; fill: var(--muted); }
+    .qds-anatomy .full { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; fill: var(--muted); }
+    .qds-anatomy .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 14px; font-weight: 600; text-anchor: middle; }
+    .qds-anatomy .label { font-size: 12px; font-weight: 500; fill: var(--fg); text-anchor: middle; }
+    .qds-anatomy .note { font-size: 11px; fill: var(--muted); text-anchor: middle; }
+    .qds-anatomy .seg rect { stroke-width: 1.25; }
+    .qds-anatomy .seg-0 rect { fill: var(--h0-bg); stroke: var(--h0); } .qds-anatomy .seg-0 .mono { fill: var(--h0); }
+    .qds-anatomy .seg-1 rect { fill: var(--h1-bg); stroke: var(--h1); } .qds-anatomy .seg-1 .mono { fill: var(--h1); }
+    .qds-anatomy .seg-2 rect { fill: var(--h2-bg); stroke: var(--h2); } .qds-anatomy .seg-2 .mono { fill: var(--h2); }
+    .qds-anatomy .seg-3 rect { fill: var(--h3-bg); stroke: var(--h3); } .qds-anatomy .seg-3 .mono { fill: var(--h3); }
+    .qds-anatomy .seg-4 rect { fill: var(--h4-bg); stroke: var(--h4); } .qds-anatomy .seg-4 .mono { fill: var(--h4); }
+    .qds-anatomy .seg-5 rect { fill: var(--h5-bg); stroke: var(--h5); } .qds-anatomy .seg-5 .mono { fill: var(--h5); }
+  </style>
+  <text class="title" x="24" y="26">Semantic token anatomy</text>
+  <text class="subtitle" x="24" y="46">Tier 2 — intent, referencing primitives. Light and dark differ only here.</text>
+  <text class="full" x="24" y="62">--qds-semantic-color-background-default-hover</text>
+
+    <g class="seg seg-0">
+      <rect x="24.0" y="74" width="107.9" height="46" rx="7"/>
+      <text class="mono" x="77.9" y="103">qds</text>
+      <text class="label" x="77.9" y="146">Global prefix</text>
+      <text class="note" x="77.9" y="163">always</text>
+    </g>
+    <g class="seg seg-1">
+      <rect x="131.9" y="74" width="120.5" height="46" rx="7"/>
+      <text class="mono" x="192.1" y="103">semantic</text>
+      <text class="label" x="192.1" y="146">Tier identifier</text>
+      <text class="note" x="192.1" y="163">literal</text>
+    </g>
+    <g class="seg seg-2">
+      <rect x="252.4" y="74" width="101.6" height="46" rx="7"/>
+      <text class="mono" x="303.2" y="103">color</text>
+      <text class="label" x="303.2" y="146">Category</text>
+      <text class="note" x="303.2" y="163">8 categories</text>
+    </g>
+    <g class="seg seg-3">
+      <rect x="354.0" y="74" width="114.2" height="46" rx="7"/>
+      <text class="mono" x="411.1" y="103">background</text>
+      <text class="label" x="411.1" y="146">Property</text>
+      <text class="note" x="411.1" y="163">color only · 3</text>
+    </g>
+    <g class="seg seg-4">
+      <rect x="468.2" y="74" width="85.1" height="46" rx="7"/>
+      <text class="mono" x="510.8" y="103">default</text>
+      <text class="label" x="510.8" y="146">Role</text>
+      <text class="note" x="510.8" y="163">16 roles</text>
+    </g>
+    <g class="seg seg-5">
+      <rect x="553.4" y="74" width="145.7" height="46" rx="7"/>
+      <text class="mono" x="626.2" y="103">hover</text>
+      <text class="label" x="626.2" y="146">State</text>
+      <text class="note" x="626.2" y="163">optional · 9 states</text>
+    </g>
+</svg>
