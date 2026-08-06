@@ -1,0 +1,110 @@
+---
+layout: layouts/base.njk
+title: Tokens
+description: Every token, its value in each mode, and the chain it resolves through.
+---
+
+<dl class="stat-row">
+  {% for tier in tokens.tiers %}
+    <div class="stat">
+      <dt>{{ tier.tier | capitalize }}</dt>
+      <dd>{{ tier.count }}</dd>
+    </div>
+  {% endfor %}
+</dl>
+
+<p>
+  Values below are read from the generated token manifest, so they are the values
+  the CSS actually ships. The <strong>Resolves through</strong> column walks each
+  token down to the raw value it ends at — the clearest view of the tier structure
+  the system has.
+</p>
+
+{% for tier in tokens.tiers %}
+  <h2 id="{{ tier.tier }}">{{ tier.tier | capitalize }} <span class="tier-badge" data-tier="{{ tier.tier }}">{{ tier.count }} tokens</span></h2>
+
+  {% if tier.tier == 'primitive' %}
+    <p>Raw values. No references, and no tier identifier in the variable name.</p>
+  {% elif tier.tier == 'semantic' %}
+    <p>
+      Intent, aliasing primitives. This is the only tier where light and dark
+      differ — {{ tokens.stats.modeVarying }} tokens change between modes, and all
+      of them are here.
+    </p>
+  {% else %}
+    <p>
+      Each component's public styling API. Overriding one of these variables is the
+      supported way to restyle a component.
+    </p>
+  {% endif %}
+
+  {% for group in tier.categories %}
+    <h3 id="{{ tier.tier }}-{{ group.category }}">{{ group.category }}</h3>
+
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Token</th>
+            {% for mode in tokens.modes %}
+              <th scope="col">{{ mode | capitalize }}</th>
+            {% endfor %}
+            <th scope="col">Resolves through</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for token in group.tokens %}
+            <tr>
+              <th scope="row" class="token-name">
+                --{{ token.name }}
+                {% if token.description %}
+                  <br /><small>{{ token.description }}</small>
+                {% endif %}
+              </th>
+
+              {% for mode in tokens.modes %}
+                <td>
+                  {% if token.isColor %}
+                    <span class="swatch" title="{{ token.modes[mode] }}">
+                      <span
+                        class="swatch__fill"
+                        style="background: {{ token.modes[mode] }}"
+                      ></span>
+                    </span>
+                  {% endif %}
+                  <code>{{ token.modes[mode] | tokenValue }}</code>
+                </td>
+              {% endfor %}
+
+              <td>
+                {% if token.compositeReferences %}
+                  <ul class="chain">
+                    {% for reference in token.compositeReferences %}
+                      <li><code>--{{ reference }}</code></li>
+                    {% endfor %}
+                  </ul>
+                {% elif token.chains.light | length > 1 %}
+                  <ul class="chain">
+                    {% for step in token.chains.light %}
+                      <li>
+                        {% if step.tier %}
+                          <span class="tier-badge" data-tier="{{ step.tier }}">{{ step.tier | truncate(4, true, "") }}</span>
+                        {% endif %}
+                        <code>--{{ step.name }}</code>
+                      </li>
+                    {% endfor %}
+                    <li class="chain__raw">
+                      <code>{{ token.modes.light | tokenValue }}</code>
+                    </li>
+                  </ul>
+                {% else %}
+                  <span class="chain__raw">raw value</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% endfor %}
+{% endfor %}

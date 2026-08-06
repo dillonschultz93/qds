@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% if title %}{{ title }} · {{ site.shortTitle }}{% else %}{{ site.title }}{% endif %}</title>
+    <meta name="description" content="{{ description or site.description }}" />
+
+    {#
+      The theme must be resolved BEFORE first paint, or a reader whose stored
+      preference is dark sees a white flash while the stylesheet and script load.
+      Inline and synchronous in the head is the only place that works.
+    #}
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem('qds-theme');
+          if (stored === 'light' || stored === 'dark') {
+            document.documentElement.dataset.theme = stored;
+          }
+        } catch (error) {
+          /* Private mode: fall back to prefers-color-scheme. */
+        }
+      })();
+    </script>
+
+    {# The token stylesheet, loaded once at document level. Custom properties
+       inherit through shadow DOM, so every component picks these up. #}
+    <link rel="stylesheet" href="/assets/qds.css" />
+    <link rel="stylesheet" href="/assets/docs.css" />
+
+    <script type="module" src="/assets/ui.js"></script>
+    <script type="module" src="/assets/theme-toggle.js"></script>
+  </head>
+
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="site-header">
+      <a class="site-header__brand" href="/">{{ site.shortTitle }}</a>
+
+      <nav class="site-nav" aria-label="Main">
+        <ul>
+          {% for item in site.nav %}
+            <li>
+              <a
+                href="{{ item.url }}"
+                {% if page.url == item.url %}aria-current="page"{% endif %}
+              >{{ item.text }}</a>
+            </li>
+          {% endfor %}
+        </ul>
+      </nav>
+
+      <div class="site-header__actions">
+        <button
+          id="theme-toggle"
+          class="theme-toggle"
+          type="button"
+          aria-live="polite"
+        >Theme</button>
+        <a href="{{ site.repo }}" rel="noopener">GitHub</a>
+      </div>
+    </header>
+
+    <main id="main" class="prose">
+      {% if title %}<h1>{{ title }}</h1>{% endif %}
+      {% if description %}<p class="lede">{{ description }}</p>{% endif %}
+      {{ content | safe }}
+    </main>
+
+    <footer class="site-footer">
+      <p>
+        Generated from
+        <code>packages/design-tokens</code> and <code>packages/ui</code>.
+        Every table on this site is built from the token manifest or the custom
+        elements manifest — none of it is hand-written.
+      </p>
+    </footer>
+  </body>
+</html>

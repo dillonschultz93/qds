@@ -1,0 +1,25 @@
+{
+  "name": "docs",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "QDS documentation site. Generated from the token build and the custom elements manifest.",
+  "//NODE_OPTIONS": "Node 25 exposes a localStorage global that throws unless --localstorage-file is given. @lit-labs/ssr-dom-shim copies globals when building its Window shim and trips over it, which crashes the SSR worker. Disabling Web Storage makes the global undefined, which the shim handles. Remove once @lit-labs/ssr-dom-shim guards the access itself.",
+  "scripts": {
+    "build": "node bundle-components.js && NODE_OPTIONS=--no-experimental-webstorage eleventy",
+    "dev": "node bundle-components.js && NODE_OPTIONS=--no-experimental-webstorage eleventy --serve --incremental",
+    "clean": "rm -rf _site .turbo",
+    "verify": "npm run build && node verify.mjs"
+  },
+  "dependencies": {
+    "@quieto/design-tokens": "workspace:*",
+    "@quieto/ui": "workspace:*"
+  },
+  "devDependencies": {
+    "@11ty/eleventy": "^3.1.6",
+    "@lit-labs/eleventy-plugin-lit": "^1.0.6",
+    "esbuild": "^0.28.1",
+    "@lit-labs/ssr-client": "^1.1.8",
+    "playwright": "^1.62.1"
+  }
+}

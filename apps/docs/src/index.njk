@@ -1,0 +1,112 @@
+---
+layout: layouts/base.njk
+title: Quieto Design System
+description: Three-tier design tokens, Lit web components, and the naming grammar that ties them together.
+---
+
+<dl class="stat-row">
+  <div class="stat">
+    <dt>Tokens</dt>
+    <dd>{{ tokens.stats.total }}</dd>
+  </div>
+  <div class="stat">
+    <dt>Vary by mode</dt>
+    <dd>{{ tokens.stats.modeVarying }}</dd>
+  </div>
+  <div class="stat">
+    <dt>Components</dt>
+    <dd>{{ components | length }}</dd>
+  </div>
+  <div class="stat">
+    <dt>Roles</dt>
+    <dd>{{ nomenclature.semantic.roles | length }}</dd>
+  </div>
+</dl>
+
+<h2>The idea</h2>
+
+<p>
+  Every visual decision in QDS lives in one place and travels one path. A raw value
+  becomes a <strong>primitive</strong>, a primitive is given meaning as a
+  <strong>semantic</strong>, and a semantic is applied by a
+  <strong>component</strong> token. Nothing skips a tier, and nothing points
+  backwards.
+</p>
+
+<p>
+  That structure survives into the CSS rather than being flattened at build time,
+  which is what makes a single stylesheet themeable:
+</p>
+
+<pre><code>--qds-component-button-primary-color-background-rest: var(--qds-semantic-color-background-primary-rest);
+--qds-semantic-color-background-primary-rest:         var(--qds-color-blue-600);
+--qds-color-blue-600:                                 #2563eb;</code></pre>
+
+<p>
+  Switching to dark mode redefines the middle line and nothing else. Try the theme
+  toggle in the header — every colour on this page moves, and only
+  {{ tokens.stats.modeVarying }} of {{ tokens.stats.total }} variables are
+  redeclared to do it.
+</p>
+
+<h2>Components</h2>
+
+{% example "Buttons, in every variant" %}
+  <qds-button variant="primary">Primary</qds-button>
+  <qds-button variant="secondary">Secondary</qds-button>
+  <qds-button variant="ghost">Ghost</qds-button>
+  <qds-button variant="danger">Danger</qds-button>
+{% endexample %}
+
+<p>
+  Each of those resolves through the component tier, so
+  <code>--qds-component-button-*</code> is at once the token API and the styling
+  API. Overriding one of those variables is the supported way to restyle a button,
+  and it is the same variable the token source defines.
+</p>
+
+<h2>Where things are</h2>
+
+<div class="table-scroll">
+  <table>
+    <thead>
+      <tr>
+        <th scope="col">Page</th>
+        <th scope="col">What it covers</th>
+        <th scope="col">Generated from</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a href="/nomenclature/">Nomenclature</a></td>
+        <td>The naming grammar, its vocabularies, and how the build enforces it</td>
+        <td><code>nomenclature.js</code></td>
+      </tr>
+      <tr>
+        <td><a href="/tokens/">Tokens</a></td>
+        <td>All {{ tokens.stats.total }} tokens with values per mode and full reference chains</td>
+        <td><code>design-tokens/dist</code></td>
+      </tr>
+      <tr>
+        <td><a href="/components/">Components</a></td>
+        <td>Properties, slots, events, CSS parts and custom properties</td>
+        <td><code>custom-elements.json</code></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<h2>Install</h2>
+
+<pre><code>pnpm add @quieto/design-tokens @quieto/ui</code></pre>
+
+<p>Load the stylesheet once, at document level, then import the components you need:</p>
+
+<pre><code>import '@quieto/design-tokens/css';
+import '@quieto/ui/qds-button.js';</code></pre>
+
+<p>
+  The stylesheet is not optional. Custom properties inherit through shadow DOM, so
+  it is what themes every component — without it they fall back to hardcoded
+  values, render correctly once, and never respond to the theme again.
+</p>

@@ -1,0 +1,22 @@
+---
+layout: layouts/base.njk
+title: Components
+description: Web components styled entirely by the token system.
+permalink: /components/
+---
+
+<p>
+  Every component is a Lit element. All API documentation on these pages is
+  generated from <code>custom-elements.json</code>, which
+  <code>cem analyze</code> extracts from the source — so a table here cannot
+  disagree with the code.
+</p>
+
+<ul class="card-grid">
+  {% for component in components %}
+    <li class="card">
+      <h2><a href="/components/{{ component.tagName }}/">&lt;{{ component.tagName }}&gt;</a></h2>
+      <p>{{ component.summary | truncate(150) }}</p>
+    </li>
+  {% endfor %}
+</ul>

@@ -1,0 +1,474 @@
+/**
+ * Documentation site chrome.
+ *
+ * Written entirely against QDS semantic tokens — the site is the design system's
+ * first consumer. If a token is wrong, this page looks wrong, which is a faster
+ * feedback loop than any test.
+ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--qds-semantic-typography-body-font-family);
+  font-size: var(--qds-semantic-typography-body-font-size);
+  font-weight: var(--qds-semantic-typography-body-font-weight);
+  line-height: var(--qds-semantic-typography-body-line-height);
+  color: var(--qds-semantic-color-content-default);
+  background-color: var(--qds-semantic-color-background-default);
+  -webkit-font-smoothing: antialiased;
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+}
+
+.skip-link:focus {
+  left: var(--qds-spacing-400);
+  top: var(--qds-spacing-400);
+  z-index: 10;
+  padding: var(--qds-spacing-200) var(--qds-spacing-300);
+  color: var(--qds-semantic-color-content-default);
+  background: var(--qds-semantic-color-background-subtle);
+  border-radius: var(--qds-semantic-radius-default);
+}
+
+/* ── Header ───────────────────────────────────────────────────────────────── */
+
+.site-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--qds-spacing-400);
+  align-items: center;
+  padding: var(--qds-spacing-300) var(--qds-spacing-500);
+  border-block-end: var(--qds-semantic-border-default) solid
+    var(--qds-semantic-color-border-subtle);
+  background: var(--qds-semantic-color-background-subtle);
+}
+
+.site-header__brand {
+  font-family: var(--qds-semantic-typography-title-font-family);
+  font-size: var(--qds-semantic-typography-title-font-size);
+  font-weight: var(--qds-semantic-typography-title-font-weight);
+  color: var(--qds-semantic-color-content-default);
+  text-decoration: none;
+}
+
+.site-nav ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--qds-spacing-400);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.site-nav a,
+.site-header__actions a {
+  color: var(--qds-semantic-color-content-primary-rest);
+  text-decoration: none;
+}
+
+.site-nav a:hover,
+.site-header__actions a:hover {
+  color: var(--qds-semantic-color-content-primary-hover);
+  text-decoration: underline;
+}
+
+.site-nav a[aria-current='page'] {
+  color: var(--qds-semantic-color-content-default);
+  font-weight: var(--qds-typography-font-weight-semibold);
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+}
+
+.site-header__actions {
+  display: flex;
+  gap: var(--qds-spacing-300);
+  align-items: center;
+  margin-inline-start: auto;
+}
+
+.theme-toggle {
+  padding: var(--qds-spacing-100) var(--qds-spacing-300);
+  font: inherit;
+  font-size: var(--qds-typography-font-size-100);
+  color: var(--qds-semantic-color-content-default);
+  background: var(--qds-semantic-color-background-default);
+  border: var(--qds-semantic-border-default) solid var(--qds-semantic-color-border-default);
+  border-radius: var(--qds-semantic-radius-default);
+  cursor: pointer;
+}
+
+.theme-toggle:hover {
+  background: var(--qds-semantic-color-background-neutral);
+}
+
+:focus-visible {
+  outline: var(--qds-semantic-border-primary) solid var(--qds-semantic-color-border-primary);
+  outline-offset: 0.125rem;
+}
+
+/* ── Prose ────────────────────────────────────────────────────────────────── */
+
+.prose {
+  max-width: 76ch;
+  margin: 0 auto;
+  padding: var(--qds-spacing-600) var(--qds-spacing-500) var(--qds-spacing-800);
+}
+
+.prose h1 {
+  font-family: var(--qds-semantic-typography-headline-font-family);
+  font-size: var(--qds-semantic-typography-headline-font-size);
+  font-weight: var(--qds-semantic-typography-headline-font-weight);
+  line-height: var(--qds-semantic-typography-headline-line-height);
+  letter-spacing: var(--qds-semantic-typography-headline-letter-spacing);
+  margin-block: 0 var(--qds-spacing-400);
+}
+
+.prose h2 {
+  font-size: var(--qds-semantic-typography-title-font-size);
+  font-weight: var(--qds-semantic-typography-title-font-weight);
+  margin-block: var(--qds-spacing-700) var(--qds-spacing-300);
+  padding-block-end: var(--qds-spacing-200);
+  border-block-end: var(--qds-semantic-border-default) solid
+    var(--qds-semantic-color-border-subtle);
+}
+
+.prose h3 {
+  font-size: var(--qds-typography-font-size-400);
+  font-weight: var(--qds-typography-font-weight-semibold);
+  margin-block: var(--qds-spacing-500) var(--qds-spacing-200);
+}
+
+.prose h4,
+.prose h5,
+.prose h6 {
+  font-size: var(--qds-typography-font-size-300);
+  font-weight: var(--qds-typography-font-weight-semibold);
+  margin-block: var(--qds-spacing-400) var(--qds-spacing-200);
+}
+
+.prose p,
+.prose ul,
+.prose ol {
+  margin-block: 0 var(--qds-spacing-400);
+}
+
+.prose li {
+  margin-block-end: var(--qds-spacing-100);
+}
+
+.prose a {
+  color: var(--qds-semantic-color-content-primary-rest);
+}
+
+.prose a:visited {
+  color: var(--qds-semantic-color-content-primary-visited);
+}
+
+.lede {
+  font-size: var(--qds-typography-font-size-400);
+  color: var(--qds-semantic-color-content-subtle);
+}
+
+.prose blockquote {
+  margin-inline: 0;
+  padding: var(--qds-spacing-300) var(--qds-spacing-400);
+  border-inline-start: 0.25rem solid var(--qds-semantic-color-border-primary);
+  background: var(--qds-semantic-color-background-subtle);
+  border-radius: 0 var(--qds-semantic-radius-default) var(--qds-semantic-radius-default) 0;
+}
+
+.prose blockquote > :last-child {
+  margin-block-end: 0;
+}
+
+code,
+pre {
+  font-family: var(--qds-semantic-typography-data-font-family);
+  font-size: var(--qds-semantic-typography-data-font-size);
+}
+
+:not(pre) > code {
+  padding: 0.1em 0.35em;
+  color: var(--qds-semantic-color-content-default);
+  background: var(--qds-semantic-color-background-neutral);
+  border-radius: var(--qds-semantic-radius-subtle);
+  /* Long token names must break rather than force the page to scroll. */
+  overflow-wrap: anywhere;
+}
+
+pre {
+  overflow-x: auto;
+  padding: var(--qds-spacing-300);
+  color: var(--qds-semantic-color-content-default);
+  background: var(--qds-semantic-color-background-subtle);
+  border: var(--qds-semantic-border-default) solid var(--qds-semantic-color-border-subtle);
+  border-radius: var(--qds-semantic-radius-default);
+}
+
+/* ── Tables ───────────────────────────────────────────────────────────────── */
+
+/*
+ * Tables are the substance of this site and several are wide. Each gets its own
+ * horizontal scroll container so the page body never scrolls sideways.
+ */
+.table-scroll {
+  overflow-x: auto;
+  margin-block-end: var(--qds-spacing-500);
+  border: var(--qds-semantic-border-default) solid var(--qds-semantic-color-border-subtle);
+  border-radius: var(--qds-semantic-radius-default);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--qds-typography-font-size-200);
+}
+
+th,
+td {
+  padding: var(--qds-spacing-200) var(--qds-spacing-300);
+  text-align: start;
+  vertical-align: top;
+  border-block-end: var(--qds-semantic-border-default) solid
+    var(--qds-semantic-color-border-subtle);
+}
+
+thead th {
+  position: sticky;
+  top: 0;
+  background: var(--qds-semantic-color-background-neutral);
+  font-weight: var(--qds-typography-font-weight-semibold);
+  white-space: nowrap;
+}
+
+tbody tr:last-child td {
+  border-block-end: none;
+}
+
+/* ── Token reference ──────────────────────────────────────────────────────── */
+
+.swatch {
+  display: inline-block;
+  inline-size: 1.5rem;
+  block-size: 1.5rem;
+  vertical-align: middle;
+  border: var(--qds-semantic-border-default) solid var(--qds-semantic-color-border-default);
+  border-radius: var(--qds-semantic-radius-subtle);
+  /* A checkerboard so a transparent token is distinguishable from a white one. */
+  background-image:
+    linear-gradient(45deg, #8884 25%, transparent 25%, transparent 75%, #8884 75%),
+    linear-gradient(45deg, #8884 25%, transparent 25%, transparent 75%, #8884 75%);
+  background-size: 0.5rem 0.5rem;
+  background-position:
+    0 0,
+    0.25rem 0.25rem;
+}
+
+.swatch__fill {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+}
+
+.token-name {
+  font-family: var(--qds-semantic-typography-data-font-family);
+  font-size: var(--qds-typography-font-size-100);
+  overflow-wrap: anywhere;
+}
+
+/* The reference chain: component → semantic → primitive → raw value. */
+.chain {
+  display: flex;
+  flex-direction: column;
+  gap: var(--qds-spacing-100);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--qds-semantic-typography-data-font-family);
+  font-size: var(--qds-typography-font-size-100);
+}
+
+.chain li {
+  display: flex;
+  gap: var(--qds-spacing-200);
+  align-items: center;
+  margin: 0;
+}
+
+.chain li + li::before {
+  content: '↳';
+  color: var(--qds-semantic-color-content-subtle);
+}
+
+.chain__raw {
+  color: var(--qds-semantic-color-content-subtle);
+}
+
+.tier-badge {
+  display: inline-block;
+  padding: 0 0.4em;
+  font-size: var(--qds-typography-font-size-100);
+  font-weight: var(--qds-typography-font-weight-medium);
+  border-radius: var(--qds-semantic-radius-subtle);
+  background: var(--qds-semantic-color-background-neutral);
+  color: var(--qds-semantic-color-content-subtle);
+  white-space: nowrap;
+}
+
+.tier-badge[data-tier='semantic'] {
+  background: var(--qds-semantic-color-background-info);
+  color: var(--qds-semantic-color-content-info);
+}
+
+.tier-badge[data-tier='component'] {
+  background: var(--qds-semantic-color-background-success);
+  color: var(--qds-semantic-color-content-success);
+}
+
+.stat-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--qds-spacing-400);
+  margin-block-end: var(--qds-spacing-500);
+  padding: 0;
+  list-style: none;
+}
+
+.stat {
+  flex: 1 1 8rem;
+  padding: var(--qds-spacing-300);
+  background: var(--qds-semantic-color-background-subtle);
+  border: var(--qds-semantic-border-default) solid var(--qds-semantic-color-border-subtle);
+  border-radius: var(--qds-semantic-radius-primary);
+}
+
+.stat dt {
+  font-size: var(--qds-typography-font-size-100);
+  color: var(--qds-semantic-color-content-subtle);
+}
+
+.stat dd {
+  margin: 0;
+  font-size: var(--qds-typography-font-size-600);
+  font-weight: var(--qds-typography-font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Examples ─────────────────────────────────────────────────────────────── */
+
+.example {
+  margin: 0 0 var(--qds-spacing-500);
+  border: var(--qds-semantic-border-default) solid var(--qds-semantic-color-border-subtle);
+  border-radius: var(--qds-semantic-radius-primary);
+  overflow: hidden;
+}
+
+.example__title {
+  padding: var(--qds-spacing-200) var(--qds-spacing-300);
+  font-size: var(--qds-typography-font-size-100);
+  font-weight: var(--qds-typography-font-weight-medium);
+  color: var(--qds-semantic-color-content-subtle);
+  background: var(--qds-semantic-color-background-subtle);
+  border-block-end: var(--qds-semantic-border-default) solid
+    var(--qds-semantic-color-border-subtle);
+}
+
+.example__preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--qds-spacing-300);
+  align-items: center;
+  padding: var(--qds-spacing-500);
+}
+
+.example__source summary {
+  padding: var(--qds-spacing-200) var(--qds-spacing-300);
+  font-size: var(--qds-typography-font-size-100);
+  color: var(--qds-semantic-color-content-subtle);
+  cursor: pointer;
+  border-block-start: var(--qds-semantic-border-default) solid
+    var(--qds-semantic-color-border-subtle);
+}
+
+.example__source pre {
+  margin: 0;
+  border: none;
+  border-radius: 0;
+}
+
+/* ── Anatomy diagrams ─────────────────────────────────────────────────────── */
+
+.anatomy {
+  overflow-x: auto;
+  margin-block: var(--qds-spacing-400) var(--qds-spacing-500);
+  padding: var(--qds-spacing-300);
+  background: var(--qds-semantic-color-background-subtle);
+  border: var(--qds-semantic-border-default) solid var(--qds-semantic-color-border-subtle);
+  border-radius: var(--qds-semantic-radius-primary);
+}
+
+.anatomy svg {
+  display: block;
+  /* Keeps the diagram's aspect ratio while never overflowing the container. */
+  max-inline-size: 100%;
+  height: auto;
+}
+
+/* ── Component index ──────────────────────────────────────────────────────── */
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(16rem, 100%), 1fr));
+  gap: var(--qds-spacing-400);
+  padding: 0;
+  list-style: none;
+}
+
+.card {
+  padding: var(--qds-spacing-400);
+  background: var(--qds-semantic-color-background-subtle);
+  border: var(--qds-semantic-border-default) solid var(--qds-semantic-color-border-subtle);
+  border-radius: var(--qds-semantic-radius-primary);
+}
+
+.card h2 {
+  margin-block: 0 var(--qds-spacing-200);
+  padding: 0;
+  border: none;
+  font-size: var(--qds-typography-font-size-400);
+}
+
+.card p {
+  margin-block-end: 0;
+  color: var(--qds-semantic-color-content-subtle);
+  font-size: var(--qds-typography-font-size-200);
+}
+
+/* ── Footer ───────────────────────────────────────────────────────────────── */
+
+.site-footer {
+  padding: var(--qds-spacing-500);
+  font-size: var(--qds-typography-font-size-100);
+  color: var(--qds-semantic-color-content-subtle);
+  text-align: center;
+  border-block-start: var(--qds-semantic-border-default) solid
+    var(--qds-semantic-color-border-subtle);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,172 @@
+---
+layout: layouts/base.njk
+pagination:
+  data: components
+  size: 1
+  alias: component
+permalink: "/components/{{ component.tagName }}/"
+eleventyComputed:
+  title: "<{{ component.tagName }}>"
+  description: "{{ component.summary | truncate(160) }}"
+---
+
+{#
+  One template covers every component. The tables below are built from
+  custom-elements.json, so adding a component to the library produces a
+  documentation page with no work here — only an entry in _data/examples.js if it
+  needs live demos.
+#}
+
+<h2>Examples</h2>
+
+{% set componentExamples = examples[component.tagName] %}
+{% if componentExamples %}
+  {% for demo in componentExamples %}
+    {% if demo.description %}<p>{{ demo.description }}</p>{% endif %}
+    <figure class="example">
+      <figcaption class="example__title">{{ demo.title }}</figcaption>
+      <div class="example__preview">{{ demo.html | safe }}</div>
+      <details class="example__source">
+        <summary>Source</summary>
+        <pre><code class="language-html">{{ demo.html | escapeHtml }}</code></pre>
+      </details>
+    </figure>
+  {% endfor %}
+{% else %}
+  <p><em>No examples yet for this component.</em></p>
+{% endif %}
+
+<h2>Properties</h2>
+
+{% if component.properties | length %}
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">Property</th>
+          <th scope="col">Attribute</th>
+          <th scope="col">Type</th>
+          <th scope="col">Default</th>
+          <th scope="col">Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for property in component.properties %}
+          <tr>
+            <th scope="row"><code>{{ property.name }}</code></th>
+            <td>{% if property.attribute %}<code>{{ property.attribute }}</code>{% else %}—{% endif %}</td>
+            <td><code>{{ property.type }}</code></td>
+            <td>{% if property.default %}<code>{{ property.default }}</code>{% else %}—{% endif %}</td>
+            <td>{{ property.description }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% else %}
+  <p>None.</p>
+{% endif %}
+
+<h2>Slots</h2>
+
+{% if component.slots | length %}
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">Slot</th>
+          <th scope="col">Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for slot in component.slots %}
+          <tr>
+            <th scope="row"><code>{{ slot.name }}</code></th>
+            <td>{{ slot.description }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% else %}
+  <p>None.</p>
+{% endif %}
+
+{% if component.events | length %}
+  <h2>Events</h2>
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">Event</th>
+          <th scope="col">Type</th>
+          <th scope="col">Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for event in component.events %}
+          <tr>
+            <th scope="row"><code>{{ event.name }}</code></th>
+            <td><code>{{ event.type }}</code></td>
+            <td>{{ event.description }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endif %}
+
+{% if component.cssProperties | length %}
+  <h2>CSS custom properties</h2>
+  <p>
+    These are the component-tier tokens this element reads. Overriding one is the
+    supported way to restyle it — and they are the same variables
+    <a href="/tokens/#component">the token source</a> defines.
+  </p>
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">Property</th>
+          <th scope="col">Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for property in component.cssProperties %}
+          <tr>
+            <th scope="row" class="token-name">{{ property.name }}</th>
+            <td>{{ property.description }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endif %}
+
+{% if component.cssParts | length %}
+  <h2>CSS parts</h2>
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">Part</th>
+          <th scope="col">Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for part in component.cssParts %}
+          <tr>
+            <th scope="row"><code>{{ part.name }}</code></th>
+            <td>{{ part.description }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endif %}
+
+<h2>Import</h2>
+
+<pre><code>import '@quieto/ui/{{ component.tagName }}.js';</code></pre>
+
+<p><small>Source: <code>packages/ui/{{ component.path }}</code></small></p>
