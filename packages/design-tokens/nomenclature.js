@@ -30,6 +30,11 @@ export const TIERS = ['primitive', 'semantic', 'component'];
  * they get the shortest names. See `docs/nomenclature.md` § Primitive Token
  * Anatomy — the anatomy lists prefix/category/sub-category/value with no tier
  * segment.
+ *
+ * Typed explicitly so the published declarations keep the literals: without it the
+ * `null` for primitives is emitted as `any`.
+ *
+ * @type {{ readonly primitive: null, readonly semantic: 'semantic', readonly component: 'component' }}
  */
 export const TIER_IDENTIFIERS = {
   primitive: null,
@@ -243,5 +248,10 @@ export const component = {
 /** Every property name a component token may use. */
 export const componentProperties = [...component.colorProperties, ...component.cssProperties];
 
-/** `true` for lowercase kebab-case segments (`text-field`, `blue`, `400`). */
+/**
+ * `true` for lowercase kebab-case segments (`text-field`, `blue`, `400`).
+ *
+ * @param {string} segment
+ * @returns {boolean}
+ */
 export const isKebabCase = (segment) => /^[a-z0-9]+(-[a-z0-9]+)*$/.test(segment);

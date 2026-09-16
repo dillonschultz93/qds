@@ -1,10 +1,12 @@
 {
   "name": "@quieto/design-tokens",
-  "version": "0.0.0",
-  "description": "QDS design tokens \u2014 three-tier DTCG source, Style Dictionary build, Token Studio sync.",
+  "version": "0.1.0",
+  "description": "Three-tier design tokens as CSS custom properties and a typed JS manifest, with light and dark modes.",
   "type": "module",
   "license": "MIT",
   "author": "Dillon Schultz",
+  "homepage": "https://github.com/dillonschultz93/qds/tree/main/packages/design-tokens#readme",
+  "bugs": "https://github.com/dillonschultz93/qds/issues",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/dillonschultz93/qds.git",
@@ -12,44 +14,63 @@
   },
   "keywords": [
     "design-tokens",
+    "design-system",
     "dtcg",
+    "css-variables",
+    "dark-mode",
     "style-dictionary",
-    "tokens-studio",
-    "css-variables"
+    "tokens-studio"
   ],
+  "main": "./dist/js/tokens.js",
+  "types": "./dist/js/tokens.d.ts",
+  "typesVersions": {
+    "*": {
+      "nomenclature": [
+        "./dist/types/nomenclature.d.ts"
+      ]
+    }
+  },
   "exports": {
     ".": {
       "types": "./dist/js/tokens.d.ts",
-      "import": "./dist/js/tokens.js"
+      "default": "./dist/js/tokens.js"
     },
     "./css": "./dist/css/qds.css",
     "./css/light": "./dist/css/qds.light.css",
     "./css/dark": "./dist/css/qds.dark.css",
-    "./nomenclature": "./nomenclature.js",
-    "./tokens.json": "./tokens.json"
+    "./nomenclature": {
+      "types": "./dist/types/nomenclature.d.ts",
+      "default": "./nomenclature.js"
+    },
+    "./tokens.json": "./tokens.json",
+    "./package.json": "./package.json"
   },
   "files": [
     "dist",
     "tokens.json",
     "nomenclature.js",
-    "docs"
+    "docs/nomenclature.md",
+    "docs/anatomy/*.svg",
+    "CHANGELOG.md"
   ],
   "sideEffects": [
     "./dist/css/*.css"
   ],
-  "engines": {
-    "node": ">=22"
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
     "validate": "node validate.js",
     "docs:anatomy": "node docs/anatomy/generate.js",
-    "build": "node docs/anatomy/generate.js && node build.js",
+    "build": "node docs/anatomy/generate.js && node build.js && tsc nomenclature.js --allowJs --declaration --emitDeclarationOnly --skipLibCheck --outDir dist/types",
+    "prepack": "node validate.js && npm run build",
     "dev": "node build.js --watch",
     "test": "node --test",
     "clean": "rm -rf dist .turbo"
   },
-  "dependencies": {
+  "devDependencies": {
     "@tokens-studio/sd-transforms": "^2.0.3",
-    "style-dictionary": "^5.5.0"
+    "style-dictionary": "^5.5.0",
+    "typescript": "5.9.3"
   }
 }
