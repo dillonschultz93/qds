@@ -342,5 +342,41 @@ export default function () {
 </qds-chip>`,
       },
     ],
+
+    'qds-card': [
+      {
+        title: 'Variants',
+        description: 'Outlined by default; elevated adds the semantic elevation shadow; filled drops the border.',
+        html: `<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: var(--qds-spacing-400); width: 100%;">
+  <qds-card>
+    <h3 slot="header">Outlined</h3>
+    The default. A border on the page background.
+  </qds-card>
+  <qds-card variant="elevated">
+    <h3 slot="header">Elevated</h3>
+    Lifted with the default elevation token.
+  </qds-card>
+  <qds-card variant="filled">
+    <h3 slot="header">Filled</h3>
+    A subtle fill and no border.
+  </qds-card>
+</div>`,
+      },
+      {
+        title: 'Every region',
+        description:
+          'Media bleeds to the edges, and the footer sits at the bottom however short the body is. Empty regions take no space.',
+        html: `<qds-card style="max-width: 22rem;">
+  <div slot="media" aria-hidden="true"
+    style="height: 8rem; background: linear-gradient(135deg, var(--qds-color-blue-500), var(--qds-color-purple-500));"></div>
+  <h3 slot="header">Design tokens 0.1</h3>
+  <p style="margin: 0;">The first publishable release: three tiers, light and dark modes, and a validator that enforces the naming grammar.</p>
+  <qds-stack slot="footer" direction="inline" gap="200">
+    <qds-button size="sm">Read the notes</qds-button>
+    <qds-button size="sm" variant="ghost">Dismiss</qds-button>
+  </qds-stack>
+</qds-card>`,
+      },
+    ],
   };
 }

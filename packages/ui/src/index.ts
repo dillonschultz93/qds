@@ -63,3 +63,8 @@ export { QdsChip } from './components/qds-chip/qds-chip.js';
 export type {
   QdsChipVariant,
 } from './components/qds-chip/qds-chip.js';
+
+export { QdsCard } from './components/qds-card/qds-card.js';
+export type {
+  QdsCardVariant,
+} from './components/qds-card/qds-card.js';

@@ -363,7 +363,7 @@ check('qds-chip remove button fires qds-remove, and the example removes the chip
   chipRemoval.after === chipRemoval.before - 1, JSON.stringify(chipRemoval));
 
 // ── 8. Console cleanliness across every page ─────────────────────────────────
-for (const path of ['/', '/tokens/', '/components/', '/components/qds-stack/', '/components/qds-checkbox/', '/components/qds-radio-group/', '/components/qds-radio/', '/components/qds-toggle/', '/components/qds-input/', '/components/qds-text-field/', '/components/qds-chip/']) {
+for (const path of ['/', '/tokens/', '/components/', '/components/qds-stack/', '/components/qds-checkbox/', '/components/qds-radio-group/', '/components/qds-radio/', '/components/qds-toggle/', '/components/qds-input/', '/components/qds-text-field/', '/components/qds-chip/', '/components/qds-card/']) {
   await gotoReady(path);
 }
 check('no console errors on any page', consoleErrors.length === 0,
