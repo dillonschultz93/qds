@@ -110,5 +110,56 @@ export default function () {
 </qds-stack>`,
       },
     ],
+
+    'qds-text-field': [
+      {
+        title: 'Label and hint',
+        description:
+          'The label, hint, and error all live in the component’s shadow root, because the ID references that connect them cannot cross a shadow boundary.',
+        html: `<qds-text-field
+  label="Username"
+  hint="Letters, numbers, and underscores. You can change it later."
+  autocomplete="username"
+></qds-text-field>`,
+      },
+      {
+        title: 'Validation messages',
+        description:
+          'The browser’s own message appears once you leave the field. Type an invalid address, then tab away.',
+        html: `<qds-text-field label="Email" type="email" required autocomplete="email"></qds-text-field>`,
+      },
+      {
+        title: 'Author error',
+        description: 'For errors only the server can detect. Shown immediately.',
+        html: `<qds-text-field
+  label="Username"
+  value="ada"
+  error="That username is taken. Try another."
+></qds-text-field>`,
+      },
+      {
+        title: 'Slots',
+        html: `<qds-text-field label="Price" type="number" value="25">
+  <span slot="start" aria-hidden="true">$</span>
+  <span slot="end">USD</span>
+  <span slot="hint">Prices include tax. <a href="#">How tax is calculated</a></span>
+</qds-text-field>`,
+      },
+      {
+        title: 'Inside a form',
+        description: 'Submitting marks every field as touched, so each failing field shows its message.',
+        html: `<form onsubmit="event.preventDefault(); this.querySelector('output').textContent = JSON.stringify(Object.fromEntries(new FormData(this)));">
+  <qds-stack gap="300">
+    <qds-text-field label="Name" name="name" required autocomplete="name"></qds-text-field>
+    <qds-text-field label="Email" name="email" type="email" required autocomplete="email"></qds-text-field>
+    <qds-stack direction="inline" gap="200" align="center">
+      <qds-button type="submit">Submit</qds-button>
+      <qds-button type="reset" variant="ghost">Reset</qds-button>
+      <output></output>
+    </qds-stack>
+  </qds-stack>
+</form>`,
+      },
+    ],
   };
 }

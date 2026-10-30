@@ -7,7 +7,9 @@ pagination:
 permalink: "/components/{{ component.tagName }}/"
 eleventyComputed:
   title: "<{{ component.tagName }}>"
-  description: "{{ component.summary | truncate(160) }}"
+  # | safe because the layout escapes description when it prints it. Escaping
+  # here too printed a summary mentioning <dialog> as "&lt;dialog&gt;".
+  description: "{{ component.summary | truncate(160) | safe }}"
 ---
 
 {#

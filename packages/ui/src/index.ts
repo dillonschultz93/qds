@@ -36,3 +36,8 @@ export type {
   QdsStackAlign,
   QdsStackJustify,
 } from './components/qds-stack/qds-stack.js';
+
+export { QdsTextField } from './components/qds-text-field/qds-text-field.js';
+export type {
+  QdsTextFieldType,
+} from './components/qds-text-field/qds-text-field.js';
