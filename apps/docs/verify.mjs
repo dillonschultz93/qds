@@ -362,8 +362,19 @@ const chipRemoval = await page.evaluate(() => {
 check('qds-chip remove button fires qds-remove, and the example removes the chip',
   chipRemoval.after === chipRemoval.before - 1, JSON.stringify(chipRemoval));
 
+// ── Accordion: interaction after hydration ───────────────────────────────────
+await gotoReady('/components/qds-accordion/');
+const accordionToggle = await page.evaluate(() => {
+  const exclusive = document.querySelector('qds-accordion[exclusive]');
+  const items = [...exclusive.querySelectorAll('qds-accordion-item')];
+  items[1].shadowRoot.querySelector('button').click();
+  return items.map((item) => item.open);
+});
+check('qds-accordion opens an item on click and closes the others when exclusive',
+  accordionToggle.join() === 'false,true,false', JSON.stringify(accordionToggle));
+
 // ── 8. Console cleanliness across every page ─────────────────────────────────
-for (const path of ['/', '/tokens/', '/components/', '/components/qds-stack/', '/components/qds-checkbox/', '/components/qds-radio-group/', '/components/qds-radio/', '/components/qds-toggle/', '/components/qds-input/', '/components/qds-text-field/', '/components/qds-chip/', '/components/qds-card/', '/components/qds-progress-bar/']) {
+for (const path of ['/', '/tokens/', '/components/', '/components/qds-stack/', '/components/qds-checkbox/', '/components/qds-radio-group/', '/components/qds-radio/', '/components/qds-toggle/', '/components/qds-input/', '/components/qds-text-field/', '/components/qds-chip/', '/components/qds-card/', '/components/qds-progress-bar/', '/components/qds-accordion/', '/components/qds-accordion-item/']) {
   await gotoReady(path);
 }
 check('no console errors on any page', consoleErrors.length === 0,
