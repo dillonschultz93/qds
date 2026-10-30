@@ -110,5 +110,32 @@ export default function () {
 </qds-stack>`,
       },
     ],
+
+    'qds-progress-bar': [
+      {
+        title: 'Determinate',
+        description: 'Name the bar with label. It is not shown, so add visible text beside it where sighted users need it.',
+        html: `<qds-stack gap="300" style="width: 100%;">
+  <qds-progress-bar label="Uploading report.pdf" value="25"></qds-progress-bar>
+  <qds-progress-bar label="Profile completeness" value="60"></qds-progress-bar>
+  <qds-progress-bar label="Storage used" value="90" max="100"></qds-progress-bar>
+</qds-stack>`,
+      },
+      {
+        title: 'Indeterminate',
+        description:
+          'Leave value unset when the length of the work is unknown. Announced as busy rather than as 0%; with reduced motion it pulses instead of sliding.',
+        html: `<qds-progress-bar label="Connecting" style="width: 100%;"></qds-progress-bar>`,
+      },
+      {
+        title: 'Variants',
+        html: `<qds-stack gap="300" style="width: 100%;">
+  <qds-progress-bar label="Primary" value="70"></qds-progress-bar>
+  <qds-progress-bar label="Success" value="100" variant="success"></qds-progress-bar>
+  <qds-progress-bar label="Warning" value="85" variant="warning"></qds-progress-bar>
+  <qds-progress-bar label="Danger" value="97" variant="danger"></qds-progress-bar>
+</qds-stack>`,
+      },
+    ],
   };
 }

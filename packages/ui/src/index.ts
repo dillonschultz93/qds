@@ -36,3 +36,8 @@ export type {
   QdsStackAlign,
   QdsStackJustify,
 } from './components/qds-stack/qds-stack.js';
+
+export { QdsProgressBar } from './components/qds-progress-bar/qds-progress-bar.js';
+export type {
+  QdsProgressBarVariant,
+} from './components/qds-progress-bar/qds-progress-bar.js';
