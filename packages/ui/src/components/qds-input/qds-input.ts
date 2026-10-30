@@ -66,7 +66,7 @@ export class QdsInput extends QdsElement {
         --_padding-block: var(--qds-component-input-md-padding-block, 0.5rem);
         --_padding-inline: var(--qds-component-input-md-padding-inline, 0.75rem);
         --_font-size: var(--qds-component-input-md-font-size, 0.875rem);
-        --_border: var(--qds-component-input-color-border-rest, #cbd5e1);
+        --_border: var(--qds-component-input-color-border-rest, #64748b);
       }
 
       :host([size='sm']) {

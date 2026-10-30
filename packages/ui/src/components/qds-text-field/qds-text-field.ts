@@ -76,7 +76,7 @@ export class QdsTextField extends QdsElement {
       :host {
         display: block;
 
-        --_border: var(--qds-component-text-field-control-color-border-rest, #cbd5e1);
+        --_border: var(--qds-component-text-field-control-color-border-rest, #64748b);
       }
 
       .base {

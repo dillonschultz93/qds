@@ -4,7 +4,7 @@ import { styleMap } from 'lit/directives/style-map.js';
 
 import { QdsElement } from '../../internal/qds-element.js';
 
-export type QdsProgressBarVariant = 'primary' | 'success' | 'warning' | 'danger';
+export type QdsProgressBarVariant = 'primary' | 'success' | 'warning' | 'error';
 
 /**
  * Shows how far along a task is.
@@ -40,15 +40,15 @@ export class QdsProgressBar extends QdsElement {
       }
 
       :host([variant='success']) {
-        --_fill: var(--qds-component-progress-bar-success-color-background-rest, #15803d);
+        --_fill: var(--qds-component-progress-bar-success-color-background-rest, #059669);
       }
 
       :host([variant='warning']) {
-        --_fill: var(--qds-component-progress-bar-warning-color-background-rest, #854d0e);
+        --_fill: var(--qds-component-progress-bar-warning-color-background-rest, #d97706);
       }
 
-      :host([variant='danger']) {
-        --_fill: var(--qds-component-progress-bar-danger-color-background-rest, #dc2626);
+      :host([variant='error']) {
+        --_fill: var(--qds-component-progress-bar-error-color-background-rest, #dc2626);
       }
 
       .track {

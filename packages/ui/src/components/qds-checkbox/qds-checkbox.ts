@@ -92,7 +92,7 @@ export class QdsCheckbox extends QdsElement {
         color: var(--qds-component-checkbox-control-color-content-checked, #f8fafc);
         background-color: var(--qds-component-checkbox-control-color-background-unchecked, #f8fafc);
         border: var(--qds-component-checkbox-control-border-width, 0.0625rem) solid
-          var(--qds-component-checkbox-control-color-border-unchecked, #cbd5e1);
+          var(--qds-component-checkbox-control-color-border-unchecked, #64748b);
         border-radius: var(--qds-component-checkbox-control-border-radius, 0.25rem);
 
         transition:

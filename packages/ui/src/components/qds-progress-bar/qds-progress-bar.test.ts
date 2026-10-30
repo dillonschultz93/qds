@@ -25,7 +25,7 @@ describe('qds-progress-bar', () => {
   });
 
   it('is accessible determinate and indeterminate, in every variant', async () => {
-    for (const variant of ['primary', 'success', 'warning', 'danger'] as const) {
+    for (const variant of ['primary', 'success', 'warning', 'error'] as const) {
       await expect(
         await fixture(
           html`<qds-progress-bar label="Saving" value="50" variant=${variant}></qds-progress-bar>`,

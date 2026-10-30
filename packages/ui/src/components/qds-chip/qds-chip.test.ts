@@ -16,7 +16,7 @@ describe('qds-chip', () => {
   });
 
   it('is accessible in every variant, with and without a remove button', async () => {
-    for (const variant of ['neutral', 'info', 'success', 'warning', 'danger'] as const) {
+    for (const variant of ['neutral', 'info', 'success', 'warning', 'error'] as const) {
       await expect(
         await fixture(html`<qds-chip variant=${variant}>Status</qds-chip>`),
       ).to.be.accessible();

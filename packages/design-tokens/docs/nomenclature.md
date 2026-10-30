@@ -169,9 +169,12 @@ The available roles are:
 - info
 - warning
 - danger
+- error
 - success
 - subtle
 - neutral
+- control
+- raised
 - headline
 - display
 - title
@@ -179,6 +182,23 @@ The available roles are:
 - label
 - meta
 - data
+
+Three pairs of roles are easy to confuse:
+
+- **`danger` and `error`.** `danger` is an *action* role: a destructive button, filled and
+  stateful (`color.background.danger.rest`, `.hover`, …). `error` is a *status* role, alongside
+  `info`, `success`, and `warning`: a tinted background, a text color, and a border, with no states.
+  Use `error` for validation messages and failed states, `danger` for "Delete".
+- **`default` and `control` borders.** A `default` border is decorative — a divider, a card edge —
+  and may be faint. A `control` border is the only thing showing where an interactive control is
+  (an input, an unchecked checkbox), so it must reach 3:1 against the page.
+- **`default` and `raised` backgrounds.** `raised` is the surface of something elevated, such as a
+  card or dialog. In light mode it matches `default` and the shadow does the work; in dark mode it is
+  a step lighter, because a shadow cannot be seen against a near-black page.
+
+The status roles also have **border** colors, tuned to reach 3:1 against the page. Because that is
+exactly the requirement for any non-text mark, they are also what solid status indicators use — a
+progress bar's fill, for example.
 
 ##### State
 
@@ -275,6 +295,23 @@ The property signifier describes the component property to be controlled:
 
 CSS properties are validated against a registered list (`component.cssProperties`) so that typos are
 caught. Extend that list freely as components need more.
+
+Three pairs of roles are easy to confuse:
+
+- **`danger` and `error`.** `danger` is an *action* role: a destructive button, filled and
+  stateful (`color.background.danger.rest`, `.hover`, …). `error` is a *status* role, alongside
+  `info`, `success`, and `warning`: a tinted background, a text color, and a border, with no states.
+  Use `error` for validation messages and failed states, `danger` for "Delete".
+- **`default` and `control` borders.** A `default` border is decorative — a divider, a card edge —
+  and may be faint. A `control` border is the only thing showing where an interactive control is
+  (an input, an unchecked checkbox), so it must reach 3:1 against the page.
+- **`default` and `raised` backgrounds.** `raised` is the surface of something elevated, such as a
+  card or dialog. In light mode it matches `default` and the shadow does the work; in dark mode it is
+  a step lighter, because a shadow cannot be seen against a near-black page.
+
+The status roles also have **border** colors, tuned to reach 3:1 against the page. Because that is
+exactly the requirement for any non-text mark, they are also what solid status indicators use — a
+progress bar's fill, for example.
 
 ##### State
 

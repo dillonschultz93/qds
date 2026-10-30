@@ -3,7 +3,7 @@ import { customElement, property } from 'lit/decorators.js';
 
 import { QdsElement } from '../../internal/qds-element.js';
 
-export type QdsChipVariant = 'neutral' | 'info' | 'success' | 'warning' | 'danger';
+export type QdsChipVariant = 'neutral' | 'info' | 'success' | 'warning' | 'error';
 
 /**
  * A compact label for a status, category, or applied filter.
@@ -72,10 +72,10 @@ export class QdsChip extends QdsElement {
         --_border: var(--qds-component-chip-warning-color-border-rest, transparent);
       }
 
-      :host([variant='danger']) {
-        --_bg: var(--qds-component-chip-danger-color-background-rest, #f8fafc);
-        --_fg: var(--qds-component-chip-danger-color-content-rest, #b91c1c);
-        --_border: var(--qds-component-chip-danger-color-border-rest, #dc2626);
+      :host([variant='error']) {
+        --_bg: var(--qds-component-chip-error-color-background-rest, #fee2e2);
+        --_fg: var(--qds-component-chip-error-color-content-rest, #b91c1c);
+        --_border: var(--qds-component-chip-error-color-border-rest, transparent);
       }
 
       .base {

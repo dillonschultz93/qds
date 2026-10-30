@@ -179,6 +179,18 @@ export const semantic = {
    * typographic roles (`headline`, `body`, `meta`) because both are addressed
    * the same way: `color.background.danger` and `typography.body` share one
    * grammar slot.
+   *
+   * `danger` and `error` are deliberately different. `danger` is an ACTION
+   * role — a destructive button, filled and stateful (`danger.rest`,
+   * `danger.hover`). `error` is a STATUS role, alongside `info`, `success`, and
+   * `warning` — a tinted background, a text color, and a border, stateless. One
+   * role could not be both: a stateful role cannot also hold a plain token.
+   *
+   * `control` names the boundary of an interactive control (an input's border,
+   * an unchecked checkbox), which must reach 3:1 against the page where the
+   * decorative `default` border does not. `raised` names the surface of
+   * something elevated (a card, a dialog), which in dark mode has to lighten,
+   * since a shadow cannot be seen against a near-black page.
    */
   roles: [
     'default',
@@ -187,9 +199,12 @@ export const semantic = {
     'info',
     'warning',
     'danger',
+    'error',
     'success',
     'subtle',
     'neutral',
+    'control',
+    'raised',
     'headline',
     'display',
     'title',

@@ -318,7 +318,7 @@ export default function () {
   <qds-chip variant="info">In review</qds-chip>
   <qds-chip variant="success">Published</qds-chip>
   <qds-chip variant="warning">Expiring soon</qds-chip>
-  <qds-chip variant="danger">Overdue</qds-chip>
+  <qds-chip variant="error">Overdue</qds-chip>
 </qds-stack>`,
       },
       {
@@ -401,7 +401,7 @@ export default function () {
   <qds-progress-bar label="Primary" value="70"></qds-progress-bar>
   <qds-progress-bar label="Success" value="100" variant="success"></qds-progress-bar>
   <qds-progress-bar label="Warning" value="85" variant="warning"></qds-progress-bar>
-  <qds-progress-bar label="Danger" value="97" variant="danger"></qds-progress-bar>
+  <qds-progress-bar label="Error" value="97" variant="error"></qds-progress-bar>
 </qds-stack>`,
       },
     ],
