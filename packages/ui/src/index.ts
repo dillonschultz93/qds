@@ -38,3 +38,10 @@ export type {
 } from './components/qds-stack/qds-stack.js';
 
 export { QdsCheckbox } from './components/qds-checkbox/qds-checkbox.js';
+
+export { QdsRadioGroup } from './components/qds-radio-group/qds-radio-group.js';
+export type {
+  QdsRadioGroupOrientation,
+} from './components/qds-radio-group/qds-radio-group.js';
+
+export { QdsRadio } from './components/qds-radio/qds-radio.js';

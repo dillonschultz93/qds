@@ -146,5 +146,51 @@ export default function () {
 </form>`,
       },
     ],
+
+    'qds-radio-group': [
+      {
+        title: 'A group of options',
+        description:
+          'Tab moves into the group and lands on the chosen option; arrow keys move between options and choose as they go.',
+        html: `<qds-radio-group label="Delivery" name="delivery" value="standard">
+  <qds-radio value="standard">Standard — 3 to 5 days</qds-radio>
+  <qds-radio value="express">Express — next day</qds-radio>
+  <qds-radio value="pickup" disabled>Pick up in store (unavailable)</qds-radio>
+</qds-radio-group>`,
+      },
+      {
+        title: 'Inline orientation',
+        html: `<qds-radio-group label="Size" orientation="inline">
+  <qds-radio value="s">Small</qds-radio>
+  <qds-radio value="m" checked>Medium</qds-radio>
+  <qds-radio value="l">Large</qds-radio>
+</qds-radio-group>`,
+      },
+      {
+        title: 'Disabled group',
+        html: `<qds-radio-group label="Plan" value="free" disabled>
+  <qds-radio value="free">Free</qds-radio>
+  <qds-radio value="pro">Pro</qds-radio>
+</qds-radio-group>`,
+      },
+      {
+        title: 'Inside a form',
+        description:
+          'The group is the form-associated element: it submits the chosen value under its name, and required blocks submission until something is chosen.',
+        html: `<form onsubmit="event.preventDefault(); this.querySelector('output').textContent = JSON.stringify(Object.fromEntries(new FormData(this)));">
+  <qds-stack gap="300">
+    <qds-radio-group label="Contact me by" name="contact" required>
+      <qds-radio value="email">Email</qds-radio>
+      <qds-radio value="phone">Phone</qds-radio>
+    </qds-radio-group>
+    <qds-stack direction="inline" gap="200" align="center">
+      <qds-button type="submit">Submit</qds-button>
+      <qds-button type="reset" variant="ghost">Reset</qds-button>
+      <output></output>
+    </qds-stack>
+  </qds-stack>
+</form>`,
+      },
+    ],
   };
 }
