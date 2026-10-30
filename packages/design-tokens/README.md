@@ -96,7 +96,7 @@ Each token has `name`, `path`, `type`, `tier`, `set`, `description`, its resolve
 mode (`modes`), what it references (`references`, `referenceNames`), and `modeInvariant`. Types
 are included.
 
-The manifest is a single 144 kB module, and importing anything from it includes all of it. If you
+The manifest is a single 294 kB module, and importing anything from it includes all of it. If you
 only need the CSS variables, you don't need to import JavaScript at all.
 
 ## Everything the package exports
