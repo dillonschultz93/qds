@@ -132,7 +132,13 @@ export const primitive = {
    * deliberate addition, and adding one line here is cheap. Extend as the
    * palette grows.
    */
-  hues: ['neutral', 'blue', 'green', 'yellow', 'red', 'purple', 'teal'],
+  /**
+   * `black` is the exception to "steps are lightness": its steps are opacity
+   * percentages (`color.black.20` is black at 20%), for shadows. A solid gray
+   * shadow only reads on a light page; a translucent one darkens whatever is
+   * behind it, in either mode.
+   */
+  hues: ['neutral', 'black', 'blue', 'green', 'yellow', 'red', 'purple', 'teal'],
 };
 
 /**

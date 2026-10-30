@@ -88,6 +88,10 @@ Hue names are validated against a registered list (`primitive.hues`) rather than
 unrecognized hue is far more often a typo than a deliberate addition, and registering a new one is a
 one-line change.
 
+`black` is the one hue whose steps are not lightness: they are opacity percentages, so
+`color.black.20` is black at 20%. It exists for shadows, which need to darken whatever is behind
+them in either mode — a solid gray shadow only reads on a light page.
+
 ##### Value
 
 The value identifier serves as a way to identify a determined raw value. Using a ramp numbering system or t-shirt sizing is a common way to convey this.
@@ -413,7 +417,5 @@ respectively.
 
 Recorded here rather than worked around silently.
 
-**Shadow color has no alpha.** `elevation.*` composes shadow primitives with a solid neutral, because
-the palette has no translucent colors and DTCG has no alpha modifier without reaching for Token
-Studio-specific syntax. The result reads acceptably but is less soft than a real alpha shadow. Adding
-translucent neutral primitives would fix it.
+None at the moment. The two gaps once recorded here — no role for content on a filled surface, and
+shadows with no alpha — were closed by the `inverse` role and the `black` opacity steps.
