@@ -122,6 +122,67 @@ describe('qds-radio-group', () => {
     expect(group.value, 'wraps to the end').to.equal('l');
   });
 
+  it('treats radios wrapped in other elements as its own, but not a nested group’s', async () => {
+    const group = await fixture<QdsRadioGroup>(html`
+      <qds-radio-group label="Plan">
+        <div><qds-radio value="free">Free</qds-radio></div>
+        <div><qds-radio value="pro">Pro</qds-radio></div>
+        <qds-radio-group label="Add-ons">
+          <qds-radio value="support">Support</qds-radio>
+        </qds-radio-group>
+      </qds-radio-group>
+    `);
+    await settle(group);
+    const [free, pro, support] = [...group.querySelectorAll('qds-radio')];
+
+    pro!.click();
+    await settle(group);
+    expect(group.value).to.equal('pro');
+    expect(pro!.checked).to.be.true;
+    expect(pro!.tabIndex).to.equal(0);
+
+    pro!.focus();
+    press('ArrowDown');
+    await settle(group);
+    expect(group.value, 'wraps to the first wrapped radio').to.equal('free');
+    expect(free!.checked).to.be.true;
+
+    support!.click();
+    await settle(group);
+    expect(group.value, 'a nested group’s radio is not ours').to.equal('free');
+  });
+
+  it('follows the visual direction for Left and Right under RTL', async () => {
+    const container = await fixture<HTMLDivElement>(html`<div dir="rtl">${sizes()}</div>`);
+    const group = container.querySelector('qds-radio-group') as QdsRadioGroup;
+    await settle(group);
+
+    radiosOf(group)[0]!.focus();
+    press('ArrowLeft');
+    await settle(group);
+
+    expect(group.value, 'Left moves forward in RTL').to.equal('m');
+  });
+
+  it('leaves arrow keys with a modifier to the browser', async () => {
+    const group = await fixture<QdsRadioGroup>(sizes());
+    await settle(group);
+    radiosOf(group)[0]!.focus();
+
+    const event = new KeyboardEvent('keydown', {
+      key: 'ArrowRight',
+      altKey: true,
+      bubbles: true,
+      composed: true,
+      cancelable: true,
+    });
+    document.activeElement!.dispatchEvent(event);
+    await settle(group);
+
+    expect(group.value).to.equal('');
+    expect(event.defaultPrevented).to.be.false;
+  });
+
   it('ignores clicks and keys while disabled', async () => {
     const group = await fixture<QdsRadioGroup>(html`
       <qds-radio-group label="Size" disabled>

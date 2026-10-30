@@ -129,8 +129,14 @@ export class QdsRadioGroup extends QdsElement {
     return this.#internals.validity;
   }
 
+  /**
+   * This group's radios: every qds-radio inside it, however deeply wrapped for
+   * layout, except those that belong to a group nested inside this one.
+   */
   get #radios(): QdsRadio[] {
-    return [...this.querySelectorAll(':scope > qds-radio')] as QdsRadio[];
+    return ([...this.querySelectorAll('qds-radio')] as QdsRadio[]).filter(
+      (radio) => radio.closest('qds-radio-group') === this,
+    );
   }
 
   get #enabledRadios(): QdsRadio[] {
@@ -240,26 +246,39 @@ export class QdsRadioGroup extends QdsElement {
   #handleSelect = (event: Event): void => {
     if (this.disabled || this.formDisabled) return;
     const radio = event.target as QdsRadio;
+    // A nested group's radio bubbles its event up through this one too.
+    if (!this.#radios.includes(radio)) return;
     this.#choose(radio);
     radio.focus();
   };
 
   #handleKeydown = (event: KeyboardEvent): void => {
     if (this.disabled || this.formDisabled) return;
+    // Alt+Left is the browser's Back; leave every modified key to the browser.
+    if (event.altKey || event.ctrlKey || event.metaKey) return;
 
     const radios = this.#enabledRadios;
     const current = radios.indexOf(event.target as QdsRadio);
     if (current === -1) return;
 
+    // Left and Right follow the visual order, which reverses under RTL.
+    const rtl = getComputedStyle(this).direction === 'rtl';
+    const forward = (current + 1) % radios.length;
+    const backward = (current - 1 + radios.length) % radios.length;
+
     let next: number;
     switch (event.key) {
       case 'ArrowDown':
-      case 'ArrowRight':
-        next = (current + 1) % radios.length;
+        next = forward;
         break;
       case 'ArrowUp':
+        next = backward;
+        break;
+      case 'ArrowRight':
+        next = rtl ? backward : forward;
+        break;
       case 'ArrowLeft':
-        next = (current - 1 + radios.length) % radios.length;
+        next = rtl ? forward : backward;
         break;
       case ' ':
         next = current;
