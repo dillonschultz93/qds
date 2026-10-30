@@ -68,3 +68,8 @@ export { QdsCard } from './components/qds-card/qds-card.js';
 export type {
   QdsCardVariant,
 } from './components/qds-card/qds-card.js';
+
+export { QdsProgressBar } from './components/qds-progress-bar/qds-progress-bar.js';
+export type {
+  QdsProgressBarVariant,
+} from './components/qds-progress-bar/qds-progress-bar.js';
