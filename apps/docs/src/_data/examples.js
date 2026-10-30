@@ -110,5 +110,35 @@ export default function () {
 </qds-stack>`,
       },
     ],
+
+    'qds-tabs': [
+      {
+        title: 'Basic',
+        description:
+          'Left and Right select as they move; Tab goes from the selected tab straight into its panel. Tabs and panels pair by position.',
+        html: `<qds-tabs label="Account settings" style="width: 100%;">
+  <qds-tab slot="tab">Profile</qds-tab>
+  <qds-tab slot="tab">Security</qds-tab>
+  <qds-tab slot="tab">Billing</qds-tab>
+  <qds-tab slot="tab" disabled>Team (Pro only)</qds-tab>
+  <qds-tab-panel>Your name, photo, and bio.</qds-tab-panel>
+  <qds-tab-panel>Password, two-factor authentication, and active sessions.</qds-tab-panel>
+  <qds-tab-panel>Plan, payment method, and invoices.</qds-tab-panel>
+  <qds-tab-panel>Invite and manage teammates.</qds-tab-panel>
+</qds-tabs>`,
+      },
+      {
+        title: 'Initial selection',
+        description: 'Mark a tab selected in the markup to start there.',
+        html: `<qds-tabs label="Reports" style="width: 100%;">
+  <qds-tab slot="tab">Daily</qds-tab>
+  <qds-tab slot="tab" selected>Weekly</qds-tab>
+  <qds-tab slot="tab">Monthly</qds-tab>
+  <qds-tab-panel>Today's numbers.</qds-tab-panel>
+  <qds-tab-panel>This week's numbers.</qds-tab-panel>
+  <qds-tab-panel>This month's numbers.</qds-tab-panel>
+</qds-tabs>`,
+      },
+    ],
   };
 }
