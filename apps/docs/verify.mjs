@@ -362,6 +362,17 @@ const chipRemoval = await page.evaluate(() => {
 check('qds-chip remove button fires qds-remove, and the example removes the chip',
   chipRemoval.after === chipRemoval.before - 1, JSON.stringify(chipRemoval));
 
+// A disabled filter chip must not react to hover. Needs a real pointer.
+const disabledChip = page.locator('qds-chip[selectable][disabled]');
+const chipFill = () =>
+  disabledChip.evaluate((chip) => getComputedStyle(chip.shadowRoot.querySelector('.base')).backgroundColor);
+await page.mouse.move(0, 0);
+const fillAtRest = await chipFill();
+await disabledChip.hover({ force: true });
+const fillHovered = await chipFill();
+check('a disabled filter chip does not change on hover',
+  fillAtRest === fillHovered, JSON.stringify({ fillAtRest, fillHovered }));
+
 // ── Accordion: interaction after hydration ───────────────────────────────────
 await gotoReady('/components/qds-accordion/');
 const accordionToggle = await page.evaluate(() => {

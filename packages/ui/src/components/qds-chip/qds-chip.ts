@@ -173,11 +173,12 @@ export class QdsChip extends QdsElement {
         appearance: none;
       }
 
-      button.base:where(:hover) {
+      /* Hover only while enabled: a disabled chip must not look interactive. */
+      button.base:where(:hover:not(:disabled)) {
         background-color: var(--qds-component-chip-selectable-color-background-hover, #e2e8f0);
       }
 
-      :host([selected]) button.base:where(:hover) {
+      :host([selected]) button.base:where(:hover:not(:disabled)) {
         background-color: var(--qds-component-chip-selected-color-background-hover, #1d4ed8);
       }
 
