@@ -86,3 +86,8 @@ export { QdsTabs } from './components/qds-tabs/qds-tabs.js';
 export { QdsTab } from './components/qds-tab/qds-tab.js';
 
 export { QdsTabPanel } from './components/qds-tab-panel/qds-tab-panel.js';
+
+export { QdsModal } from './components/qds-modal/qds-modal.js';
+export type {
+  QdsModalSize,
+} from './components/qds-modal/qds-modal.js';

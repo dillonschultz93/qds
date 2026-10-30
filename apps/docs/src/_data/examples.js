@@ -476,5 +476,34 @@ export default function () {
 </qds-tabs>`,
       },
     ],
+
+    'qds-modal': [
+      {
+        title: 'Confirmation',
+        description:
+          'Built on the native dialog: the page behind becomes inert, focus moves in, Escape closes it, and focus returns to the button that opened it.',
+        html: `<qds-button variant="danger" onclick="document.getElementById('delete-modal').show()">
+  Delete project
+</qds-button>
+<qds-modal id="delete-modal" heading="Delete this project?" size="sm">
+  <p style="margin: 0;">Its 14 files and their history will be removed. This cannot be undone.</p>
+  <form method="dialog" slot="footer">
+    <qds-button type="submit" variant="ghost">Cancel</qds-button>
+    <qds-button type="submit" variant="danger">Delete project</qds-button>
+  </form>
+</qds-modal>`,
+      },
+      {
+        title: 'Light dismiss',
+        description:
+          'Clicking the backdrop closes the dialog only with light-dismiss, so a stray click cannot throw away a half-filled form.',
+        html: `<qds-button variant="secondary" onclick="document.getElementById('info-modal').show()">
+  What's new
+</qds-button>
+<qds-modal id="info-modal" heading="What's new in 0.2" light-dismiss>
+  <p style="margin: 0;">Eleven new components, from checkboxes to tabs.</p>
+</qds-modal>`,
+      },
+    ],
   };
 }

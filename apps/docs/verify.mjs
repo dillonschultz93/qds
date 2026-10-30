@@ -396,8 +396,49 @@ check('qds-tabs shows the selected panel after hydration, and switches on click'
     tabsState.afterClick.join() === 'false,false,true,false',
   JSON.stringify(tabsState));
 
+// ── Modal: real keyboard, inert page, focus return ───────────────────────────
+/**
+ * The native dialog supplies Escape, inertness, and focus return. Driven with a
+ * real key press, since a synthetic event exercises none of them.
+ */
+await gotoReady('/components/qds-modal/');
+const opener = page.locator('qds-button', { hasText: 'Delete project' }).first();
+await opener.click();
+await page.waitForFunction(() => document.getElementById('delete-modal').open);
+const whileOpen = await page.evaluate(() => {
+  const dialog = document.getElementById('delete-modal').shadowRoot.querySelector('dialog');
+  // Inert content refuses focus, so a link behind the modal stays unfocused.
+  const link = document.querySelector('a[href]');
+  link.focus();
+  return { modal: dialog.matches(':modal'), pageInert: document.activeElement !== link };
+});
+await page.keyboard.press('Escape');
+await page.waitForFunction(() => !document.getElementById('delete-modal').open);
+const focusReturned = await page.evaluate(() => {
+  const active = document.activeElement;
+  return active?.tagName === 'QDS-BUTTON' && active.textContent.includes('Delete project');
+});
+check('qds-modal opens modally, closes on Escape, and returns focus to its opener',
+  whileOpen.modal && whileOpen.pageInert && focusReturned,
+  JSON.stringify({ ...whileOpen, focusReturned }));
+
+// A slotted <form method="dialog"> cannot reach the shadow dialog natively.
+await opener.click();
+await page.waitForFunction(() => document.getElementById('delete-modal').open);
+await page.locator('#delete-modal qds-button', { hasText: 'Cancel' }).click();
+const closedByForm = await page
+  .waitForFunction(() => !document.getElementById('delete-modal').open, null, { timeout: 2000 })
+  .then(() => true, () => false);
+check('qds-modal closes from a slotted form with method="dialog"', closedByForm);
+
+// ── Component summaries are escaped exactly once ─────────────────────────────
+await gotoReady('/components/qds-modal/');
+const lede = await page.evaluate(() => document.querySelector('.lede')?.textContent ?? '');
+check('component page summaries are not double-escaped',
+  lede.includes('<dialog>') && !lede.includes('&lt;'), lede.slice(0, 120));
+
 // ── 8. Console cleanliness across every page ─────────────────────────────────
-for (const path of ['/', '/tokens/', '/components/', '/components/qds-stack/', '/components/qds-checkbox/', '/components/qds-radio-group/', '/components/qds-radio/', '/components/qds-toggle/', '/components/qds-input/', '/components/qds-text-field/', '/components/qds-chip/', '/components/qds-card/', '/components/qds-progress-bar/', '/components/qds-accordion/', '/components/qds-accordion-item/', '/components/qds-tabs/', '/components/qds-tab/', '/components/qds-tab-panel/']) {
+for (const path of ['/', '/tokens/', '/components/', '/components/qds-stack/', '/components/qds-checkbox/', '/components/qds-radio-group/', '/components/qds-radio/', '/components/qds-toggle/', '/components/qds-input/', '/components/qds-text-field/', '/components/qds-chip/', '/components/qds-card/', '/components/qds-progress-bar/', '/components/qds-accordion/', '/components/qds-accordion-item/', '/components/qds-tabs/', '/components/qds-tab/', '/components/qds-tab-panel/', '/components/qds-modal/']) {
   await gotoReady(path);
 }
 check('no console errors on any page', consoleErrors.length === 0,
