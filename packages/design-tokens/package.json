@@ -1,6 +1,6 @@
 {
   "name": "@quieto/design-tokens",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Three-tier design tokens as CSS custom properties and a typed JS manifest, with light and dark modes.",
   "type": "module",
   "license": "MIT",

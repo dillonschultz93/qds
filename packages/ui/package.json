@@ -1,6 +1,6 @@
 {
   "name": "@quieto/ui",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "QDS web components — Lit elements styled entirely by @quieto/design-tokens.",
   "type": "module",
   "license": "MIT",
@@ -10,7 +10,12 @@
     "url": "git+https://github.com/dillonschultz93/qds.git",
     "directory": "packages/ui"
   },
-  "keywords": ["web-components", "lit", "design-system", "custom-elements"],
+  "keywords": [
+    "web-components",
+    "lit",
+    "design-system",
+    "custom-elements"
+  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -86,10 +91,16 @@
     },
     "./custom-elements.json": "./custom-elements.json"
   },
-  "files": ["dist", "custom-elements.json"],
+  "files": [
+    "dist",
+    "custom-elements.json"
+  ],
   "customElements": "custom-elements.json",
   "//sideEffects": "Defining a custom element IS a side effect, so every module that calls customElements.define must be listed — including the index barrel, which registers everything by re-exporting the component modules. Omitting index.js lets a bundler tree-shake `import '@quieto/ui'` down to nothing: no error, no elements registered, and the page shows un-upgraded markup.",
-  "sideEffects": ["./dist/index.js", "./dist/**/qds-*.js"],
+  "sideEffects": [
+    "./dist/index.js",
+    "./dist/**/qds-*.js"
+  ],
   "engines": {
     "node": ">=22"
   },
