@@ -47,3 +47,9 @@ export type {
 export { QdsRadio } from './components/qds-radio/qds-radio.js';
 
 export { QdsToggle } from './components/qds-toggle/qds-toggle.js';
+
+export { QdsInput } from './components/qds-input/qds-input.js';
+export type {
+  QdsInputType,
+  QdsInputSize,
+} from './components/qds-input/qds-input.js';
