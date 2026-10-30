@@ -1,4 +1,4 @@
-import { expect, fixture, html, oneEvent, elementUpdated } from '@open-wc/testing';
+import { expect, fixture, html, oneEvent, elementUpdated, nextFrame } from '@open-wc/testing';
 
 import './qds-accordion.js';
 import '../qds-accordion-item/qds-accordion-item.js';
@@ -157,6 +157,52 @@ describe('qds-accordion', () => {
 
     expect(itemsOf(accordion).map((item) => item.open)).to.deep.equal([false, true, false]);
     expect(closes).to.equal(0);
+  });
+
+  it('keeps only the first item open when markup opens several in an exclusive accordion', async () => {
+    const accordion = await fixture<QdsAccordion>(html`
+      <qds-accordion exclusive>
+        <qds-accordion-item heading="One">1</qds-accordion-item>
+        <qds-accordion-item heading="Two" open>2</qds-accordion-item>
+        <qds-accordion-item heading="Three" open>3</qds-accordion-item>
+      </qds-accordion>
+    `);
+    await accordion.updateComplete;
+    await nextFrame();
+
+    expect(itemsOf(accordion).map((item) => item.open)).to.deep.equal([false, true, false]);
+  });
+
+  it('enforces exclusive when an item is opened from code', async () => {
+    const accordion = await fixture<QdsAccordion>(faq(true));
+    const [first, , third] = itemsOf(accordion);
+
+    first!.open = true;
+    await elementUpdated(first!);
+    third!.open = true;
+    await elementUpdated(third!);
+
+    expect(itemsOf(accordion).map((item) => item.open)).to.deep.equal([false, false, true]);
+  });
+
+  it('leaves arrow keys with a modifier to the browser', async () => {
+    const accordion = await fixture<QdsAccordion>(faq());
+    const [first] = itemsOf(accordion);
+    first!.focus();
+
+    const event = new KeyboardEvent('keydown', {
+      key: 'ArrowDown',
+      altKey: true,
+      bubbles: true,
+      composed: true,
+      cancelable: true,
+    });
+    document.activeElement!.dispatchEvent(event);
+
+    // Compared by identity: a failing equal() on two elements makes chai try to
+    // print every property of a Lit element, which hangs the test page.
+    expect(document.activeElement === first, 'focus stays put').to.be.true;
+    expect(event.defaultPrevented).to.be.false;
   });
 
   it('ignores open events from a nested accordion', async () => {

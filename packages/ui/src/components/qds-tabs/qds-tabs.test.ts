@@ -143,6 +143,25 @@ describe('qds-tabs', () => {
     expect(tabs.selectedIndex).to.equal(1);
   });
 
+  it('leaves arrow keys with a modifier to the browser', async () => {
+    const tabs = await fixture<QdsTabs>(account());
+    await settle(tabs);
+    tabsOf(tabs)[0]!.focus();
+
+    const event = new KeyboardEvent('keydown', {
+      key: 'ArrowLeft',
+      altKey: true,
+      bubbles: true,
+      composed: true,
+      cancelable: true,
+    });
+    document.activeElement!.dispatchEvent(event);
+    await settle(tabs);
+
+    expect(tabs.selectedIndex).to.equal(0);
+    expect(event.defaultPrevented).to.be.false;
+  });
+
   it('ignores clicks on a disabled tab', async () => {
     const tabs = await fixture<QdsTabs>(html`
       <qds-tabs label="Account">

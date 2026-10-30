@@ -1,4 +1,4 @@
-import { css, html, nothing, type TemplateResult } from 'lit';
+import { css, html, isServer, nothing, type TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
 import { QdsElement } from '../../internal/qds-element.js';
@@ -151,7 +151,26 @@ export class QdsAccordionItem extends QdsElement {
 
   /** Whether the panel is shown. */
   @property({ type: Boolean, reflect: true })
-  open = false;
+  get open(): boolean {
+    return this.#open;
+  }
+
+  set open(open: boolean) {
+    const old = this.#open;
+    this.#open = open;
+    this.requestUpdate('open', old);
+    // Announced from the setter, synchronously, so that qds-accordion can enforce
+    // exclusive however the item opened — a click or code — and in the order
+    // items were opened: when two open in one tick, the last one wins.
+    // Not before the first render: the open state in markup is reconciled by the
+    // accordion itself, keeping the first, as native exclusive <details> does.
+    // qds-open is the public event, and only fires for the user.
+    if (open && !old && this.hasUpdated && !isServer) {
+      this.dispatchEvent(new Event('qds-accordion-item-opened', { bubbles: true }));
+    }
+  }
+
+  #open = false;
 
   /** Prevents opening or closing, and takes the heading out of the tab order. */
   @property({ type: Boolean, reflect: true })

@@ -150,6 +150,8 @@ export class QdsTabs extends QdsElement {
   };
 
   #handleKeydown = (event: KeyboardEvent): void => {
+    // Alt+Left is the browser's Back; leave every modified key to the browser.
+    if (event.altKey || event.ctrlKey || event.metaKey) return;
     const tabs = this.#tabs;
     const current = tabs.indexOf(event.target as QdsTab);
     if (current === -1) return;
