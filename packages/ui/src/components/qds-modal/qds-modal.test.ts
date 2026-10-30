@@ -16,11 +16,15 @@ const basic = () => html`
   </qds-modal>
 `;
 
-/** Open a modal and wait for it to be showing. */
+/**
+ * Open a modal and wait for it to be fully shown — including its fade-in, or
+ * anything measuring colors (axe's contrast check) sees them half-transparent.
+ */
 const open = async (modal: QdsModal): Promise<void> => {
   const opened = oneEvent(modal, 'qds-open');
   modal.show();
   await opened;
+  await Promise.all(dialogOf(modal).getAnimations().map((animation) => animation.finished));
 };
 
 describe('qds-modal', () => {
