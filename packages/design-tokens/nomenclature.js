@@ -191,6 +191,12 @@ export const semantic = {
    * decorative `default` border does not. `raised` names the surface of
    * something elevated (a card, a dialog), which in dark mode has to lighten,
    * since a shadow cannot be seen against a near-black page.
+   *
+   * `inverse` names content drawn ON a filled surface — the label of a primary
+   * button, a check mark in a checked box. Every other role describes what the
+   * element itself means; this one describes what it sits on. It flips with the
+   * mode (light text in light mode, dark in dark) because the filled surfaces
+   * lighten in dark mode, and light text on them falls below 4.5:1.
    */
   roles: [
     'default',
@@ -205,6 +211,7 @@ export const semantic = {
     'neutral',
     'control',
     'raised',
+    'inverse',
     'headline',
     'display',
     'title',

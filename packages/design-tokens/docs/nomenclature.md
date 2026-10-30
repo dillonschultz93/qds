@@ -175,6 +175,7 @@ The available roles are:
 - neutral
 - control
 - raised
+- inverse
 - headline
 - display
 - title
@@ -195,6 +196,12 @@ Three pairs of roles are easy to confuse:
 - **`default` and `raised` backgrounds.** `raised` is the surface of something elevated, such as a
   card or dialog. In light mode it matches `default` and the shadow does the work; in dark mode it is
   a step lighter, because a shadow cannot be seen against a near-black page.
+
+`inverse` is different in kind from the rest. Every other role describes what an element *is*;
+`inverse` describes what it sits *on*: content drawn on a filled surface, such as the label of a
+primary button or the check mark in a checked box. It flips with the mode — light in light mode,
+dark in dark — because filled surfaces lighten in dark mode, where light text on them would fall
+below 4.5:1.
 
 The status roles also have **border** colors, tuned to reach 3:1 against the page. Because that is
 exactly the requirement for any non-text mark, they are also what solid status indicators use — a
@@ -309,6 +316,12 @@ Three pairs of roles are easy to confuse:
   card or dialog. In light mode it matches `default` and the shadow does the work; in dark mode it is
   a step lighter, because a shadow cannot be seen against a near-black page.
 
+`inverse` is different in kind from the rest. Every other role describes what an element *is*;
+`inverse` describes what it sits *on*: content drawn on a filled surface, such as the label of a
+primary button or the check mark in a checked box. It flips with the mode — light in light mode,
+dark in dark — because filled surfaces lighten in dark mode, where light text on them would fall
+below 4.5:1.
+
 The status roles also have **border** colors, tuned to reach 3:1 against the page. Because that is
 exactly the requirement for any non-text mark, they are also what solid status indicators use — a
 progress bar's fill, for example.
@@ -399,20 +412,6 @@ respectively.
 ## Known gaps
 
 Recorded here rather than worked around silently.
-
-**No inverse/on-color role.** The role vocabulary has no way to name "content on a filled surface" —
-white text on a primary button. Every role describes the element's own meaning, not its
-relationship to what sits behind it. Component tokens currently reach past the semantic tier
-straight to a primitive:
-
-```jsonc
-"button.primary.color.content.rest": "{color.neutral.50}"  // not a semantic token
-```
-
-That is legal under the tier contract, but it means a component hardcodes a palette step, so
-changing it in dark mode requires editing the component tier. Adding an `on-primary`-style role — or
-an `inverse` role — to the semantic vocabulary would close this. Worth deciding before the component
-library grows past a handful of filled surfaces.
 
 **Shadow color has no alpha.** `elevation.*` composes shadow primitives with a solid neutral, because
 the palette has no translucent colors and DTCG has no alpha modifier without reaching for Token

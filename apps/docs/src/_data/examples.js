@@ -70,6 +70,7 @@ export default function () {
   style="
     --qds-component-button-primary-color-background-rest: var(--qds-color-purple-600);
     --qds-component-button-primary-color-background-hover: var(--qds-color-purple-700);
+    --qds-component-button-primary-color-content-rest: var(--qds-color-neutral-50);
     --qds-component-button-border-radius: var(--qds-border-radius-full);
   "
 >Purple and round</qds-button>`,
