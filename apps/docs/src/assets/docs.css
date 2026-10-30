@@ -122,7 +122,13 @@ body {
   padding: var(--qds-spacing-600) var(--qds-spacing-500) var(--qds-spacing-800);
 }
 
-.prose h1 {
+/*
+ * Prose rules skip live examples. Outer styles beat a component's ::slotted()
+ * rules in the cascade, so a page-wide h3 margin would otherwise override how a
+ * card or accordion lays out its own slotted heading — and the demo would show
+ * the docs site's styling rather than the component's.
+ */
+.prose h1:not(.example__preview *) {
   font-family: var(--qds-semantic-typography-headline-font-family);
   font-size: var(--qds-semantic-typography-headline-font-size);
   font-weight: var(--qds-semantic-typography-headline-font-weight);
@@ -131,7 +137,7 @@ body {
   margin-block: 0 var(--qds-spacing-400);
 }
 
-.prose h2 {
+.prose h2:not(.example__preview *) {
   font-size: var(--qds-semantic-typography-title-font-size);
   font-weight: var(--qds-semantic-typography-title-font-weight);
   margin-block: var(--qds-spacing-700) var(--qds-spacing-300);
@@ -140,23 +146,23 @@ body {
     var(--qds-semantic-color-border-subtle);
 }
 
-.prose h3 {
+.prose h3:not(.example__preview *) {
   font-size: var(--qds-typography-font-size-400);
   font-weight: var(--qds-typography-font-weight-semibold);
   margin-block: var(--qds-spacing-500) var(--qds-spacing-200);
 }
 
-.prose h4,
-.prose h5,
-.prose h6 {
+.prose h4:not(.example__preview *),
+.prose h5:not(.example__preview *),
+.prose h6:not(.example__preview *) {
   font-size: var(--qds-typography-font-size-300);
   font-weight: var(--qds-typography-font-weight-semibold);
   margin-block: var(--qds-spacing-400) var(--qds-spacing-200);
 }
 
-.prose p,
-.prose ul,
-.prose ol {
+.prose p:not(.example__preview *),
+.prose ul:not(.example__preview *),
+.prose ol:not(.example__preview *) {
   margin-block: 0 var(--qds-spacing-400);
 }
 

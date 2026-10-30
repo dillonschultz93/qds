@@ -36,3 +36,8 @@ export type {
   QdsStackAlign,
   QdsStackJustify,
 } from './components/qds-stack/qds-stack.js';
+
+export { QdsCard } from './components/qds-card/qds-card.js';
+export type {
+  QdsCardVariant,
+} from './components/qds-card/qds-card.js';
