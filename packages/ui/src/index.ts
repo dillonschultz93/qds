@@ -36,3 +36,10 @@ export type {
   QdsStackAlign,
   QdsStackJustify,
 } from './components/qds-stack/qds-stack.js';
+
+export { QdsAccordion } from './components/qds-accordion/qds-accordion.js';
+
+export { QdsAccordionItem } from './components/qds-accordion-item/qds-accordion-item.js';
+export type {
+  QdsAccordionItemHeadingLevel,
+} from './components/qds-accordion-item/qds-accordion-item.js';

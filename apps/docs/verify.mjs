@@ -313,8 +313,19 @@ const svgLight = await page.evaluate(() => {
 check('inlined anatomy SVG follows the page theme toggle',
   svgDark !== svgLight, `label fill: dark=${svgDark} light=${svgLight}`);
 
+// ── Accordion: interaction after hydration ───────────────────────────────────
+await gotoReady('/components/qds-accordion/');
+const accordionToggle = await page.evaluate(() => {
+  const exclusive = document.querySelector('qds-accordion[exclusive]');
+  const items = [...exclusive.querySelectorAll('qds-accordion-item')];
+  items[1].shadowRoot.querySelector('button').click();
+  return items.map((item) => item.open);
+});
+check('qds-accordion opens an item on click and closes the others when exclusive',
+  accordionToggle.join() === 'false,true,false', JSON.stringify(accordionToggle));
+
 // ── 8. Console cleanliness across every page ─────────────────────────────────
-for (const path of ['/', '/tokens/', '/components/', '/components/qds-stack/']) {
+for (const path of ['/', '/tokens/', '/components/', '/components/qds-stack/', '/components/qds-accordion/', '/components/qds-accordion-item/']) {
   await gotoReady(path);
 }
 check('no console errors on any page', consoleErrors.length === 0,

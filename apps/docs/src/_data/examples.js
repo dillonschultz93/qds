@@ -110,5 +110,46 @@ export default function () {
 </qds-stack>`,
       },
     ],
+
+    'qds-accordion': [
+      {
+        title: 'Basic',
+        description:
+          'Each heading is a button inside a real heading, so the sections show up in heading navigation. Up and Down move between headings.',
+        html: `<qds-accordion style="width: 100%;">
+  <qds-accordion-item heading="How long does shipping take?" open>
+    Orders ship within one business day and arrive in 3 to 5 days.
+  </qds-accordion-item>
+  <qds-accordion-item heading="Can I return an item?">
+    Yes — returns are free for 30 days from delivery.
+  </qds-accordion-item>
+  <qds-accordion-item heading="Is there a warranty?">
+    Every product carries a two-year warranty covering parts and labour.
+  </qds-accordion-item>
+  <qds-accordion-item heading="Gift cards (coming soon)" disabled>
+    Not available yet.
+  </qds-accordion-item>
+</qds-accordion>`,
+      },
+      {
+        title: 'Exclusive',
+        description: 'Opening one item closes the others.',
+        html: `<qds-accordion exclusive style="width: 100%;">
+  <qds-accordion-item heading="Step 1: Account" open>Choose a username and password.</qds-accordion-item>
+  <qds-accordion-item heading="Step 2: Profile">Add a photo and a short bio.</qds-accordion-item>
+  <qds-accordion-item heading="Step 3: Notifications">Pick what we email you about.</qds-accordion-item>
+</qds-accordion>`,
+      },
+      {
+        title: 'Searchable when closed',
+        description:
+          'Closed panels use hidden="until-found": search this page for "aurora" and the item opens to show the match.',
+        html: `<qds-accordion style="width: 100%;">
+  <qds-accordion-item heading="Release codenames">
+    Every release is named after a natural phenomenon. The next one is aurora.
+  </qds-accordion-item>
+</qds-accordion>`,
+      },
+    ],
   };
 }
