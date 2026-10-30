@@ -52,9 +52,14 @@ The available category types are:
 - color
 - typography
 - spacing
+- size
 - border
 - shadow
+- opacity
 - animation
+
+`spacing` is the space between things; `size` is the dimensions of things, such as container
+widths, which outgrow the spacing scale. `opacity` is transparency, as a number from 0 to 1.
 
 ##### Sub-category (if needed)
 

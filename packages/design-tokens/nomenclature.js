@@ -92,7 +92,14 @@ export const STATES = [
  * Example: --qds-color-blue-400   (from color.blue.400)
  */
 export const primitive = {
-  categories: ['color', 'typography', 'spacing', 'border', 'shadow', 'animation'],
+  /**
+   * `size` is for the dimensions of things rather than the space between them
+   * (container widths, which outgrow the spacing scale), and `opacity` for
+   * transparency. Both were added when the component library first needed them:
+   * before that, the modal's widths and backdrop opacity were raw values with
+   * nothing to reference.
+   */
+  categories: ['color', 'typography', 'spacing', 'size', 'border', 'shadow', 'opacity', 'animation'],
 
   /**
    * Fixed sub-categories. Colors are the exception: their sub-category is a hue
