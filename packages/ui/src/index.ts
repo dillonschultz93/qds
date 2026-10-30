@@ -36,3 +36,5 @@ export type {
   QdsStackAlign,
   QdsStackJustify,
 } from './components/qds-stack/qds-stack.js';
+
+export { QdsToggle } from './components/qds-toggle/qds-toggle.js';
