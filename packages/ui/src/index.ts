@@ -36,3 +36,9 @@ export type {
   QdsStackAlign,
   QdsStackJustify,
 } from './components/qds-stack/qds-stack.js';
+
+export { QdsInput } from './components/qds-input/qds-input.js';
+export type {
+  QdsInputType,
+  QdsInputSize,
+} from './components/qds-input/qds-input.js';

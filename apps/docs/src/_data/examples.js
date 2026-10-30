@@ -110,5 +110,43 @@ export default function () {
 </qds-stack>`,
       },
     ],
+
+    'qds-input': [
+      {
+        title: 'Basic',
+        description:
+          'The bare control, named by its label attribute. For a visible label, hint, or error message, use qds-text-field.',
+        html: `<qds-input label="Search the docs" placeholder="Search the docs" type="search"></qds-input>`,
+      },
+      {
+        title: 'Sizes',
+        html: `<qds-stack gap="200">
+  <qds-input size="sm" label="Small" placeholder="Small"></qds-input>
+  <qds-input size="md" label="Medium" placeholder="Medium"></qds-input>
+  <qds-input size="lg" label="Large" placeholder="Large"></qds-input>
+</qds-stack>`,
+      },
+      {
+        title: 'Start and end slots',
+        description: 'For icons, prefixes, and units. Clicking an affix puts the cursor in the text.',
+        html: `<qds-stack gap="200">
+  <qds-input label="Amount" type="number" value="25">
+    <span slot="start" aria-hidden="true">$</span>
+    <span slot="end">USD</span>
+  </qds-input>
+  <qds-input label="Website" type="url" placeholder="example.com">
+    <span slot="start" aria-hidden="true">https://</span>
+  </qds-input>
+</qds-stack>`,
+      },
+      {
+        title: 'States',
+        html: `<qds-stack gap="200">
+  <qds-input label="Disabled" value="Disabled" disabled></qds-input>
+  <qds-input label="Read-only" value="Read-only" readonly></qds-input>
+  <qds-input label="Invalid" value="Invalid" invalid></qds-input>
+</qds-stack>`,
+      },
+    ],
   };
 }
