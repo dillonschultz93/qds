@@ -205,6 +205,9 @@ describe('qds-radio-group', () => {
     const group = await fixture<QdsRadioGroup>(sizes());
     group.value = 's';
     await settle(group);
+    // The color transitions, so a read straight after the change can land
+    // mid-transition and return the old color. Switch the transition off.
+    document.documentElement.style.setProperty('--qds-component-radio-duration', '0s');
     document.documentElement.style.setProperty(
       '--qds-component-radio-control-color-background-checked',
       'rgb(1, 2, 3)',
@@ -217,6 +220,7 @@ describe('qds-radio-group', () => {
       document.documentElement.style.removeProperty(
         '--qds-component-radio-control-color-background-checked',
       );
+      document.documentElement.style.removeProperty('--qds-component-radio-duration');
     }
   });
 

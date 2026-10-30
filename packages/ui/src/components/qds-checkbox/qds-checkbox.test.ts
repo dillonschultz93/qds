@@ -82,6 +82,9 @@ describe('qds-checkbox', () => {
     const element = await fixture<QdsCheckbox>(
       html`<qds-checkbox checked>Subscribe</qds-checkbox>`,
     );
+    // The color transitions, so a read straight after the change can land
+    // mid-transition and return the old color. Switch the transition off.
+    document.documentElement.style.setProperty('--qds-component-checkbox-duration', '0s');
     document.documentElement.style.setProperty(
       '--qds-component-checkbox-control-color-background-checked',
       'rgb(1, 2, 3)',
@@ -95,6 +98,7 @@ describe('qds-checkbox', () => {
       document.documentElement.style.removeProperty(
         '--qds-component-checkbox-control-color-background-checked',
       );
+      document.documentElement.style.removeProperty('--qds-component-checkbox-duration');
     }
   });
 

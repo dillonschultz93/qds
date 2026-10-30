@@ -66,6 +66,9 @@ describe('qds-toggle', () => {
 
   it('resolves the checked track fill from the component token', async () => {
     const element = await fixture<QdsToggle>(html`<qds-toggle checked>Wi-Fi</qds-toggle>`);
+    // The color transitions, so a read straight after the change can land
+    // mid-transition and return the old color. Switch the transition off.
+    document.documentElement.style.setProperty('--qds-component-toggle-duration', '0s');
     document.documentElement.style.setProperty(
       '--qds-component-toggle-track-color-background-checked',
       'rgb(1, 2, 3)',
@@ -78,6 +81,7 @@ describe('qds-toggle', () => {
       document.documentElement.style.removeProperty(
         '--qds-component-toggle-track-color-background-checked',
       );
+      document.documentElement.style.removeProperty('--qds-component-toggle-duration');
     }
   });
 

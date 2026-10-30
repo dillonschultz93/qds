@@ -194,6 +194,9 @@ describe('qds-tabs', () => {
   it('resolves the selected underline color from the component token', async () => {
     const tabs = await fixture<QdsTabs>(account());
     await settle(tabs);
+    // The color transitions, so a read straight after the change can land
+    // mid-transition and return the old color. Switch the transition off.
+    document.documentElement.style.setProperty('--qds-component-tabs-duration', '0s');
     document.documentElement.style.setProperty(
       '--qds-component-tabs-indicator-color-border-selected',
       'rgb(1, 2, 3)',
@@ -205,6 +208,7 @@ describe('qds-tabs', () => {
       document.documentElement.style.removeProperty(
         '--qds-component-tabs-indicator-color-border-selected',
       );
+      document.documentElement.style.removeProperty('--qds-component-tabs-duration');
     }
   });
 });
