@@ -126,8 +126,7 @@ export class QdsToggle extends QdsElement {
       }
 
       button:focus-visible .track {
-        outline: var(--qds-semantic-border-primary, 0.125rem) solid
-          var(--qds-semantic-color-border-primary, currentColor);
+        outline: var(--_focus-ring);
         outline-offset: 0.125rem;
       }
 

@@ -467,6 +467,42 @@ const lede = await page.evaluate(() => document.querySelector('.lede')?.textCont
 check('component page summaries are not double-escaped',
   lede.includes('<dialog>') && !lede.includes('&lt;'), lede.slice(0, 120));
 
+// ── Focus ring: drawn, and following the semantic token ─────────────────────
+/**
+ * Components draw the ring on different elements (here an inner button, a drawn
+ * box, and the host). Override the semantic focus color and focus each with a
+ * real Tab press, since :focus-visible needs keyboard focus: each ring must
+ * appear, in the overridden color.
+ */
+const ringColor = async (path, tag, ringSelector) => {
+  await gotoReady(path);
+  await page.evaluate(() =>
+    document.documentElement.style.setProperty('--qds-semantic-color-border-primary', 'rgb(1, 2, 3)'),
+  );
+  await page.evaluate(() => document.activeElement?.blur());
+  for (let i = 0; i < 60; i++) {
+    await page.keyboard.press('Tab');
+    const reached = await page.evaluate((t) => document.activeElement?.tagName === t.toUpperCase(), tag);
+    if (reached) break;
+  }
+  return page.evaluate(
+    ({ tag, ringSelector }) => {
+      const host = document.activeElement;
+      if (host?.tagName !== tag.toUpperCase()) return 'never focused';
+      const ring = ringSelector ? host.shadowRoot.querySelector(ringSelector) : host;
+      return getComputedStyle(ring).outlineColor;
+    },
+    { tag, ringSelector },
+  );
+};
+const rings = {
+  button: await ringColor('/components/qds-button/', 'qds-button', 'button'),
+  checkbox: await ringColor('/components/qds-checkbox/', 'qds-checkbox', '.control'),
+  tab: await ringColor('/components/qds-tabs/', 'qds-tab', null),
+};
+check('focus rings appear on keyboard focus and follow the semantic focus color',
+  Object.values(rings).every((color) => color === 'rgb(1, 2, 3)'), JSON.stringify(rings));
+
 // ── 8. Console cleanliness across every page ─────────────────────────────────
 for (const path of ['/', '/tokens/', '/components/', '/components/qds-stack/', '/components/qds-checkbox/', '/components/qds-radio-group/', '/components/qds-radio/', '/components/qds-toggle/', '/components/qds-input/', '/components/qds-text-field/', '/components/qds-chip/', '/components/qds-card/', '/components/qds-progress-bar/', '/components/qds-accordion/', '/components/qds-accordion-item/', '/components/qds-tabs/', '/components/qds-tab/', '/components/qds-tab-panel/', '/components/qds-modal/']) {
   await gotoReady(path);

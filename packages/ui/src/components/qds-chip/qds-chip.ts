@@ -141,8 +141,7 @@ export class QdsChip extends QdsElement {
       }
 
       .remove:focus-visible {
-        outline: var(--qds-semantic-border-primary, 0.125rem) solid
-          var(--qds-semantic-color-border-primary, currentColor);
+        outline: var(--_focus-ring);
         outline-offset: 0.0625rem;
       }
 
@@ -183,8 +182,7 @@ export class QdsChip extends QdsElement {
       }
 
       button.base:focus-visible {
-        outline: var(--qds-semantic-border-primary, 0.125rem) solid
-          var(--qds-semantic-color-border-primary, currentColor);
+        outline: var(--_focus-ring);
         outline-offset: 0.125rem;
       }
 

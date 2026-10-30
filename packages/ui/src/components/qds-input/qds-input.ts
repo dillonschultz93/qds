@@ -120,8 +120,7 @@ export class QdsInput extends QdsElement {
        */
       .base:focus-within {
         border-color: var(--qds-component-input-color-border-focus, #2563eb);
-        outline: var(--qds-semantic-border-primary, 0.125rem) solid
-          var(--qds-semantic-color-border-primary, currentColor);
+        outline: var(--_focus-ring);
         outline-offset: 0.0625rem;
       }
 

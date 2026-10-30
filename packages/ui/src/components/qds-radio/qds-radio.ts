@@ -98,8 +98,7 @@ export class QdsRadio extends QdsElement {
 
       /* The host is what takes focus, so the ring is drawn on the circle from here. */
       :host(:focus-visible) .control {
-        outline: var(--qds-semantic-border-primary, 0.125rem) solid
-          var(--qds-semantic-color-border-primary, currentColor);
+        outline: var(--_focus-ring);
         outline-offset: 0.125rem;
       }
 

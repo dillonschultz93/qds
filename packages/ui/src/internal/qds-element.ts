@@ -22,6 +22,16 @@ export class QdsElement extends LitElement {
   static baseStyles = css`
     :host {
       box-sizing: border-box;
+
+      /*
+       * The focus ring, defined once. Components draw it on different elements —
+       * the host, an inner button, a drawn box, the outline of a text box — so
+       * each writes its own selector and offset, but takes the ring itself from
+       * here: outline: var(--_focus-ring). The tokens it reads change in one
+       * place.
+       */
+      --_focus-ring: var(--qds-semantic-border-primary, 0.125rem) solid
+        var(--qds-semantic-color-border-primary, currentColor);
     }
 
     *,
@@ -52,8 +62,7 @@ export class QdsElement extends LitElement {
    */
   static focusRingStyles = css`
     .focus-ring:focus-visible {
-      outline: var(--qds-semantic-border-primary, 0.125rem) solid
-        var(--qds-semantic-color-border-primary, currentColor);
+      outline: var(--_focus-ring);
       outline-offset: 0.125rem;
     }
   `;
