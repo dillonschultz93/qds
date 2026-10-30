@@ -150,3 +150,6 @@ _site/
 
 # Generated custom elements manifest (rebuilt by `turbo analyze`)
 custom-elements.json
+
+# macOS
+.DS_Store
