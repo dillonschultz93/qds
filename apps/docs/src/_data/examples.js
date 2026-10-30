@@ -336,6 +336,19 @@ export default function () {
 </script>`,
       },
       {
+        title: 'Filter chips',
+        description:
+          'With selectable, each chip is a toggle button announced as pressed or not. Group them with role="group" and a label so the set is announced together.',
+        html: `<div role="group" aria-label="Filter by team">
+  <qds-stack direction="inline" gap="200" wrap>
+    <qds-chip selectable selected>Design</qds-chip>
+    <qds-chip selectable>Engineering</qds-chip>
+    <qds-chip selectable>Research</qds-chip>
+    <qds-chip selectable disabled>Legal (no open roles)</qds-chip>
+  </qds-stack>
+</div>`,
+      },
+      {
         title: 'With an icon',
         html: `<qds-chip variant="success">
   <span slot="start" aria-hidden="true">&check;</span>

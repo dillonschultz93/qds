@@ -13,6 +13,12 @@ export type QdsChipVariant = 'neutral' | 'info' | 'success' | 'warning' | 'error
  * the decision to the page: the chip does not delete itself, because the page
  * usually needs to update its own state (a filter list, a set of tags) first.
  *
+ * With `selectable` it becomes a filter chip instead: the whole chip is a toggle
+ * button, announced as pressed or not, showing a check mark while selected.
+ * Wrap a set of them in an element with `role="group"` and an `aria-label` so
+ * the set is announced together. A selectable chip ignores `removable`, since a
+ * button cannot contain another button.
+ *
  * Meaning is never carried by color alone: the variant tints the chip, but the
  * text has to say what it means.
  *
@@ -23,8 +29,10 @@ export type QdsChipVariant = 'neutral' | 'info' | 'success' | 'warning' | 'error
  *
  * @fires {CustomEvent<void>} qds-remove - Fired when the remove button is
  * activated. The chip stays in the DOM; remove it in the handler.
+ * @fires {CustomEvent<{ selected: boolean }>} qds-change - Fired when the user
+ * toggles a selectable chip. Not fired for programmatic changes.
  *
- * @csspart base - The chip body.
+ * @csspart base - The chip body. A button when the chip is selectable.
  * @csspart label - The wrapper around the default slot.
  * @csspart remove - The remove button.
  *
@@ -39,6 +47,11 @@ export type QdsChipVariant = 'neutral' | 'info' | 'success' | 'warning' | 'error
  * @cssprop [--qds-component-chip-{variant}-color-background-rest] - Fill per variant.
  * @cssprop [--qds-component-chip-{variant}-color-content-rest] - Text color per variant.
  * @cssprop [--qds-component-chip-{variant}-color-border-rest] - Border color per variant.
+ * @cssprop [--qds-component-chip-selectable-color-border-rest] - Border of an unselected selectable chip.
+ * @cssprop [--qds-component-chip-selectable-color-background-hover] - Fill of an unselected selectable chip under the pointer.
+ * @cssprop [--qds-component-chip-selected-color-background-{state}] - Fill of a selected chip: `rest`, `hover`.
+ * @cssprop [--qds-component-chip-selected-color-content-rest] - Text of a selected chip.
+ * @cssprop [--qds-component-chip-selected-color-border-rest] - Border of a selected chip.
  */
 @customElement('qds-chip')
 export class QdsChip extends QdsElement {
@@ -138,9 +151,61 @@ export class QdsChip extends QdsElement {
         height: 0.75em;
       }
 
+      /*
+       * Selectable: an interactive control, so its border must reach 3:1 against
+       * the page, which the decorative variant borders do not.
+       */
+      :host([selectable]) {
+        --_border: var(--qds-component-chip-selectable-color-border-rest, #64748b);
+      }
+
+      :host([selectable][selected]) {
+        --_bg: var(--qds-component-chip-selected-color-background-rest, #2563eb);
+        --_fg: var(--qds-component-chip-selected-color-content-rest, #f8fafc);
+        --_border: var(--qds-component-chip-selected-color-border-rest, transparent);
+      }
+
+      button.base {
+        margin: 0;
+        font-family: var(--qds-typography-font-family-sans, inherit);
+        cursor: pointer;
+        -webkit-appearance: none;
+        appearance: none;
+      }
+
+      button.base:where(:hover) {
+        background-color: var(--qds-component-chip-selectable-color-background-hover, #e2e8f0);
+      }
+
+      :host([selected]) button.base:where(:hover) {
+        background-color: var(--qds-component-chip-selected-color-background-hover, #1d4ed8);
+      }
+
+      button.base:focus-visible {
+        outline: var(--qds-semantic-border-primary, 0.125rem) solid
+          var(--qds-semantic-color-border-primary, currentColor);
+        outline-offset: 0.125rem;
+      }
+
+      button.base:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      .check {
+        width: 0.875em;
+        height: 0.875em;
+        /* Pull it toward the edge so the chip does not grow lopsided when selected. */
+        margin-inline-start: -0.25em;
+      }
+
       @media (forced-colors: active) {
         .base {
           border-color: CanvasText;
+        }
+
+        :host([selected]) .base {
+          border-color: Highlight;
         }
       }
     `,
@@ -150,7 +215,19 @@ export class QdsChip extends QdsElement {
   @property({ reflect: true })
   variant: QdsChipVariant = 'neutral';
 
-  /** Adds a remove button that fires `qds-remove`. */
+  /** Makes the chip a toggle button, for filtering. */
+  @property({ type: Boolean, reflect: true })
+  selectable = false;
+
+  /** Whether a selectable chip is selected. */
+  @property({ type: Boolean, reflect: true })
+  selected = false;
+
+  /** Prevents toggling a selectable chip. */
+  @property({ type: Boolean, reflect: true })
+  disabled = false;
+
+  /** Adds a remove button that fires `qds-remove`. Ignored when `selectable`. */
   @property({ type: Boolean, reflect: true })
   removable = false;
 
@@ -167,7 +244,38 @@ export class QdsChip extends QdsElement {
     this.dispatchEvent(new CustomEvent('qds-remove', { bubbles: true, composed: true }));
   }
 
+  #handleToggle(): void {
+    this.selected = !this.selected;
+    this.dispatchEvent(
+      new CustomEvent('qds-change', {
+        detail: { selected: this.selected },
+        bubbles: true,
+        composed: true,
+      }),
+    );
+  }
+
   override render(): TemplateResult {
+    if (this.selectable) {
+      return html`
+        <button
+          class="base"
+          part="base"
+          type="button"
+          aria-pressed=${String(this.selected)}
+          ?disabled=${this.disabled}
+          @click=${this.#handleToggle}
+        >
+          ${this.selected
+            ? html`<svg class="check" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3.5 8.5 6.5 11.5 12.5 4.5"></polyline>
+              </svg>`
+            : html`<slot name="start"></slot>`}
+          <span id="label" part="label"><slot></slot></span>
+        </button>
+      `;
+    }
+
     return html`
       <span class="base" part="base">
         <slot name="start"></slot>

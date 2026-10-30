@@ -78,4 +78,76 @@ describe('qds-chip', () => {
       );
     }
   });
+
+  describe('selectable', () => {
+    const base = (element: QdsChip): HTMLButtonElement =>
+      element.shadowRoot?.querySelector('button.base') as HTMLButtonElement;
+
+    it('is a toggle button, accessible selected and unselected', async () => {
+      const element = await fixture<QdsChip>(html`<qds-chip selectable>Design</qds-chip>`);
+      expect(base(element).getAttribute('aria-pressed')).to.equal('false');
+      await expect(element).to.be.accessible();
+
+      element.selected = true;
+      await elementUpdated(element);
+      expect(base(element).getAttribute('aria-pressed')).to.equal('true');
+      await expect(element).to.be.accessible();
+    });
+
+    it('toggles on click and fires qds-change', async () => {
+      const element = await fixture<QdsChip>(html`<qds-chip selectable>Design</qds-chip>`);
+
+      const listener = oneEvent(element, 'qds-change');
+      base(element).click();
+      const event = await listener;
+
+      expect(element.selected).to.be.true;
+      expect(event.detail).to.deep.equal({ selected: true });
+    });
+
+    it('shows a check mark only while selected', async () => {
+      const element = await fixture<QdsChip>(html`<qds-chip selectable>Design</qds-chip>`);
+      expect(element.shadowRoot?.querySelector('.check')).to.be.null;
+
+      base(element).click();
+      await elementUpdated(element);
+      expect(element.shadowRoot?.querySelector('.check')).to.exist;
+    });
+
+    it('does not toggle when disabled', async () => {
+      const element = await fixture<QdsChip>(
+        html`<qds-chip selectable disabled>Design</qds-chip>`,
+      );
+
+      base(element).click();
+      expect(element.selected).to.be.false;
+    });
+
+    it('ignores removable, since a button cannot hold another button', async () => {
+      const element = await fixture<QdsChip>(
+        html`<qds-chip selectable removable>Design</qds-chip>`,
+      );
+
+      expect(element.shadowRoot?.querySelectorAll('button').length).to.equal(1);
+    });
+
+    it('resolves the selected fill from the component token', async () => {
+      const element = await fixture<QdsChip>(
+        html`<qds-chip selectable selected>Design</qds-chip>`,
+      );
+      document.documentElement.style.setProperty(
+        '--qds-component-chip-selected-color-background-rest',
+        'rgb(1, 2, 3)',
+      );
+
+      try {
+        await elementUpdated(element);
+        expect(getComputedStyle(base(element)).backgroundColor).to.equal('rgb(1, 2, 3)');
+      } finally {
+        document.documentElement.style.removeProperty(
+          '--qds-component-chip-selected-color-background-rest',
+        );
+      }
+    });
+  });
 });
