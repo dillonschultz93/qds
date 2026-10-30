@@ -36,3 +36,8 @@ export type {
   QdsStackAlign,
   QdsStackJustify,
 } from './components/qds-stack/qds-stack.js';
+
+export { QdsModal } from './components/qds-modal/qds-modal.js';
+export type {
+  QdsModalSize,
+} from './components/qds-modal/qds-modal.js';
