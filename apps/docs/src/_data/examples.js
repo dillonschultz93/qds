@@ -192,5 +192,32 @@ export default function () {
 </form>`,
       },
     ],
+
+    'qds-toggle': [
+      {
+        title: 'On and off',
+        description:
+          'For settings that apply immediately. Announced as a switch, "on" or "off", rather than as a checkbox.',
+        html: `<qds-stack gap="300">
+  <qds-toggle checked>Wi-Fi</qds-toggle>
+  <qds-toggle>Bluetooth</qds-toggle>
+  <qds-toggle disabled>Airplane mode (managed by your organization)</qds-toggle>
+</qds-stack>`,
+      },
+      {
+        title: 'Inside a form',
+        description: 'Form-associated: submits its value only while on, and reset restores the declared state.',
+        html: `<form onsubmit="event.preventDefault(); this.querySelector('output').textContent = JSON.stringify(Object.fromEntries(new FormData(this)));">
+  <qds-stack gap="300">
+    <qds-toggle name="notifications" value="enabled" checked>Notifications</qds-toggle>
+    <qds-stack direction="inline" gap="200" align="center">
+      <qds-button type="submit">Save</qds-button>
+      <qds-button type="reset" variant="ghost">Reset</qds-button>
+      <output></output>
+    </qds-stack>
+  </qds-stack>
+</form>`,
+      },
+    ],
   };
 }

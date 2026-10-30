@@ -45,3 +45,5 @@ export type {
 } from './components/qds-radio-group/qds-radio-group.js';
 
 export { QdsRadio } from './components/qds-radio/qds-radio.js';
+
+export { QdsToggle } from './components/qds-toggle/qds-toggle.js';

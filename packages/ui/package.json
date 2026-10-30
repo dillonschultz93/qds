@@ -36,6 +36,10 @@
       "types": "./dist/components/qds-radio/qds-radio.d.ts",
       "default": "./dist/components/qds-radio/qds-radio.js"
     },
+    "./qds-toggle.js": {
+      "types": "./dist/components/qds-toggle/qds-toggle.d.ts",
+      "default": "./dist/components/qds-toggle/qds-toggle.js"
+    },
     "./custom-elements.json": "./custom-elements.json"
   },
   "files": ["dist", "custom-elements.json"],

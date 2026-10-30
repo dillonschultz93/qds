@@ -333,7 +333,7 @@ check('qds-radio-group syncs its options after hydration',
   radioSync.checked.join() === 'standard' && radioSync.disabledSynced, JSON.stringify(radioSync));
 
 // ── 8. Console cleanliness across every page ─────────────────────────────────
-for (const path of ['/', '/tokens/', '/components/', '/components/qds-stack/', '/components/qds-checkbox/', '/components/qds-radio-group/', '/components/qds-radio/']) {
+for (const path of ['/', '/tokens/', '/components/', '/components/qds-stack/', '/components/qds-checkbox/', '/components/qds-radio-group/', '/components/qds-radio/', '/components/qds-toggle/']) {
   await gotoReady(path);
 }
 check('no console errors on any page', consoleErrors.length === 0,
