@@ -313,8 +313,19 @@ const svgLight = await page.evaluate(() => {
 check('inlined anatomy SVG follows the page theme toggle',
   svgDark !== svgLight, `label fill: dark=${svgDark} light=${svgLight}`);
 
+// ── Chip: remove example ─────────────────────────────────────────────────────
+await gotoReady('/components/qds-chip/');
+const chipRemoval = await page.evaluate(() => {
+  const list = document.getElementById('filters');
+  const before = list.querySelectorAll('qds-chip').length;
+  list.querySelector('qds-chip').shadowRoot.querySelector('button').click();
+  return { before, after: list.querySelectorAll('qds-chip').length };
+});
+check('qds-chip remove button fires qds-remove, and the example removes the chip',
+  chipRemoval.after === chipRemoval.before - 1, JSON.stringify(chipRemoval));
+
 // ── 8. Console cleanliness across every page ─────────────────────────────────
-for (const path of ['/', '/tokens/', '/components/', '/components/qds-stack/']) {
+for (const path of ['/', '/tokens/', '/components/', '/components/qds-stack/', '/components/qds-chip/']) {
   await gotoReady(path);
 }
 check('no console errors on any page', consoleErrors.length === 0,

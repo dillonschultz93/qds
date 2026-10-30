@@ -36,3 +36,8 @@ export type {
   QdsStackAlign,
   QdsStackJustify,
 } from './components/qds-stack/qds-stack.js';
+
+export { QdsChip } from './components/qds-chip/qds-chip.js';
+export type {
+  QdsChipVariant,
+} from './components/qds-chip/qds-chip.js';
