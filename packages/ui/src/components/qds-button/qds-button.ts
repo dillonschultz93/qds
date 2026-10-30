@@ -15,6 +15,13 @@ export type QdsButtonType = 'button' | 'submit' | 'reset';
  * API — overriding one of those variables is the supported way to restyle a
  * button, and it is the same variable the design tokens define.
  *
+ * When it submits a form, `event.submitter` is not the `qds-button` itself: a
+ * custom element cannot be a submitter, so it submits through a temporary native
+ * button carrying its `name` and `value`, which exists only while the submit
+ * event is being dispatched. Read `event.submitter.value` (or
+ * `new FormData(form, event.submitter)`) inside the submit handler, and give
+ * buttons distinct values to tell them apart.
+ *
  * @element qds-button
  *
  * @slot - The button label.
