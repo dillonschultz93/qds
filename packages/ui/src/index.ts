@@ -58,3 +58,8 @@ export { QdsTextField } from './components/qds-text-field/qds-text-field.js';
 export type {
   QdsTextFieldType,
 } from './components/qds-text-field/qds-text-field.js';
+
+export { QdsChip } from './components/qds-chip/qds-chip.js';
+export type {
+  QdsChipVariant,
+} from './components/qds-chip/qds-chip.js';

@@ -308,5 +308,39 @@ export default function () {
 </form>`,
       },
     ],
+
+    'qds-chip': [
+      {
+        title: 'Variants',
+        description: 'The variant tints the chip; the text still has to say what it means.',
+        html: `<qds-stack direction="inline" gap="200" wrap>
+  <qds-chip>Draft</qds-chip>
+  <qds-chip variant="info">In review</qds-chip>
+  <qds-chip variant="success">Published</qds-chip>
+  <qds-chip variant="warning">Expiring soon</qds-chip>
+  <qds-chip variant="danger">Overdue</qds-chip>
+</qds-stack>`,
+      },
+      {
+        title: 'Removable',
+        description:
+          'The remove button is named "Remove" plus the chip text. The chip fires qds-remove and leaves removing it to the page.',
+        html: `<qds-stack id="filters" direction="inline" gap="200" wrap>
+  <qds-chip removable>Design</qds-chip>
+  <qds-chip removable>Engineering</qds-chip>
+  <qds-chip removable variant="info">Open roles</qds-chip>
+</qds-stack>
+<script>
+  document.getElementById('filters').addEventListener('qds-remove', (event) => event.target.remove());
+</script>`,
+      },
+      {
+        title: 'With an icon',
+        html: `<qds-chip variant="success">
+  <span slot="start" aria-hidden="true">&check;</span>
+  Verified
+</qds-chip>`,
+      },
+    ],
   };
 }

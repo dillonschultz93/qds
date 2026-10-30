@@ -351,8 +351,19 @@ const slottedHint = await page.evaluate(() => {
 check('qds-text-field shows a slotted hint after hydration',
   slottedHint.visible && slottedHint.describedBy === 'hint', JSON.stringify(slottedHint));
 
+// ── Chip: remove example ─────────────────────────────────────────────────────
+await gotoReady('/components/qds-chip/');
+const chipRemoval = await page.evaluate(() => {
+  const list = document.getElementById('filters');
+  const before = list.querySelectorAll('qds-chip').length;
+  list.querySelector('qds-chip').shadowRoot.querySelector('button').click();
+  return { before, after: list.querySelectorAll('qds-chip').length };
+});
+check('qds-chip remove button fires qds-remove, and the example removes the chip',
+  chipRemoval.after === chipRemoval.before - 1, JSON.stringify(chipRemoval));
+
 // ── 8. Console cleanliness across every page ─────────────────────────────────
-for (const path of ['/', '/tokens/', '/components/', '/components/qds-stack/', '/components/qds-checkbox/', '/components/qds-radio-group/', '/components/qds-radio/', '/components/qds-toggle/', '/components/qds-input/', '/components/qds-text-field/']) {
+for (const path of ['/', '/tokens/', '/components/', '/components/qds-stack/', '/components/qds-checkbox/', '/components/qds-radio-group/', '/components/qds-radio/', '/components/qds-toggle/', '/components/qds-input/', '/components/qds-text-field/', '/components/qds-chip/']) {
   await gotoReady(path);
 }
 check('no console errors on any page', consoleErrors.length === 0,

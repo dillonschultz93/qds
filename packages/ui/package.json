@@ -48,6 +48,10 @@
       "types": "./dist/components/qds-text-field/qds-text-field.d.ts",
       "default": "./dist/components/qds-text-field/qds-text-field.js"
     },
+    "./qds-chip.js": {
+      "types": "./dist/components/qds-chip/qds-chip.d.ts",
+      "default": "./dist/components/qds-chip/qds-chip.js"
+    },
     "./custom-elements.json": "./custom-elements.json"
   },
   "files": ["dist", "custom-elements.json"],
