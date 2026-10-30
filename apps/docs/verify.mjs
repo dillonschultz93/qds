@@ -332,8 +332,27 @@ const radioSync = await page.evaluate(() => {
 check('qds-radio-group syncs its options after hydration',
   radioSync.checked.join() === 'standard' && radioSync.disabledSynced, JSON.stringify(radioSync));
 
+// ── Text field: slotted hint survives hydration ──────────────────────────────
+/**
+ * A slotted hint is already assigned when the server-rendered field hydrates, so
+ * no slotchange arrives. A field that only checked on slotchange kept it hidden.
+ */
+await gotoReady('/components/qds-text-field/');
+const slottedHint = await page.evaluate(() => {
+  const field = [...document.querySelectorAll('qds-text-field')].find((f) =>
+    f.querySelector('[slot="hint"]'),
+  );
+  const hint = field.shadowRoot.querySelector('#hint');
+  return {
+    visible: !!hint && !hint.hidden && hint.getBoundingClientRect().height > 0,
+    describedBy: field.shadowRoot.querySelector('input').getAttribute('aria-describedby'),
+  };
+});
+check('qds-text-field shows a slotted hint after hydration',
+  slottedHint.visible && slottedHint.describedBy === 'hint', JSON.stringify(slottedHint));
+
 // ── 8. Console cleanliness across every page ─────────────────────────────────
-for (const path of ['/', '/tokens/', '/components/', '/components/qds-stack/', '/components/qds-checkbox/', '/components/qds-radio-group/', '/components/qds-radio/', '/components/qds-toggle/', '/components/qds-input/']) {
+for (const path of ['/', '/tokens/', '/components/', '/components/qds-stack/', '/components/qds-checkbox/', '/components/qds-radio-group/', '/components/qds-radio/', '/components/qds-toggle/', '/components/qds-input/', '/components/qds-text-field/']) {
   await gotoReady(path);
 }
 check('no console errors on any page', consoleErrors.length === 0,

@@ -53,3 +53,8 @@ export type {
   QdsInputType,
   QdsInputSize,
 } from './components/qds-input/qds-input.js';
+
+export { QdsTextField } from './components/qds-text-field/qds-text-field.js';
+export type {
+  QdsTextFieldType,
+} from './components/qds-text-field/qds-text-field.js';

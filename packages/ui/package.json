@@ -44,6 +44,10 @@
       "types": "./dist/components/qds-input/qds-input.d.ts",
       "default": "./dist/components/qds-input/qds-input.js"
     },
+    "./qds-text-field.js": {
+      "types": "./dist/components/qds-text-field/qds-text-field.d.ts",
+      "default": "./dist/components/qds-text-field/qds-text-field.js"
+    },
     "./custom-elements.json": "./custom-elements.json"
   },
   "files": ["dist", "custom-elements.json"],
