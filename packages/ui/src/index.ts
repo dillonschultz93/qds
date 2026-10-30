@@ -80,3 +80,9 @@ export { QdsAccordionItem } from './components/qds-accordion-item/qds-accordion-
 export type {
   QdsAccordionItemHeadingLevel,
 } from './components/qds-accordion-item/qds-accordion-item.js';
+
+export { QdsTabs } from './components/qds-tabs/qds-tabs.js';
+
+export { QdsTab } from './components/qds-tab/qds-tab.js';
+
+export { QdsTabPanel } from './components/qds-tab-panel/qds-tab-panel.js';

@@ -68,6 +68,18 @@
       "types": "./dist/components/qds-accordion-item/qds-accordion-item.d.ts",
       "default": "./dist/components/qds-accordion-item/qds-accordion-item.js"
     },
+    "./qds-tabs.js": {
+      "types": "./dist/components/qds-tabs/qds-tabs.d.ts",
+      "default": "./dist/components/qds-tabs/qds-tabs.js"
+    },
+    "./qds-tab.js": {
+      "types": "./dist/components/qds-tab/qds-tab.d.ts",
+      "default": "./dist/components/qds-tab/qds-tab.js"
+    },
+    "./qds-tab-panel.js": {
+      "types": "./dist/components/qds-tab-panel/qds-tab-panel.d.ts",
+      "default": "./dist/components/qds-tab-panel/qds-tab-panel.js"
+    },
     "./custom-elements.json": "./custom-elements.json"
   },
   "files": ["dist", "custom-elements.json"],

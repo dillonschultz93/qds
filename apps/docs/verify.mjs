@@ -373,8 +373,31 @@ const accordionToggle = await page.evaluate(() => {
 check('qds-accordion opens an item on click and closes the others when exclusive',
   accordionToggle.join() === 'false,true,false', JSON.stringify(accordionToggle));
 
+// ── Tabs: selection survives hydration ───────────────────────────────────────
+/**
+ * Server-rendered tabs are already slotted when qds-tabs hydrates, so selection
+ * has to be resolved without slotchange. Panels are hidden until it is, so a
+ * failure shows up as every panel hidden.
+ */
+await gotoReady('/components/qds-tabs/');
+const tabsState = await page.evaluate(async () => {
+  const [basic, initial] = document.querySelectorAll('qds-tabs');
+  const visible = (tabs) =>
+    [...tabs.querySelectorAll('qds-tab-panel')].map((p) => getComputedStyle(p).display !== 'none');
+  const before = { basic: visible(basic), initial: visible(initial) };
+  basic.querySelectorAll('qds-tab')[2].click();
+  // Selection renders on Lit's next update, not synchronously with the click.
+  await basic.updateComplete;
+  return { before, afterClick: visible(basic) };
+});
+check('qds-tabs shows the selected panel after hydration, and switches on click',
+  tabsState.before.basic.join() === 'true,false,false,false' &&
+    tabsState.before.initial.join() === 'false,true,false' &&
+    tabsState.afterClick.join() === 'false,false,true,false',
+  JSON.stringify(tabsState));
+
 // ── 8. Console cleanliness across every page ─────────────────────────────────
-for (const path of ['/', '/tokens/', '/components/', '/components/qds-stack/', '/components/qds-checkbox/', '/components/qds-radio-group/', '/components/qds-radio/', '/components/qds-toggle/', '/components/qds-input/', '/components/qds-text-field/', '/components/qds-chip/', '/components/qds-card/', '/components/qds-progress-bar/', '/components/qds-accordion/', '/components/qds-accordion-item/']) {
+for (const path of ['/', '/tokens/', '/components/', '/components/qds-stack/', '/components/qds-checkbox/', '/components/qds-radio-group/', '/components/qds-radio/', '/components/qds-toggle/', '/components/qds-input/', '/components/qds-text-field/', '/components/qds-chip/', '/components/qds-card/', '/components/qds-progress-bar/', '/components/qds-accordion/', '/components/qds-accordion-item/', '/components/qds-tabs/', '/components/qds-tab/', '/components/qds-tab-panel/']) {
   await gotoReady(path);
 }
 check('no console errors on any page', consoleErrors.length === 0,
