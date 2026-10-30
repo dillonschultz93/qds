@@ -165,19 +165,22 @@ export class QdsAccordionItem extends QdsElement {
   @property({ type: Number, attribute: 'heading-level' })
   headingLevel: QdsAccordionItemHeadingLevel = 3;
 
-  constructor() {
-    super();
-    // Find-in-page matched text in the collapsed panel. The browser has already
-    // revealed it; mirror that into `open` so the item's state agrees.
-    this.addEventListener('beforematch', () => this.#setOpen(true));
-  }
-
   #setOpen(open: boolean): void {
     if (open === this.open) return;
     this.open = open;
     this.dispatchEvent(
       new CustomEvent(open ? 'qds-open' : 'qds-close', { bubbles: true, composed: true }),
     );
+  }
+
+  /**
+   * Find-in-page matched text in the collapsed panel. The browser has already
+   * revealed it; mirror that into `open` so the item's state and aria-expanded
+   * agree. Listened for on the panel itself: beforematch is not composed, so it
+   * never reaches the host.
+   */
+  #handleBeforeMatch(): void {
+    this.#setOpen(true);
   }
 
   #handleClick(): void {
@@ -210,6 +213,7 @@ export class QdsAccordionItem extends QdsElement {
         role="region"
         aria-labelledby="trigger"
         hidden=${this.open ? nothing : 'until-found'}
+        @beforematch=${this.#handleBeforeMatch}
       >
         <slot></slot>
       </div>

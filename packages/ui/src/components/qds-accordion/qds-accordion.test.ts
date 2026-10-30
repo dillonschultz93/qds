@@ -91,10 +91,14 @@ describe('qds-accordion-item', () => {
     );
 
     const opened = oneEvent(item, 'qds-open');
-    panel(item).dispatchEvent(new Event('beforematch', { bubbles: true, composed: true }));
+    // As the browser fires it: at the panel, bubbling but NOT composed, so it
+    // never leaves the shadow root.
+    panel(item).dispatchEvent(new Event('beforematch', { bubbles: true }));
     await opened;
+    await elementUpdated(item);
 
     expect(item.open).to.be.true;
+    expect(trigger(item).getAttribute('aria-expanded')).to.equal('true');
   });
 
   it('does not toggle when disabled', async () => {
