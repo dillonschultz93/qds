@@ -36,3 +36,5 @@ export type {
   QdsStackAlign,
   QdsStackJustify,
 } from './components/qds-stack/qds-stack.js';
+
+export { QdsCheckbox } from './components/qds-checkbox/qds-checkbox.js';

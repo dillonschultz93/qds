@@ -110,5 +110,41 @@ export default function () {
 </qds-stack>`,
       },
     ],
+
+    'qds-checkbox': [
+      {
+        title: 'States',
+        description:
+          'Unchecked, checked, and indeterminate — the dash a parent shows when only some of its children are checked.',
+        html: `<qds-stack gap="200">
+  <qds-checkbox>Email me about updates</qds-checkbox>
+  <qds-checkbox checked>Remember this device</qds-checkbox>
+  <qds-checkbox indeterminate>Select all</qds-checkbox>
+</qds-stack>`,
+      },
+      {
+        title: 'Disabled',
+        html: `<qds-stack gap="200">
+  <qds-checkbox disabled>Unavailable</qds-checkbox>
+  <qds-checkbox disabled checked>Locked on</qds-checkbox>
+</qds-stack>`,
+      },
+      {
+        title: 'Inside a form',
+        description:
+          'Form-associated: the value submits only while checked, required blocks submission, and reset restores the declared state.',
+        html: `<form onsubmit="event.preventDefault(); this.querySelector('output').textContent = JSON.stringify(Object.fromEntries(new FormData(this)));">
+  <qds-stack gap="300">
+    <qds-checkbox name="terms" value="accepted" required>I accept the terms</qds-checkbox>
+    <qds-checkbox name="newsletter" checked>Send me the newsletter</qds-checkbox>
+    <qds-stack direction="inline" gap="200" align="center">
+      <qds-button type="submit">Submit</qds-button>
+      <qds-button type="reset" variant="ghost">Reset</qds-button>
+      <output></output>
+    </qds-stack>
+  </qds-stack>
+</form>`,
+      },
+    ],
   };
 }

@@ -314,7 +314,7 @@ check('inlined anatomy SVG follows the page theme toggle',
   svgDark !== svgLight, `label fill: dark=${svgDark} light=${svgLight}`);
 
 // ── 8. Console cleanliness across every page ─────────────────────────────────
-for (const path of ['/', '/tokens/', '/components/', '/components/qds-stack/']) {
+for (const path of ['/', '/tokens/', '/components/', '/components/qds-stack/', '/components/qds-checkbox/']) {
   await gotoReady(path);
 }
 check('no console errors on any page', consoleErrors.length === 0,
