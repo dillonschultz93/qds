@@ -36,3 +36,10 @@ export type {
   QdsStackAlign,
   QdsStackJustify,
 } from './components/qds-stack/qds-stack.js';
+
+export { QdsRadioGroup } from './components/qds-radio-group/qds-radio-group.js';
+export type {
+  QdsRadioGroupOrientation,
+} from './components/qds-radio-group/qds-radio-group.js';
+
+export { QdsRadio } from './components/qds-radio/qds-radio.js';

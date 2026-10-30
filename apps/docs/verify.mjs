@@ -313,8 +313,27 @@ const svgLight = await page.evaluate(() => {
 check('inlined anatomy SVG follows the page theme toggle',
   svgDark !== svgLight, `label fill: dark=${svgDark} light=${svgLight}`);
 
+// ── Radio group: state survives hydration ─────────────────────────────────────
+/**
+ * Server-rendered radios are already slotted when the group hydrates, so no
+ * slotchange arrives. A group that only synced on slotchange showed nothing
+ * checked and stayed enabled when disabled. Only a hydrated page shows it.
+ */
+await gotoReady('/components/qds-radio-group/');
+const radioSync = await page.evaluate(() => {
+  const groups = [...document.querySelectorAll('qds-radio-group')];
+  const valued = groups.find((g) => g.getAttribute('value') === 'standard');
+  const disabled = groups.find((g) => g.hasAttribute('disabled'));
+  return {
+    checked: [...valued.querySelectorAll('qds-radio')].filter((r) => r.checked).map((r) => r.value),
+    disabledSynced: [...disabled.querySelectorAll('qds-radio')].every((r) => r.groupDisabled),
+  };
+});
+check('qds-radio-group syncs its options after hydration',
+  radioSync.checked.join() === 'standard' && radioSync.disabledSynced, JSON.stringify(radioSync));
+
 // ── 8. Console cleanliness across every page ─────────────────────────────────
-for (const path of ['/', '/tokens/', '/components/', '/components/qds-stack/']) {
+for (const path of ['/', '/tokens/', '/components/', '/components/qds-stack/', '/components/qds-radio-group/', '/components/qds-radio/']) {
   await gotoReady(path);
 }
 check('no console errors on any page', consoleErrors.length === 0,
