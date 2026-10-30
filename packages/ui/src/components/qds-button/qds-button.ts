@@ -310,6 +310,17 @@ export class QdsButton extends QdsElement {
   @property({ attribute: 'label' })
   label: string | null = null;
 
+  /** Submitted as the name of this button's entry when it submits a form. */
+  @property()
+  name = '';
+
+  /**
+   * Submitted with `name` when this button submits a form, and reported as the
+   * dialog's `returnValue` when it submits a `<form method="dialog">`.
+   */
+  @property()
+  value = '';
+
   readonly #internals: ElementInternals;
 
   constructor() {
@@ -340,10 +351,34 @@ export class QdsButton extends QdsElement {
     if (!form) return;
 
     if (this.type === 'submit') {
-      // requestSubmit(), not submit(), so validation and the submit event still run.
-      form.requestSubmit();
+      this.#submit(form);
     } else if (this.type === 'reset') {
       form.reset();
+    }
+  }
+
+  /**
+   * Submit through a temporary native button carrying this button's name and
+   * value.
+   *
+   * A custom element cannot be a form's submitter — requestSubmit(this) throws —
+   * so a plain requestSubmit() would submit with no submitter at all: the name and
+   * value would be missing from the form data, event.submitter would be null, and
+   * a dialog form's returnValue would be empty. The proxy makes all three behave
+   * as they would for a native submit button. requestSubmit() rather than
+   * submit(), so validation and the submit event still run.
+   */
+  #submit(form: HTMLFormElement): void {
+    const proxy = document.createElement('button');
+    proxy.type = 'submit';
+    proxy.hidden = true;
+    if (this.name) proxy.name = this.name;
+    proxy.value = this.value;
+    form.append(proxy);
+    try {
+      form.requestSubmit(proxy);
+    } finally {
+      proxy.remove();
     }
   }
 

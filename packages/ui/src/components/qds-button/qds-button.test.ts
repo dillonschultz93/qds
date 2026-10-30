@@ -151,6 +151,44 @@ describe('qds-button', () => {
       expect(await submitted).to.exist;
     });
 
+    it('submits its name and value, as the submitter', async () => {
+      const form = await fixture<HTMLFormElement>(html`
+        <form @submit=${(event: Event) => event.preventDefault()}>
+          <input name="title" value="Draft" />
+          <qds-button type="submit" name="intent" value="publish">Publish</qds-button>
+        </form>
+      `);
+      const element = form.querySelector('qds-button') as QdsButton;
+
+      // Read inside the handler, as a page would: the submitter only exists for
+      // the duration of the submission.
+      let data: FormData | undefined;
+      form.addEventListener('submit', (event) => {
+        data = new FormData(form, event.submitter);
+      });
+      inner(element).click();
+
+      expect(data?.get('intent')).to.equal('publish');
+      expect(data?.get('title')).to.equal('Draft');
+      expect(form.querySelectorAll('button').length, 'the proxy is removed again').to.equal(0);
+    });
+
+    it('still runs constraint validation before submitting', async () => {
+      const form = await fixture<HTMLFormElement>(html`
+        <form @submit=${(event: Event) => event.preventDefault()}>
+          <input name="title" required />
+          <qds-button type="submit">Save</qds-button>
+        </form>
+      `);
+      const element = form.querySelector('qds-button') as QdsButton;
+
+      let submits = 0;
+      form.addEventListener('submit', () => submits++);
+      inner(element).click();
+
+      expect(submits).to.equal(0);
+    });
+
     it('resets the surrounding form', async () => {
       const form = await fixture<HTMLFormElement>(html`
         <form>

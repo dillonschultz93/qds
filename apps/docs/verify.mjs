@@ -429,7 +429,9 @@ await page.locator('#delete-modal qds-button', { hasText: 'Cancel' }).click();
 const closedByForm = await page
   .waitForFunction(() => !document.getElementById('delete-modal').open, null, { timeout: 2000 })
   .then(() => true, () => false);
-check('qds-modal closes from a slotted form with method="dialog"', closedByForm);
+const returned = await page.evaluate(() => document.getElementById('delete-result').textContent);
+check('qds-modal closes from a slotted form with method="dialog", reporting the qds-button value',
+  closedByForm && returned === 'Closed with: cancel', returned);
 
 // ── Component summaries are escaped exactly once ─────────────────────────────
 await gotoReady('/components/qds-modal/');

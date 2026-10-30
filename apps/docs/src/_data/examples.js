@@ -482,17 +482,23 @@ export default function () {
       {
         title: 'Confirmation',
         description:
-          'Built on the native dialog: the page behind becomes inert, focus moves in, Escape closes it, and focus returns to the button that opened it.',
+          'Built on the native dialog: the page behind becomes inert, focus moves in, Escape closes it, and focus returns to the button that opened it. The value of the button that closes it arrives in qds-close.',
         html: `<qds-button variant="danger" onclick="document.getElementById('delete-modal').show()">
   Delete project
 </qds-button>
 <qds-modal id="delete-modal" heading="Delete this project?" size="sm">
   <p style="margin: 0;">Its 14 files and their history will be removed. This cannot be undone.</p>
   <form method="dialog" slot="footer">
-    <qds-button type="submit" variant="ghost">Cancel</qds-button>
-    <qds-button type="submit" variant="danger">Delete project</qds-button>
+    <qds-button type="submit" variant="ghost" value="cancel">Cancel</qds-button>
+    <qds-button type="submit" variant="danger" value="delete">Delete project</qds-button>
   </form>
-</qds-modal>`,
+</qds-modal>
+<output id="delete-result"></output>
+<script>
+  document.getElementById('delete-modal').addEventListener('qds-close', (event) => {
+    document.getElementById('delete-result').textContent = 'Closed with: ' + (event.detail.returnValue || '(nothing)');
+  });
+</script>`,
       },
       {
         title: 'Light dismiss',

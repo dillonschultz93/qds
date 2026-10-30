@@ -1,6 +1,7 @@
 import { expect, fixture, html, oneEvent, elementUpdated } from '@open-wc/testing';
 
 import './qds-modal.js';
+import '../qds-button/qds-button.js';
 import type { QdsModal } from './qds-modal.js';
 
 const dialogOf = (modal: QdsModal): HTMLDialogElement =>
@@ -127,6 +128,25 @@ describe('qds-modal', () => {
 
     expect(event.detail).to.deep.equal({ returnValue: 'save' });
     expect(modal.open).to.be.false;
+  });
+
+  it('reports the value of a qds-button that submits a dialog form', async () => {
+    const modal = await fixture<QdsModal>(html`
+      <qds-modal heading="Delete project?">
+        <form method="dialog" slot="footer">
+          <qds-button type="submit" value="cancel">Cancel</qds-button>
+          <qds-button type="submit" value="delete">Delete</qds-button>
+        </form>
+      </qds-modal>
+    `);
+    await open(modal);
+
+    const closed = oneEvent(modal, 'qds-close');
+    const button = modal.querySelectorAll('qds-button')[1]!;
+    button.shadowRoot!.querySelector('button')!.click();
+    const event = await closed;
+
+    expect(event.detail).to.deep.equal({ returnValue: 'delete' });
   });
 
   it('closes when open is set to false', async () => {
