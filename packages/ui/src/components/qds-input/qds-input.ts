@@ -1,10 +1,11 @@
-import { css, html, nothing, type PropertyValues, type TemplateResult } from 'lit';
-import { customElement, property, query, state } from 'lit/decorators.js';
+import { css, html, nothing, type TemplateResult } from 'lit';
+import { customElement, property } from 'lit/decorators.js';
 import { live } from 'lit/directives/live.js';
 
 import { QdsElement } from '../../internal/qds-element.js';
+import { QdsTextControl, type QdsTextControlType } from '../../internal/qds-text-control.js';
 
-export type QdsInputType = 'text' | 'email' | 'password' | 'search' | 'tel' | 'url' | 'number';
+export type QdsInputType = QdsTextControlType;
 export type QdsInputSize = 'sm' | 'md' | 'lg';
 
 /**
@@ -49,14 +50,7 @@ export type QdsInputSize = 'sm' | 'md' | 'lg';
  * @cssprop [--qds-component-input-affix-color-content-rest] - Color of slotted start and end content.
  */
 @customElement('qds-input')
-export class QdsInput extends QdsElement {
-  static override shadowRootOptions: ShadowRootInit = {
-    ...QdsElement.shadowRootOptions,
-    delegatesFocus: true,
-  };
-
-  static formAssociated = true;
-
+export class QdsInput extends QdsTextControl {
   static override styles = [
     QdsElement.baseStyles,
     css`
@@ -176,41 +170,13 @@ export class QdsInput extends QdsElement {
     `,
   ];
 
-  /** Input type. Only the single-line text types; use a dedicated component for dates or files. */
-  @property()
-  type: QdsInputType = 'text';
-
-  /** The current value. The `value` attribute sets the initial value, restored on form reset. */
-  @property()
-  value = '';
-
-  /** Field name used when the form is submitted. */
-  @property()
-  name = '';
-
   /** Accessible name. Required, since this control has no visible label. */
   @property()
   label = '';
 
-  /** Hint shown while empty. Not a substitute for a label. */
-  @property()
-  placeholder = '';
-
   /** Control size. */
   @property({ reflect: true })
   size: QdsInputSize = 'md';
-
-  /** Prevents interaction and excludes the value from form submission. */
-  @property({ type: Boolean, reflect: true })
-  disabled = false;
-
-  /** Prevents editing but keeps the value focusable, selectable, and submitted. */
-  @property({ type: Boolean, reflect: true })
-  readonly = false;
-
-  /** Makes the form invalid while empty. */
-  @property({ type: Boolean, reflect: true })
-  required = false;
 
   /**
    * Shows the error state and sets `aria-invalid`, for errors the form itself
@@ -219,120 +185,9 @@ export class QdsInput extends QdsElement {
   @property({ type: Boolean, reflect: true })
   invalid = false;
 
-  /** Minimum length, as on a native input. */
-  @property({ type: Number })
-  minlength?: number;
-
-  /** Maximum length, as on a native input. */
-  @property({ type: Number })
-  maxlength?: number;
-
-  /** A regular expression the value must match, as on a native input. */
-  @property()
-  pattern?: string;
-
-  /** Autofill hint, as on a native input. */
-  @property()
-  autocomplete?: string;
-
-  @query('input')
-  private readonly input!: HTMLInputElement;
-
-  /** Disabled by its own attribute or by an ancestor `<fieldset disabled>`. */
-  @state()
-  private formDisabled = false;
-
-  readonly #internals: ElementInternals;
-
-  constructor() {
-    super();
-    this.#internals = this.attachInternals();
-  }
-
-  /** The form this input belongs to, if any. */
-  get form(): HTMLFormElement | null {
-    return this.#internals.form;
-  }
-
-  /** Same as the native `checkValidity()`. */
-  checkValidity(): boolean {
-    return this.#internals.checkValidity();
-  }
-
-  /** Same as the native `reportValidity()`. */
-  reportValidity(): boolean {
-    return this.#internals.reportValidity();
-  }
-
-  /** Same as the native `validity`. */
-  get validity(): ValidityState {
-    return this.#internals.validity;
-  }
-
-  /** Selects all of the text, as the native `select()`. */
-  select(): void {
-    this.input.select();
-  }
-
-  protected override willUpdate(changed: PropertyValues<this>): void {
-    if (changed.has('value')) {
-      this.#internals.setFormValue(this.value);
-    }
-  }
-
-  protected override updated(): void {
-    this.#syncValidity();
-  }
-
-  /** Called by the form on reset: restore the value the markup declared. */
-  formResetCallback(): void {
-    this.value = this.getAttribute('value') ?? '';
-  }
-
-  /** Called when this element's disabled state changes, from its own attribute or a fieldset. */
-  formDisabledCallback(disabled: boolean): void {
-    this.formDisabled = disabled;
-  }
-
-  /**
-   * Mirror the native input's validity onto the host, anchored to the input so
-   * the browser's validation bubble points at the text rather than the host.
-   */
-  #syncValidity(): void {
-    const { validity, validationMessage } = this.input;
-    if (validity.valid) {
-      this.#internals.setValidity({});
-    } else {
-      this.#internals.setValidity(validity, validationMessage, this.input);
-    }
-  }
-
-  #handleInput(): void {
-    this.value = this.input.value;
-    // Synchronously, not left to willUpdate: a listener reading FormData from
-    // this very event would otherwise see the previous value.
-    this.#internals.setFormValue(this.value);
-    this.#syncValidity();
-    this.dispatchEvent(
-      new CustomEvent('qds-input', { detail: { value: this.value }, bubbles: true, composed: true }),
-    );
-  }
-
-  #handleChange(): void {
-    this.dispatchEvent(
-      new CustomEvent('qds-change', { detail: { value: this.value }, bubbles: true, composed: true }),
-    );
-  }
-
-  #focusInput(event: MouseEvent): void {
-    // Clicking the padding or an affix should land in the text, as it would on
-    // a native input whose box is the whole control.
-    if (event.target !== this.input) this.input.focus();
-  }
-
   override render(): TemplateResult {
     return html`
-      <div class="base" part="base" @click=${this.#focusInput}>
+      <div class="base" part="base" @click=${this.focusInput}>
         <slot name="start"></slot>
         <input
           part="input"
@@ -349,8 +204,8 @@ export class QdsInput extends QdsElement {
           ?disabled=${this.disabled || this.formDisabled}
           ?readonly=${this.readonly}
           ?required=${this.required}
-          @input=${this.#handleInput}
-          @change=${this.#handleChange}
+          @input=${this.handleInput}
+          @change=${this.handleChange}
         />
         <slot name="end"></slot>
       </div>

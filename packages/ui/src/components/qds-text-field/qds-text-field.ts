@@ -1,10 +1,11 @@
-import { css, html, nothing, type PropertyValues, type TemplateResult } from 'lit';
-import { customElement, property, query, state } from 'lit/decorators.js';
+import { css, html, nothing, type TemplateResult } from 'lit';
+import { customElement, property, state } from 'lit/decorators.js';
 import { live } from 'lit/directives/live.js';
 
 import { QdsElement } from '../../internal/qds-element.js';
+import { QdsTextControl, type QdsTextControlType } from '../../internal/qds-text-control.js';
 
-export type QdsTextFieldType = 'text' | 'email' | 'password' | 'search' | 'tel' | 'url' | 'number';
+export type QdsTextFieldType = QdsTextControlType;
 
 /**
  * A complete text field: a visible label, the input, an optional hint, and an
@@ -19,7 +20,8 @@ export type QdsTextFieldType = 'text' | 'email' | 'password' | 'search' | 'tel' 
  * shown. Otherwise, once the user has left the field (or tried to submit the
  * form), the browser's own validation message is shown for any failing
  * constraint — `required`, `type="email"`, `minlength`, `pattern` — so the common
- * cases need no code at all.
+ * cases need no code at all. A `required` field marks its label with an asterisk,
+ * hidden from assistive technology, which announces the input as required.
  *
  * @element qds-text-field
  *
@@ -62,14 +64,7 @@ export type QdsTextFieldType = 'text' | 'email' | 'password' | 'search' | 'tel' 
  * @cssprop [--qds-component-text-field-affix-color-content-rest] - Color of slotted start and end content.
  */
 @customElement('qds-text-field')
-export class QdsTextField extends QdsElement {
-  static override shadowRootOptions: ShadowRootInit = {
-    ...QdsElement.shadowRootOptions,
-    delegatesFocus: true,
-  };
-
-  static formAssociated = true;
-
+export class QdsTextField extends QdsTextControl {
   static override styles = [
     QdsElement.baseStyles,
     css`
@@ -211,57 +206,6 @@ export class QdsTextField extends QdsElement {
   @property()
   error = '';
 
-  /** Input type. Only the single-line text types. */
-  @property()
-  type: QdsTextFieldType = 'text';
-
-  /** The current value. The `value` attribute sets the initial value, restored on form reset. */
-  @property()
-  value = '';
-
-  /** Field name used when the form is submitted. */
-  @property()
-  name = '';
-
-  /** Hint shown while empty. Not a substitute for the label. */
-  @property()
-  placeholder = '';
-
-  /** Prevents interaction and excludes the value from form submission. */
-  @property({ type: Boolean, reflect: true })
-  disabled = false;
-
-  /** Prevents editing but keeps the value focusable, selectable, and submitted. */
-  @property({ type: Boolean, reflect: true })
-  readonly = false;
-
-  /** Makes the form invalid while empty, and marks the label with an asterisk. */
-  @property({ type: Boolean, reflect: true })
-  required = false;
-
-  /** Minimum length, as on a native input. */
-  @property({ type: Number })
-  minlength?: number;
-
-  /** Maximum length, as on a native input. */
-  @property({ type: Number })
-  maxlength?: number;
-
-  /** A regular expression the value must match, as on a native input. */
-  @property()
-  pattern?: string;
-
-  /** Autofill hint, as on a native input. */
-  @property()
-  autocomplete?: string;
-
-  @query('input')
-  private readonly input!: HTMLInputElement;
-
-  /** Disabled by its own attribute or by an ancestor `<fieldset disabled>`. */
-  @state()
-  private formDisabled = false;
-
   /**
    * Whether native validation messages may be shown yet: after the user leaves
    * the field, or tries to submit the form. Before that, a required field that
@@ -280,46 +224,22 @@ export class QdsTextField extends QdsElement {
   @state()
   private hasHintSlot = false;
 
-  readonly #internals: ElementInternals;
-
   constructor() {
     super();
-    this.#internals = this.attachInternals();
     // The form fires `invalid` at each failing control when submission is
     // attempted. Treat that as touching the field, so its message appears.
     this.addEventListener('invalid', () => (this.touched = true));
   }
 
-  /** The form this field belongs to, if any. */
-  get form(): HTMLFormElement | null {
-    return this.#internals.form;
-  }
-
-  /** Same as the native `checkValidity()`. */
-  checkValidity(): boolean {
-    return this.#internals.checkValidity();
-  }
-
-  /** Same as the native `reportValidity()`. */
-  reportValidity(): boolean {
+  /** Same as the native `reportValidity()`, and shows the field's message. */
+  override reportValidity(): boolean {
     this.touched = true;
-    return this.#internals.reportValidity();
-  }
-
-  /** Same as the native `validity`. */
-  get validity(): ValidityState {
-    return this.#internals.validity;
+    return super.reportValidity();
   }
 
   /** The message currently shown, or an empty string. */
   get #shownError(): string {
     return this.error || (this.touched ? this.#nativeError : '');
-  }
-
-  protected override willUpdate(changed: PropertyValues<this>): void {
-    if (changed.has('value')) {
-      this.#internals.setFormValue(this.value);
-    }
   }
 
   protected override firstUpdated(): void {
@@ -336,54 +256,20 @@ export class QdsTextField extends QdsElement {
     });
   }
 
-  protected override updated(): void {
-    this.#syncValidity();
-  }
-
   /** Called by the form on reset: restore the declared value and hide messages again. */
-  formResetCallback(): void {
-    this.value = this.getAttribute('value') ?? '';
+  override formResetCallback(): void {
+    super.formResetCallback();
     this.touched = false;
   }
 
-  /** Called when this element's disabled state changes, from its own attribute or a fieldset. */
-  formDisabledCallback(disabled: boolean): void {
-    this.formDisabled = disabled;
-  }
-
-  #syncValidity(): void {
-    const { validity, validationMessage } = this.input;
-    if (validity.valid) {
-      this.#internals.setValidity({});
-    } else {
-      this.#internals.setValidity(validity, validationMessage, this.input);
-    }
+  protected override syncValidity(): void {
+    super.syncValidity();
+    const { validationMessage } = this.input;
     // A programmatic value change can alter the message after this render
     // already showed the old one. Re-render only then, and only if it is shown.
     const stale = this.touched && !this.error && this.#nativeError !== validationMessage;
     this.#nativeError = validationMessage;
     if (stale) this.requestUpdate();
-  }
-
-  #handleInput(): void {
-    this.value = this.input.value;
-    // Synchronously, not left to willUpdate: a listener reading FormData from
-    // this very event would otherwise see the previous value.
-    this.#internals.setFormValue(this.value);
-    this.#syncValidity();
-    this.dispatchEvent(
-      new CustomEvent('qds-input', { detail: { value: this.value }, bubbles: true, composed: true }),
-    );
-  }
-
-  #handleChange(): void {
-    this.dispatchEvent(
-      new CustomEvent('qds-change', { detail: { value: this.value }, bubbles: true, composed: true }),
-    );
-  }
-
-  #focusInput(event: MouseEvent): void {
-    if (event.target !== this.input) this.input.focus();
   }
 
   override render(): TemplateResult {
@@ -397,7 +283,7 @@ export class QdsTextField extends QdsElement {
           <slot name="label">${this.label}</slot>
           ${this.required ? html`<span class="required" aria-hidden="true">*</span>` : nothing}
         </label>
-        <div class="control" part="control" @click=${this.#focusInput}>
+        <div class="control" part="control" @click=${this.focusInput}>
           <slot name="start"></slot>
           <input
             id="input"
@@ -415,8 +301,8 @@ export class QdsTextField extends QdsElement {
             ?disabled=${this.disabled || this.formDisabled}
             ?readonly=${this.readonly}
             ?required=${this.required}
-            @input=${this.#handleInput}
-            @change=${this.#handleChange}
+            @input=${this.handleInput}
+            @change=${this.handleChange}
             @blur=${() => (this.touched = true)}
           />
           <slot name="end"></slot>
