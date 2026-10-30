@@ -433,6 +433,23 @@ const returned = await page.evaluate(() => document.getElementById('delete-resul
 check('qds-modal closes from a slotted form with method="dialog", reporting the qds-button value',
   closedByForm && returned === 'Closed with: cancel', returned);
 
+// Light dismiss with a real mouse: a click on the dialog's own border must not
+// close it, since the dialog is the event target there just as on the backdrop.
+await page.locator('qds-button', { hasText: "What's new" }).click();
+await page.waitForFunction(() => document.getElementById('info-modal').open);
+const box = await page.evaluate(() => {
+  const r = document.getElementById('info-modal').shadowRoot.querySelector('dialog').getBoundingClientRect();
+  return { left: r.left, top: r.top, height: r.height };
+});
+await page.mouse.click(box.left + 0.5, box.top + box.height / 2);
+const openAfterBorder = await page.evaluate(() => document.getElementById('info-modal').open);
+await page.mouse.click(5, 5);
+const openAfterBackdrop = await page
+  .waitForFunction(() => !document.getElementById('info-modal').open, null, { timeout: 2000 })
+  .then(() => false, () => true);
+check('qds-modal light dismiss: a border click keeps it open, a backdrop click closes it',
+  openAfterBorder && !openAfterBackdrop, JSON.stringify({ openAfterBorder, openAfterBackdrop }));
+
 // ── Component summaries are escaped exactly once ─────────────────────────────
 await gotoReady('/components/qds-modal/');
 const lede = await page.evaluate(() => document.querySelector('.lede')?.textContent ?? '');

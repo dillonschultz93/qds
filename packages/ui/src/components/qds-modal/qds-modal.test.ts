@@ -149,6 +149,29 @@ describe('qds-modal', () => {
     expect(event.detail).to.deep.equal({ returnValue: 'delete' });
   });
 
+  it('stays open when the page cancels the dialog form submission', async () => {
+    const modal = await fixture<QdsModal>(html`
+      <qds-modal heading="Save changes?">
+        <form method="dialog" slot="footer"><button value="save">Save</button></form>
+      </qds-modal>
+    `);
+    await open(modal);
+    const form = modal.querySelector('form') as HTMLFormElement;
+
+    // One listener on the form (runs before the modal's) and one on the document
+    // (runs after it): either cancelling must keep the dialog open.
+    for (const target of [form, document] as EventTarget[]) {
+      const cancel = (event: Event) => event.preventDefault();
+      target.addEventListener('submit', cancel);
+      (modal.querySelector('button') as HTMLButtonElement).click();
+      await new Promise((resolve) => setTimeout(resolve, 20));
+      target.removeEventListener('submit', cancel);
+
+      expect(dialogOf(modal).open, `cancelled on ${target === form ? 'the form' : 'the document'}`)
+        .to.be.true;
+    }
+  });
+
   it('closes when open is set to false', async () => {
     const modal = await fixture<QdsModal>(basic());
     await open(modal);
@@ -160,19 +183,60 @@ describe('qds-modal', () => {
     expect(dialogOf(modal).open).to.be.false;
   });
 
+  /**
+   * A pointer press and release at a point, as the browser reports them: the
+   * dialog is the target for any point outside its content, backdrop or not.
+   */
+  const pointerAt = (target: Element, down: { x: number; y: number }, up = down): void => {
+    const init = (point: { x: number; y: number }) => ({
+      bubbles: true,
+      composed: true,
+      clientX: point.x,
+      clientY: point.y,
+    });
+    target.dispatchEvent(new PointerEvent('pointerdown', init(down)));
+    dialogOfTarget(target).dispatchEvent(new MouseEvent('click', init(up)));
+  };
+  const dialogOfTarget = (target: Element): Element =>
+    target.closest('dialog') ?? (target.getRootNode() as ShadowRoot).querySelector('dialog')!;
+
   it('ignores backdrop clicks unless light-dismiss is set', async () => {
     const modal = await fixture<QdsModal>(basic());
     await open(modal);
+    const outside = { x: 2, y: 2 };
 
-    dialogOf(modal).dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }));
+    pointerAt(dialogOf(modal), outside);
     expect(dialogOf(modal).open).to.be.true;
 
     modal.lightDismiss = true;
     await elementUpdated(modal);
     const closed = oneEvent(modal, 'qds-close');
-    dialogOf(modal).dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }));
+    pointerAt(dialogOf(modal), outside);
     await closed;
     expect(modal.open).to.be.false;
+  });
+
+  it('does not light-dismiss on a click on the dialog border', async () => {
+    const modal = await fixture<QdsModal>(html`<qds-modal heading="Hello" light-dismiss>Body</qds-modal>`);
+    await open(modal);
+    const box = dialogOf(modal).getBoundingClientRect();
+    const onBorder = { x: box.left + 0.5, y: box.top + box.height / 2 };
+
+    pointerAt(dialogOf(modal), onBorder);
+
+    expect(dialogOf(modal).open).to.be.true;
+  });
+
+  it('does not light-dismiss when a drag starts inside and ends on the backdrop', async () => {
+    const modal = await fixture<QdsModal>(html`
+      <qds-modal heading="Hello" light-dismiss><p>Select this text</p></qds-modal>
+    `);
+    await open(modal);
+    const text = (modal.querySelector('p') as HTMLElement).getBoundingClientRect();
+
+    pointerAt(dialogOf(modal), { x: text.left + 2, y: text.top + 2 }, { x: 2, y: 2 });
+
+    expect(dialogOf(modal).open).to.be.true;
   });
 
   it('does not treat a click inside the content as a backdrop click', async () => {

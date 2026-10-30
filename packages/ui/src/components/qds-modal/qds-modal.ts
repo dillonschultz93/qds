@@ -275,15 +275,52 @@ export class QdsModal extends QdsElement {
   #handleSubmit = (event: SubmitEvent): void => {
     const form = event.target as HTMLFormElement;
     if (form.method !== 'dialog' || form.closest('qds-modal') !== this) return;
-    event.preventDefault();
+    // Read now: a qds-button submits through a temporary submitter that is gone
+    // once the event has been dispatched.
     const submitter = event.submitter as HTMLButtonElement | HTMLInputElement | null;
-    this.close(submitter?.value ?? '');
+    const returnValue = submitter?.value ?? '';
+    // Decide after the event has reached every listener, as the native dialog
+    // does: one on the document runs after this one, and may still cancel. No
+    // preventDefault here — natively this form, with no dialog ancestor, does
+    // nothing anyway.
+    setTimeout(() => {
+      if (!event.defaultPrevented) this.close(returnValue);
+    });
   };
 
+  /** Whether the current press started outside the dialog box. */
+  #pressedOnBackdrop = false;
+
+  /**
+   * Whether a pointer event lies outside the dialog's box. The target alone
+   * cannot say: the dialog is also the target for a click on its own border,
+   * and for the release of a drag that started inside it.
+   */
+  #isOutside(event: MouseEvent): boolean {
+    const box = this.dialog.getBoundingClientRect();
+    return (
+      event.clientX < box.left ||
+      event.clientX > box.right ||
+      event.clientY < box.top ||
+      event.clientY > box.bottom
+    );
+  }
+
+  #handlePointerDown(event: PointerEvent): void {
+    this.#pressedOnBackdrop = event.target === this.dialog && this.#isOutside(event);
+  }
+
   #handleClick(event: MouseEvent): void {
-    // A click whose target is the dialog element itself landed on the backdrop:
-    // everything inside the dialog is a descendant, and padding is zero.
-    if (this.lightDismiss && event.target === this.dialog) {
+    // Both the press and the release must be on the backdrop: a text selection
+    // dragged out of the dialog ends with a click on it too.
+    const pressedOnBackdrop = this.#pressedOnBackdrop;
+    this.#pressedOnBackdrop = false;
+    if (
+      this.lightDismiss &&
+      pressedOnBackdrop &&
+      event.target === this.dialog &&
+      this.#isOutside(event)
+    ) {
       this.dialog.close();
     }
   }
@@ -294,6 +331,7 @@ export class QdsModal extends QdsElement {
         part="dialog"
         aria-labelledby="heading"
         @close=${this.#handleClose}
+        @pointerdown=${this.#handlePointerDown}
         @click=${this.#handleClick}
       >
         <div class="header" part="header">
