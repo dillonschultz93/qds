@@ -186,9 +186,10 @@ export class QdsAccordionItem extends QdsElement {
   #setOpen(open: boolean): void {
     if (open === this.open) return;
     this.open = open;
-    this.dispatchEvent(
-      new CustomEvent(open ? 'qds-open' : 'qds-close', { bubbles: true, composed: true }),
-    );
+    // Literal names, not open ? 'qds-open' : 'qds-close': the manifest analyzer
+    // cannot read a computed name, and records a nameless event instead.
+    const init = { bubbles: true, composed: true };
+    this.dispatchEvent(open ? new CustomEvent('qds-open', init) : new CustomEvent('qds-close', init));
   }
 
   /**
