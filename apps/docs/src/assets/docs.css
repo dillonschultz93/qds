@@ -94,7 +94,8 @@ body {
   margin-inline-start: auto;
 }
 
-.theme-toggle {
+.theme-toggle,
+.search-button {
   padding: var(--qds-spacing-100) var(--qds-spacing-300);
   font: inherit;
   font-size: var(--qds-typography-font-size-100);
@@ -105,8 +106,116 @@ body {
   cursor: pointer;
 }
 
-.theme-toggle:hover {
+.theme-toggle:hover,
+.search-button:hover {
   background: var(--qds-semantic-color-background-neutral);
+}
+
+/* [hidden] must win over the display set above: the button is hidden until search.js loads. */
+.search-button[hidden] {
+  display: none;
+}
+
+.search-button kbd {
+  margin-inline-start: var(--qds-spacing-100);
+  padding: 0 var(--qds-spacing-100);
+  font-family: var(--qds-typography-font-family-mono);
+  font-size: 0.9em;
+  color: var(--qds-semantic-color-content-subtle);
+  border: var(--qds-semantic-border-default) solid var(--qds-semantic-color-border-default);
+  border-radius: var(--qds-semantic-radius-subtle);
+}
+
+/* ── Search ───────────────────────────────────────────────────────────────── */
+
+.search {
+  display: flex;
+  flex-direction: column;
+  gap: var(--qds-spacing-200);
+}
+
+.search__input {
+  width: 100%;
+  padding: var(--qds-spacing-200) var(--qds-spacing-300);
+  font: inherit;
+  color: var(--qds-semantic-color-content-default);
+  background: var(--qds-semantic-color-background-default);
+  border: var(--qds-semantic-border-default) solid var(--qds-semantic-color-border-control);
+  border-radius: var(--qds-semantic-radius-default);
+}
+
+.search__status {
+  margin: 0;
+  min-height: 1lh;
+  font-size: var(--qds-typography-font-size-100);
+  color: var(--qds-semantic-color-content-subtle);
+}
+
+.search__results {
+  max-height: min(60vh, 28rem);
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.search__results:empty {
+  display: none;
+}
+
+.search__option {
+  display: grid;
+  grid-template-columns: 5.5rem 1fr;
+  column-gap: var(--qds-spacing-300);
+  padding: var(--qds-spacing-200) var(--qds-spacing-300);
+  border-radius: var(--qds-semantic-radius-default);
+  cursor: pointer;
+}
+
+.search__option[aria-selected='true'] {
+  background: var(--qds-semantic-color-background-subtle);
+  box-shadow: inset var(--qds-semantic-border-primary) 0 0 var(--qds-semantic-color-border-primary);
+}
+
+.search__kind {
+  grid-row: span 2;
+  padding-block-start: 0.125rem;
+  font-size: var(--qds-typography-font-size-100);
+  color: var(--qds-semantic-color-content-subtle);
+}
+
+.search__title {
+  display: flex;
+  align-items: center;
+  gap: var(--qds-spacing-200);
+  font-family: var(--qds-typography-font-family-mono);
+  font-size: var(--qds-typography-font-size-200);
+  overflow-wrap: anywhere;
+}
+
+.search__detail {
+  font-size: var(--qds-typography-font-size-100);
+  color: var(--qds-semantic-color-content-subtle);
+  overflow-wrap: anywhere;
+}
+
+.search__swatch {
+  flex: none;
+  width: 0.875rem;
+  height: 0.875rem;
+  border: var(--qds-semantic-border-default) solid var(--qds-semantic-color-border-default);
+  border-radius: var(--qds-semantic-radius-subtle);
+}
+
+/* A token reached from search: show which row it was. */
+tr:target {
+  background: var(--qds-semantic-color-background-info);
+}
+
+tr:target,
+h2[id],
+h3[id] {
+  scroll-margin-block-start: var(--qds-spacing-600);
 }
 
 :focus-visible {

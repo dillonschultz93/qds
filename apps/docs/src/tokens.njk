@@ -54,7 +54,7 @@ description: Every token, its value in each mode, and the chain it resolves thro
         </thead>
         <tbody>
           {% for token in group.tokens %}
-            <tr>
+            <tr id="{{ token.name }}">
               <th scope="row" class="token-name">
                 --{{ token.name }}
                 {% if token.description %}

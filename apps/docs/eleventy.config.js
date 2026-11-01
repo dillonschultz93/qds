@@ -4,6 +4,8 @@ import { dirname, join, basename } from 'node:path';
 
 import litPlugin from '@lit-labs/eleventy-plugin-lit';
 
+import { createSearchIndex } from './search-index.js';
+
 const require = createRequire(import.meta.url);
 
 /** Directory of the design-tokens package, resolved through the workspace link. */
@@ -51,6 +53,12 @@ export default async function (eleventyConfig) {
   });
 
   eleventyConfig.addPassthroughCopy({ 'src/assets': 'assets' });
+
+  // Search: ids on every h2 and h3 as pages are written, and the index once the
+  // build is done. See search-index.js.
+  const search = createSearchIndex();
+  eleventyConfig.addTransform('search-anchors', search.transform);
+  eleventyConfig.on('eleventy.after', search.write);
 
   // The built token CSS and the component JS are consumed as static assets, so
   // the site works without a bundler.
