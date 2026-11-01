@@ -31,6 +31,7 @@
 
     <script type="module" src="/assets/ui.js"></script>
     <script type="module" src="/assets/theme-toggle.js"></script>
+    <script type="module" src="/assets/search.js"></script>
   </head>
 
   <body>
@@ -53,6 +54,14 @@
       </nav>
 
       <div class="site-header__actions">
+        {# Hidden until search.js loads: without it the button would do nothing. #}
+        <button
+          id="search-open"
+          class="search-button"
+          type="button"
+          aria-keyshortcuts="/ Control+K Meta+K"
+          hidden
+        >Search <kbd>/</kbd></button>
         <button
           id="theme-toggle"
           class="theme-toggle"
@@ -68,6 +77,26 @@
       {% if description %}<p class="lede">{{ description }}</p>{% endif %}
       {{ content | safe }}
     </main>
+
+    <qds-modal id="search" heading="Search the docs" light-dismiss>
+      <div class="search">
+        <input
+          id="search-input"
+          class="search__input"
+          type="search"
+          role="combobox"
+          aria-label="Search the docs"
+          aria-expanded="false"
+          aria-controls="search-results"
+          aria-autocomplete="list"
+          autocomplete="off"
+          spellcheck="false"
+          placeholder="Components, properties, tokens…"
+        />
+        <p id="search-status" class="search__status" role="status"></p>
+        <ul id="search-results" class="search__results" role="listbox" aria-label="Results"></ul>
+      </div>
+    </qds-modal>
 
     <footer class="site-footer">
       <p>

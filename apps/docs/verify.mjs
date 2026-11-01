@@ -503,6 +503,64 @@ const rings = {
 check('focus rings appear on keyboard focus and follow the semantic focus color',
   Object.values(rings).every((color) => color === 'rgb(1, 2, 3)'), JSON.stringify(rings));
 
+// ── Search ──────────────────────────────────────────────────────────────────
+/**
+ * Every link in the index must land somewhere: each URL's page must exist and,
+ * if it has a fragment, contain an element with that id. This is what keeps the
+ * index from drifting from the pages it points into.
+ */
+{
+  const index = JSON.parse(await readFile(join(SITE, 'search-index.json'), 'utf8'));
+  const pageCache = new Map();
+  const broken = [];
+  for (const entry of index) {
+    const [path, hash] = entry.url.split('#');
+    const file = join(SITE, path, path.endsWith('/') ? 'index.html' : '');
+    if (!pageCache.has(file)) pageCache.set(file, await readFile(file, 'utf8').catch(() => null));
+    const html = pageCache.get(file);
+    if (html === null || (hash && !html.includes(`id="${hash}"`))) broken.push(entry.url);
+  }
+  check('every search result links to a page and anchor that exist',
+    index.length > 500 && broken.length === 0,
+    broken.length ? broken.slice(0, 5).join(', ') : `${index.length} entries`);
+}
+
+// Real keyboard, end to end: "/" opens it, typing searches, Enter goes there.
+await gotoReady('/');
+await page.keyboard.press('/');
+await page.waitForFunction(() => document.activeElement?.id === 'search-input');
+await page.keyboard.type('toggle');
+await page.waitForFunction(() => document.querySelectorAll('.search__option').length > 0);
+const firstResult = await page.evaluate(() => document.querySelector('.search__option .search__title').textContent);
+await page.keyboard.press('Enter');
+await page.waitForURL('**/components/qds-toggle/');
+check('search opens on "/", ranks the component first, and Enter goes to it',
+  firstResult === '<qds-toggle>' && page.url().endsWith('/components/qds-toggle/'), firstResult);
+
+// A token result lands on its own row.
+await gotoReady('/');
+await page.keyboard.press('Control+K');
+await page.waitForFunction(() => document.activeElement?.id === 'search-input');
+await page.keyboard.type('background primary rest');
+await page.waitForFunction(() => document.querySelectorAll('.search__option').length > 0);
+await page.keyboard.press('Enter');
+await page.waitForURL('**/tokens/#qds-semantic-color-background-primary-rest');
+const landed = await page.evaluate(() => document.querySelector(':target')?.id);
+check('a token search result lands on that token\'s row',
+  landed === 'qds-semantic-color-background-primary-rest', String(landed));
+
+// "/" typed into a component's input is text, not the shortcut. The keypress
+// is retargeted to the component host, which is not itself an input.
+await gotoReady('/components/qds-text-field/');
+await page.locator('qds-text-field').first().click();
+await page.keyboard.type('a/b');
+const typed = await page.evaluate(() => ({
+  value: document.querySelector('qds-text-field').value,
+  searchOpen: document.getElementById('search').open,
+}));
+check('"/" typed in a qds-text-field stays in the field',
+  typed.value === 'a/b' && !typed.searchOpen, JSON.stringify(typed));
+
 // ── 8. Console cleanliness across every page ─────────────────────────────────
 for (const path of ['/', '/tokens/', '/components/', '/components/qds-stack/', '/components/qds-checkbox/', '/components/qds-radio-group/', '/components/qds-radio/', '/components/qds-toggle/', '/components/qds-input/', '/components/qds-text-field/', '/components/qds-chip/', '/components/qds-card/', '/components/qds-progress-bar/', '/components/qds-accordion/', '/components/qds-accordion-item/', '/components/qds-tabs/', '/components/qds-tab/', '/components/qds-tab-panel/', '/components/qds-modal/']) {
   await gotoReady(path);
