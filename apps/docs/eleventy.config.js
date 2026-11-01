@@ -2,6 +2,7 @@ import { readFile, readdir } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { dirname, join, basename } from 'node:path';
 
+import { HtmlBasePlugin } from '@11ty/eleventy';
 import litPlugin from '@lit-labs/eleventy-plugin-lit';
 
 import { createSearchIndex } from './search-index.js';
@@ -53,6 +54,15 @@ export default async function (eleventyConfig) {
   });
 
   eleventyConfig.addPassthroughCopy({ 'src/assets': 'assets' });
+
+  /**
+   * The site is written with root-relative URLs (/assets/…, /components/…), but
+   * GitHub Pages serves it from a subfolder: /qds/. With QDS_DOCS_BASE set, this
+   * rewrites every URL in the HTML onto that base. Unset, as in development and
+   * in verify.mjs, it is / and changes nothing. Script that builds URLs itself
+   * (search.js) has to find the base on its own; see there.
+   */
+  eleventyConfig.addPlugin(HtmlBasePlugin);
 
   // Search: ids on every h2 and h3 as pages are written, and the index once the
   // build is done. See search-index.js.
@@ -177,5 +187,6 @@ export default async function (eleventyConfig) {
     },
     markdownTemplateEngine: 'njk',
     htmlTemplateEngine: 'njk',
+    pathPrefix: process.env.QDS_DOCS_BASE || '/',
   };
 }

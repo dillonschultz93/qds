@@ -15,6 +15,15 @@
 
 const LIMIT = 50;
 
+/**
+ * The site root, found from where this script was loaded rather than assumed to
+ * be "/": deployed to GitHub Pages the site lives under /qds/. The build rewrites
+ * URLs in the HTML onto that base, but not the ones this script builds, so the
+ * index and every result URL (written root-relative) are resolved against this.
+ */
+const ROOT = new URL('../', import.meta.url);
+const resolve = (path) => new URL(path.replace(/^\//, ''), ROOT).href;
+
 /** Shown beside each result, and a tiebreak: earlier kinds rank higher. */
 const KINDS = {
   page: { label: 'Page', weight: 6 },
@@ -48,7 +57,7 @@ const normalize = (text) =>
     .trim();
 
 function load() {
-  index ??= fetch('/search-index.json')
+  index ??= fetch(resolve('/search-index.json'))
     .then((response) => {
       if (!response.ok) throw new Error(`search-index.json: ${response.status}`);
       return response.json();
@@ -172,11 +181,11 @@ async function update() {
 }
 
 function go(url, { newTab = false } = {}) {
+  const target = new URL(resolve(url));
   if (newTab) {
-    window.open(url, '_blank', 'noopener');
+    window.open(target.href, '_blank', 'noopener');
     return;
   }
-  const target = new URL(url, location.href);
   if (target.pathname === location.pathname) {
     // Same page: close first, so focus does not return to the opener and pull
     // the page back up after the jump.

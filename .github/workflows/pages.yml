@@ -1,0 +1,74 @@
+name: Docs site
+
+# Publishes apps/docs to GitHub Pages on every push to main, so the docs —
+# including the roadmap — always match what is on main.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  # deploy-pages proves the deployment came from this workflow with an OIDC token.
+  id-token: write
+
+# One deployment at a time, and never cancel one halfway: a cancelled deploy can
+# leave the live site between versions.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build the site
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          # Node 22, as in CI: see the NODE_OPTIONS note in apps/docs/package.json.
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # Where Pages will serve the site from, as GitHub reports it: /qds for a
+      # project site, or empty for a custom domain. Read rather than hardcoded,
+      # so a rename or a custom domain needs no change here.
+      - name: Configure Pages
+        id: pages
+        uses: actions/configure-pages@v5
+
+      # The packages the site is generated from: tokens and components.
+      - name: Build the packages
+        run: pnpm turbo build --filter='docs^...'
+
+      # Built outside turbo on purpose: turbo would not pass QDS_DOCS_BASE through
+      # to the task (it is not declared in turbo.json), and could replay a cached
+      # build made for "/". Every root-relative URL is rewritten onto this base.
+      - name: Build the site
+        working-directory: apps/docs
+        env:
+          QDS_DOCS_BASE: ${{ steps.pages.outputs.base_path }}/
+        run: pnpm build
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: apps/docs/_site
+
+  deploy:
+    name: Deploy
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
