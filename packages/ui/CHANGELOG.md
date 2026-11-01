@@ -1,5 +1,11 @@
 # @quieto/ui
 
+## 0.1.1
+
+### Patch Changes
+
+- ad25dd6: List `qds-accordion-item`'s `qds-open` and `qds-close` events by name in `custom-elements.json`. They were recorded as a single unnamed event, because the event name was computed; editors and docs reading the manifest showed a blank entry.
+
 ## 0.1.0
 
 ### Minor Changes
