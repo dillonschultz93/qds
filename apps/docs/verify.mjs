@@ -561,8 +561,32 @@ const typed = await page.evaluate(() => ({
 check('"/" typed in a qds-text-field stays in the field',
   typed.value === 'a/b' && !typed.searchOpen, JSON.stringify(typed));
 
+// ── Roadmap: the budget, and nothing shipped off the books ───────────────────
+/**
+ * The roadmap's whole premise is a budget, so the build enforces it: at most
+ * `budget` components, and every shipped element accounted for on the roadmap —
+ * a component added to the library without a roadmap entry would otherwise
+ * slip past the count.
+ */
+{
+  const { default: loadRoadmap } = await import('./src/_data/roadmap.js');
+  const roadmap = await loadRoadmap();
+  check('the roadmap stays within its component budget',
+    roadmap.total <= roadmap.budget, `${roadmap.total} of ${roadmap.budget}`);
+  check('every shipped element is on the roadmap',
+    roadmap.unlisted.length === 0, roadmap.unlisted.join(', ') || 'all listed');
+
+  await gotoReady('/roadmap/');
+  const rendered = await page.evaluate(() =>
+    [...document.querySelectorAll('#shipped + .table-scroll tbody th a')].map((a) => a.textContent.trim()),
+  );
+  const expected = roadmap.shipped.map((component) => component.name);
+  check('the roadmap page lists exactly the shipped components',
+    rendered.join() === expected.join(), `${rendered.length} shipped`);
+}
+
 // ── 8. Console cleanliness across every page ─────────────────────────────────
-for (const path of ['/', '/tokens/', '/components/', '/components/qds-stack/', '/components/qds-checkbox/', '/components/qds-radio-group/', '/components/qds-radio/', '/components/qds-toggle/', '/components/qds-input/', '/components/qds-text-field/', '/components/qds-chip/', '/components/qds-card/', '/components/qds-progress-bar/', '/components/qds-accordion/', '/components/qds-accordion-item/', '/components/qds-tabs/', '/components/qds-tab/', '/components/qds-tab-panel/', '/components/qds-modal/']) {
+for (const path of ['/', '/tokens/', '/components/', '/components/qds-stack/', '/components/qds-checkbox/', '/components/qds-radio-group/', '/components/qds-radio/', '/components/qds-toggle/', '/components/qds-input/', '/components/qds-text-field/', '/components/qds-chip/', '/components/qds-card/', '/components/qds-progress-bar/', '/components/qds-accordion/', '/components/qds-accordion-item/', '/components/qds-tabs/', '/components/qds-tab/', '/components/qds-tab-panel/', '/components/qds-modal/', '/roadmap/']) {
   await gotoReady(path);
 }
 check('no console errors on any page', consoleErrors.length === 0,
