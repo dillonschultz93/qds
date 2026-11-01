@@ -1,0 +1,222 @@
+---
+layout: layouts/base.njk
+title: Roadmap
+description: The components QDS has, the ones it needs next, and the ones it leaves out on purpose — within a budget of thirty.
+---
+
+{#
+  Built from _data/roadmap.js. Whether a component has shipped is not written
+  down anywhere: it is read from the custom elements manifest, so a planned
+  component moves to the shipped table by itself once its elements exist.
+#}
+
+<dl class="stat-row">
+  <div class="stat">
+    <dt>Shipped</dt>
+    <dd>{{ roadmap.shipped | length }}</dd>
+  </div>
+  <div class="stat">
+    <dt>Planned</dt>
+    <dd>{{ roadmap.total - (roadmap.shipped | length) }}</dd>
+  </div>
+  <div class="stat">
+    <dt>Budget</dt>
+    <dd>{{ roadmap.budget }}</dd>
+  </div>
+  <div class="stat">
+    <dt>Room left</dt>
+    <dd>{{ roadmap.remaining }}</dd>
+  </div>
+</dl>
+
+<div class="roadmap-budget">
+  <qds-progress-bar
+    label="Components shipped and planned, out of the budget"
+    value="{{ roadmap.total }}"
+    max="{{ roadmap.budget }}"
+  ></qds-progress-bar>
+  <p>
+    {{ roadmap.shipped | length }} shipped and
+    {{ roadmap.total - (roadmap.shipped | length) }} planned:
+    <strong>{{ roadmap.total }} of {{ roadmap.budget }}</strong> components.
+  </p>
+</div>
+
+<h2>The budget</h2>
+
+<p>
+  QDS stays slim: <strong>at most {{ roadmap.budget }} components</strong>. Every
+  component is something to keep accessible, documented, and consistent with the
+  rest, so each one has to earn its place. A component is a family of elements
+  that ship together — <code>qds-tabs</code>, <code>qds-tab</code>, and
+  <code>qds-tab-panel</code> count as one.
+</p>
+
+<p>
+  Before adding a component, check whether the need is better met by an option
+  on one that exists (see <a href="#variants-not-components">variants</a>), or by
+  plain HTML and the token CSS (see <a href="#left-out-on-purpose">left out on
+  purpose</a>).
+</p>
+
+{% if roadmap.unlisted | length %}
+  <p class="roadmap-warning" role="alert">
+    Shipped but not on the roadmap:
+    {% for tag in roadmap.unlisted %}<code>&lt;{{ tag }}&gt;</code>{% if not loop.last %}, {% endif %}{% endfor %}.
+    Add {{ 'it' if roadmap.unlisted | length == 1 else 'them' }} to <code>_data/roadmap.js</code>,
+    so the budget counts {{ 'it' if roadmap.unlisted | length == 1 else 'them' }}.
+  </p>
+{% endif %}
+
+<h2>Shipped</h2>
+
+<div class="table-scroll">
+  <table class="roadmap-table">
+    <thead>
+      <tr>
+        <th scope="col">Component</th>
+        <th scope="col">Elements</th>
+        <th scope="col">What it is</th>
+        <th scope="col">Since</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for component in roadmap.shipped %}
+        <tr>
+          <th scope="row">
+            <a href="/components/{{ component.elements[0] }}/">{{ component.name }}</a>
+          </th>
+          <td>
+            {% for tag in component.elements %}<code>&lt;{{ tag }}&gt;</code>{% if not loop.last %}<br />{% endif %}{% endfor %}
+          </td>
+          <td>{{ component.summary }}</td>
+          <td>{{ component.since or 'Unreleased' }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% for tier in roadmap.tiers %}
+  <h2>{{ tier.title }}</h2>
+
+  <p><qds-chip variant="info">Planned</qds-chip> {{ tier.summary }}</p>
+
+  {% if tier.components | length %}
+    <div class="table-scroll">
+      <table class="roadmap-table">
+        <thead>
+          <tr>
+            <th scope="col">Component</th>
+            <th scope="col">Why it is needed</th>
+            <th scope="col">Depends on</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for component in tier.components %}
+            <tr>
+              <th scope="row">
+                {{ component.name }}
+                <br />{% for tag in component.elements %}<code>&lt;{{ tag }}&gt;</code>{% if not loop.last %} {% endif %}{% endfor %}
+              </th>
+              <td>{{ component.why }}</td>
+              <td>
+                {% if component.needs | length %}
+                  {% for need in component.needs %}{{ need }}{% if not loop.last %}<br />{% endif %}{% endfor %}
+                {% else %}
+                  Nothing new
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p><em>Everything in this tier has shipped.</em></p>
+  {% endif %}
+{% endfor %}
+
+<h2>Variants, not components</h2>
+
+<p>Needs better met by an option on a component that exists. These cost nothing from the budget.</p>
+
+<div class="table-scroll">
+  <table class="roadmap-table">
+    <thead>
+      <tr>
+        <th scope="col">Need</th>
+        <th scope="col">Met by</th>
+        <th scope="col">Why</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for variant in roadmap.variants %}
+        <tr>
+          <th scope="row">{{ variant.name }}</th>
+          <td><code>{{ variant.as }}</code></td>
+          <td>{{ variant.why }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<h2>Shared foundations</h2>
+
+<p>Built once, and used by several planned components.</p>
+
+<div class="table-scroll">
+  <table class="roadmap-table">
+    <thead>
+      <tr>
+        <th scope="col">Foundation</th>
+        <th scope="col">Used by</th>
+        <th scope="col">What it is</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in roadmap.infrastructure %}
+        <tr>
+          <th scope="row">{{ item.name }}</th>
+          <td>{{ item.for | join(', ') }}</td>
+          <td>{{ item.note }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<h2>Left out on purpose</h2>
+
+<div class="table-scroll">
+  <table class="roadmap-table">
+    <thead>
+      <tr>
+        <th scope="col">Not a component</th>
+        <th scope="col">Instead</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in roadmap.outOfScope %}
+        <tr>
+          <th scope="row">{{ item.name }}</th>
+          <td>{{ item.why }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<h2>Room left</h2>
+
+<p>
+  {{ roadmap.remaining }} components of budget remain once the planned ones ship.
+  Candidates, added only when a real need appears:
+</p>
+
+<ul>
+  {% for item in roadmap.headroom %}
+    <li><strong>{{ item.name }}.</strong> {{ item.note }}</li>
+  {% endfor %}
+</ul>

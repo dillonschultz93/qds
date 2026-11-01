@@ -587,3 +587,40 @@ tbody tr:last-child td {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ── Roadmap ──────────────────────────────────────────────────────────────── */
+
+.roadmap-budget {
+  margin-block: var(--qds-spacing-400) var(--qds-spacing-600);
+}
+
+.roadmap-budget p {
+  margin-block: var(--qds-spacing-200) 0;
+  font-size: var(--qds-typography-font-size-200);
+  color: var(--qds-semantic-color-content-subtle);
+}
+
+/*
+ * Wide enough to read on a phone: below this the tables scroll sideways inside
+ * .table-scroll instead of squeezing every column to a word per line.
+ */
+.roadmap-table {
+  min-width: 40rem;
+}
+
+.roadmap-table code {
+  white-space: nowrap;
+}
+
+/* Shown only when a shipped element is missing from the roadmap. */
+.roadmap-warning {
+  padding: var(--qds-spacing-300) var(--qds-spacing-400);
+  color: var(--qds-semantic-color-content-error);
+  background: var(--qds-semantic-color-background-error);
+  border-radius: var(--qds-semantic-radius-default);
+}
+
+p > qds-chip:first-child {
+  margin-inline-end: var(--qds-spacing-200);
+}
+

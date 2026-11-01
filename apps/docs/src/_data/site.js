@@ -10,6 +10,7 @@ export default function () {
       { text: 'Nomenclature', url: '/nomenclature/' },
       { text: 'Tokens', url: '/tokens/' },
       { text: 'Components', url: '/components/' },
+      { text: 'Roadmap', url: '/roadmap/' },
     ],
   };
 }
