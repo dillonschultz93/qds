@@ -1,0 +1,15 @@
+# Netlify: the documentation site (apps/docs).
+#
+# The base directory is the repository root, not apps/docs: the site is
+# generated from the token and component packages, so the whole workspace is
+# installed and turbo builds those packages before the site. pnpm's version
+# comes from the packageManager field in package.json, through Corepack.
+
+[build]
+  command = "pnpm turbo build --filter=docs"
+  publish = "apps/docs/_site"
+
+[build.environment]
+  # As in CI. Node 25 also works (see the NODE_OPTIONS note in
+  # apps/docs/package.json); 22 keeps the deployed build the same as the tested one.
+  NODE_VERSION = "22"
