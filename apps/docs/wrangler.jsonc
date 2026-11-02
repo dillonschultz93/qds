@@ -18,7 +18,10 @@
 //   pnpm --filter docs exec wrangler deploy
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
-  "name": "quieto-docs",
+  // Must match the Worker's name in the Cloudflare dashboard, where Workers
+  // Builds deploys it. A different name here would make a manual `wrangler
+  // deploy` create a second, separate Worker.
+  "name": "quieto-design-system",
   "compatibility_date": "2026-10-01",
 
   "assets": {
