@@ -97,7 +97,8 @@ export const primitive = {
    * (container widths, which outgrow the spacing scale), and `opacity` for
    * transparency. Both were added when the component library first needed them:
    * before that, the modal's widths and backdrop opacity were raw values with
-   * nothing to reference.
+   * nothing to reference. Icon sizes sit under `size` with the `icon`
+   * sub-category (`size.icon.md`), apart from the container widths.
    */
   categories: ['color', 'typography', 'spacing', 'size', 'border', 'shadow', 'opacity', 'animation'],
 
@@ -107,6 +108,7 @@ export const primitive = {
    * below rather than this list.
    */
   subCategories: [
+    'icon',
     'font-size',
     'font-family',
     'font-weight',
@@ -202,7 +204,10 @@ export const semantic = {
    * button, a check mark in a checked box. Every other role describes what the
    * element itself means; this one describes what it sits on. It flips with the
    * mode (light text in light mode, dark in dark) because the filled surfaces
-   * lighten in dark mode, and light text on them falls below 4.5:1.
+   * lighten in dark mode, and light text on them falls below 4.5:1. As a
+   * background, it is that filled surface itself, for an element that stands
+   * out from the page in either mode, such as a tooltip: dark in light mode,
+   * light in dark, always paired with inverse content.
    */
   roles: [
     'default',
