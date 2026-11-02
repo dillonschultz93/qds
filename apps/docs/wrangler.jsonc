@@ -3,13 +3,17 @@
 // Static files only — no Worker script. The built site (_site) is uploaded as
 // assets and served as-is.
 //
-// ROUTING LIVES IN THE CLOUDFLARE DASHBOARD, NOT HERE. quieto.dev is attached to
-// this Worker as a Custom Domain, and the MCP server (the quieto-mcp Worker)
-// takes quieto.dev/mcp* and quieto.dev/sse* with Routes, which win over a
-// Custom Domain on the same hostname. A deploy REPLACES a Worker's routes and
-// domains with whatever this file lists, so adding a `routes` key here would
-// detach quieto.dev from the dashboard's setup unless it listed it too. Leave
-// it out, and deploys leave the dashboard's routing alone.
+// ROUTING LIVES IN THE CLOUDFLARE DASHBOARD, NOT HERE. quieto.dev is shared by
+// Routes on its existing, proxied DNS record, and the most specific route wins:
+//
+//   quieto.dev/mcp*   → quieto-mcp (the MCP server)
+//   quieto.dev/sse*   → quieto-mcp
+//   quieto.dev/*      → this Worker (everything else)
+//
+// A deploy REPLACES a Worker's routes and domains with whatever this file
+// lists, so adding a `routes` key here would drop the dashboard's quieto.dev/*
+// route on the next deploy unless it listed it too. Leave it out, and deploys
+// leave the dashboard's routing alone.
 //
 // Deploys with the docs build (see the deploy commands in the Workers Builds
 // settings), from the repository root:
@@ -18,7 +22,10 @@
 //   pnpm --filter docs exec wrangler deploy
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
-  "name": "quieto-docs",
+  // Must match the Worker's name in the Cloudflare dashboard, where Workers
+  // Builds deploys it. A different name here would make a manual `wrangler
+  // deploy` create a second, separate Worker.
+  "name": "quieto-design-system",
   "compatibility_date": "2026-10-01",
 
   "assets": {

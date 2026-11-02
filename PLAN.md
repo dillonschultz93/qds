@@ -391,9 +391,14 @@ vocabulary have diverged.
 Needs an `NPM_TOKEN` secret; `npm whoami` returned 401 locally, so the session
 needs `npm login` before any manual publish.
 
-**Docs deploy** — `apps/docs/_site` is a static build for
-Pages/Netlify/Cloudflare. Host is undecided; the plan only guarantees a static
-output directory.
+**Docs deploy** — Cloudflare Workers, at https://quieto.dev. `apps/docs/wrangler.jsonc`
+serves `apps/docs/_site` as static assets from the `quieto-design-system` Worker,
+built and deployed by Workers Builds on push to `main`. The domain is shared with
+the MCP server by Routes on its DNS record — `quieto.dev/mcp*` and `/sse*` to
+`quieto-mcp`, `quieto.dev/*` to the docs — set in the dashboard and deliberately
+absent from both Workers' configs, since a deploy replaces a Worker's routes with
+its config's. Netlify was tried first and dropped so the docs could share the
+bare domain with the MCP server.
 
 ---
 
