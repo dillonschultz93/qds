@@ -944,16 +944,6 @@ p > qds-chip:first-child {
   color: var(--qds-component-button-secondary-color-content-rest);
 }
 
-.prose .hero__action--primary {
-  color: var(--qds-component-button-primary-color-content-rest);
-  background: var(--qds-component-button-primary-color-background-rest);
-  border-color: var(--qds-component-button-primary-color-border-rest);
-}
-
-.prose .hero__action--primary:hover {
-  background: var(--qds-component-button-primary-color-background-hover);
-}
-
 .card-grid--sections {
   grid-template-columns: repeat(auto-fill, minmax(min(17rem, 100%), 1fr));
 }
