@@ -890,6 +890,12 @@ check('every component page links to @quieto/ui on npm and GitHub',
   missingPackage.join(', ') || `${componentPages.length} pages, version ${uiPackage.version}`);
 check('every page\'s content column is full width, not collapsed',
   narrow.length === 0, narrow.join(', ') || `${builtPages.length} pages`);
+// On a page shorter than the window, the footer sits at the window's bottom
+// edge rather than straight after the content.
+await gotoReady('/404.html');
+const footerGap = await page.evaluate(() =>
+  Math.round(innerHeight - document.querySelector('.site-footer').getBoundingClientRect().bottom));
+check('on a short page the footer sits at the bottom of the window', footerGap === 0, `gap=${footerGap}px`);
 check('every page has the footer links', noFooter.length === 0, noFooter.join(', ') || `${builtPages.length} pages`);
 check('no console errors on any page', consoleErrors.length === 0,
   consoleErrors.slice(0, 5).join('\n    ') || 'clean');
