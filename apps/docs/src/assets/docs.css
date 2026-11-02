@@ -573,6 +573,10 @@ tbody tr:last-child td {
   text-decoration: none;
 }
 
+.link-card a:visited {
+  color: inherit;
+}
+
 .link-card a::after {
   content: '';
   position: absolute;
@@ -934,6 +938,10 @@ p > qds-chip:first-child {
 
 .prose .hero__action:hover {
   background: var(--qds-component-button-secondary-color-background-hover);
+}
+
+.prose .hero__action:visited {
+  color: var(--qds-component-button-secondary-color-content-rest);
 }
 
 .prose .hero__action--primary {
