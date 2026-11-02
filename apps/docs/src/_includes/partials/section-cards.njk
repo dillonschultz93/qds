@@ -1,0 +1,20 @@
+{#
+  A section's pages as a grid of qds-cards, as Material's section overviews show
+  them. Expects `section` (from _data/docs.js). Each card's heading link is
+  stretched over the whole card in CSS (.link-card), so the card is one click
+  target with one accessible name.
+#}
+{% for group in section.groups %}
+  {% if group.title %}<h2>{{ group.title }}</h2>{% endif %}
+  <ul class="card-grid">
+    {% for item in group.pages %}
+      <li>
+        <qds-card class="link-card">
+          <h3 slot="header"><a href="{{ item.url }}">{{ item.title }}</a></h3>
+          {% if item.status %}<qds-chip variant="info">{{ item.status }}</qds-chip>{% endif %}
+          <p>{{ item.summary }}</p>
+        </qds-card>
+      </li>
+    {% endfor %}
+  </ul>
+{% endfor %}

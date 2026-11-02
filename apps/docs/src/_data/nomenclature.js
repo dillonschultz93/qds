@@ -19,7 +19,7 @@ export default function () {
     semantic: spec.semantic,
     component: spec.component,
 
-    /** Rendered as a table on the Nomenclature page. */
+    /** Rendered as a table on the Tokens Nomenclature page. */
     grammar: [
       {
         tier: 'primitive',

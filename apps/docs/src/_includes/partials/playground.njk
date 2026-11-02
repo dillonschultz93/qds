@@ -1,0 +1,50 @@
+{#
+  A component playground, as on Spectrum's component pages: the live component,
+  the markup for its current settings, and controls generated from its
+  attributes (_data/playgrounds.js). The controls are QDS components too.
+
+  Server-rendered at the defaults, so the preview and code are there before any
+  script runs; playground.js re-renders both from the same markup function as
+  the controls change.
+#}
+{% set playground = playgrounds | findBy('slug', family.slug) %}
+
+<h2>Playground</h2>
+
+<div class="playground" data-playground>
+  <div class="playground__stage">
+    <div class="playground__preview">{{ playground.markup | safe }}</div>
+    <div class="playground__code">
+      <pre><code class="language-html">{{ playground.markup }}</code></pre>
+      <div class="playground__copy">
+        <span class="playground__copied" role="status"></span>
+        <qds-button size="sm" variant="secondary" data-copy>Copy code</qds-button>
+      </div>
+    </div>
+  </div>
+
+  <div class="playground__controls" role="group" aria-label="{{ family.name }} settings">
+    {% if playground.hasContent %}
+      <qds-text-field data-control="content" label="Text" value="{{ playground.values.content }}"></qds-text-field>
+    {% endif %}
+    {% for control in playground.spec.controls %}
+      {% set value = playground.values[control.attribute] %}
+      {% if control.kind == 'choice' %}
+        <qds-radio-group data-control="{{ control.attribute }}" label="{{ control.attribute }}" orientation="inline" value="{{ value }}">
+          {% for option in control.options %}<qds-radio value="{{ option }}">{{ option }}</qds-radio>{% endfor %}
+        </qds-radio-group>
+      {% elif control.kind == 'boolean' %}
+        <qds-toggle data-control="{{ control.attribute }}"{% if value %} checked{% endif %}>{{ control.attribute }}</qds-toggle>
+      {% else %}
+        <qds-text-field
+          data-control="{{ control.attribute }}"
+          label="{{ control.attribute }}"
+          type="{{ 'number' if control.kind == 'number' else 'text' }}"
+          value="{{ value }}"
+        ></qds-text-field>
+      {% endif %}
+    {% endfor %}
+  </div>
+
+  <script type="application/json" data-playground-spec>{{ { spec: playground.spec, values: playground.values } | json | safe }}</script>
+</div>

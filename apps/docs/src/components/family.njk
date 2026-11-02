@@ -1,0 +1,81 @@
+---
+layout: layouts/base.njk
+pagination:
+  data: docs.families
+  size: 1
+  alias: family
+permalink: "{{ family.url }}"
+eleventyComputed:
+  title: "{{ family.name }}"
+  description: "{{ family.summary }}"
+---
+
+{#
+  A component's Overview: what it is for, live examples, and the elements it is
+  made of. The API is on its own page (family-api.njk). Both are generated for
+  every family in _data/docs.js; examples come from _data/examples.js.
+#}
+
+{% include "partials/component-header.njk" %}
+
+{% include "partials/playground.njk" %}
+
+<h2>About</h2>
+
+{% for paragraph in family.primary.description | paragraphs %}
+  <p>{{ paragraph }}</p>
+{% endfor %}
+
+<h2>Examples</h2>
+
+{% set componentExamples = examples[family.primary.tagName] %}
+{% if componentExamples %}
+  {% for demo in componentExamples %}
+    {% if demo.description %}<p>{{ demo.description }}</p>{% endif %}
+    <figure class="example">
+      <figcaption class="example__title">{{ demo.title }}</figcaption>
+      <div class="example__preview">{{ demo.html | safe }}</div>
+      <details class="example__source">
+        <summary>Source</summary>
+        <pre><code class="language-html">{{ demo.html }}</code></pre>
+      </details>
+    </figure>
+  {% endfor %}
+{% else %}
+  <p><em>No examples yet for this component.</em></p>
+{% endif %}
+
+<h2>Elements</h2>
+
+<div class="table-scroll">
+  <table>
+    <thead>
+      <tr>
+        <th scope="col">Element</th>
+        <th scope="col">What it is</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for member in family.members %}
+        <tr>
+          <th scope="row"><a href="{{ family.apiUrl }}#{{ member.tagName }}"><code>&lt;{{ member.tagName }}&gt;</code></a></th>
+          <td>{{ member.description | paragraphs | first }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<h2>Import</h2>
+
+<pre><code>import '@quieto/design-tokens/css';
+{% for member in family.members %}import '@quieto/ui/{{ member.tagName }}.js';
+{% endfor %}</code></pre>
+
+<p>
+  Or import <code>@quieto/ui</code> to register every component. See the
+  <a href="{{ family.apiUrl }}">API</a> for every property, slot, event, part, and
+  token.
+</p>
+
+<script type="module" src="/assets/playground.js"></script>

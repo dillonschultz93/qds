@@ -1,0 +1,10 @@
+---
+layout: layouts/base.njk
+title: Styles
+toc: false
+eleventyComputed:
+  description: "{{ (docs.sections | sectionFor('/styles/')).summary }}"
+---
+
+{% set section = docs.sections | sectionFor('/styles/') %}
+{% include "partials/section-cards.njk" %}

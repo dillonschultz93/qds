@@ -1,112 +1,163 @@
 ---
 layout: layouts/base.njk
 title: Quieto Design System
-description: Three-tier design tokens, Lit web components, and the naming grammar that ties them together.
+description: Design tokens and web components that share one source of truth, in light and dark.
+hideTitle: true
+toc: false
 ---
 
-<dl class="stat-row">
-  <div class="stat">
-    <dt>Tokens</dt>
-    <dd>{{ tokens.stats.total }}</dd>
-  </div>
-  <div class="stat">
-    <dt>Vary by mode</dt>
-    <dd>{{ tokens.stats.modeVarying }}</dd>
-  </div>
-  <div class="stat">
-    <dt>Components</dt>
-    <dd>{{ components | length }}</dd>
-  </div>
-  <div class="stat">
-    <dt>Roles</dt>
-    <dd>{{ nomenclature.semantic.roles | length }}</dd>
-  </div>
-</dl>
+{#
+  Laid out as Mantine's home page is: a hero with the numbers that matter, the
+  AI tools, then one band per thing the system does well, each with a live demo,
+  and how to start.
+#}
 
-<h2>The idea</h2>
+<section class="hero">
+  <p class="hero__eyebrow">
+    <qds-chip variant="info">@quieto/ui {{ packages.ui.version }}</qds-chip>
+    <a href="/roadmap/">See what is coming next</a>
+  </p>
+  <h1 class="hero__title">Quieto Design System</h1>
+  <p class="hero__lede">
+    Design tokens and web components that share one source of truth. Every color,
+    space, and type style is a token; every component is styled by nothing else.
+  </p>
+  <qds-stack direction="inline" gap="300" wrap>
+    <a class="hero__action" href="/components/">Browse components</a>
+    <a class="hero__action" href="/foundations/tokens/">Read about tokens</a>
+  </qds-stack>
 
-<p>
-  Every visual decision in QDS lives in one place and travels one path. A raw value
-  becomes a <strong>primitive</strong>, a primitive is given meaning as a
-  <strong>semantic</strong>, and a semantic is applied by a
-  <strong>component</strong> token. Nothing skips a tier, and nothing points
-  backwards.
-</p>
+  <dl class="hero-stats">
+    <div><dt>Components</dt><dd>{{ docs.families | length }}</dd></div>
+    <div><dt>Design tokens</dt><dd>{{ tokens.stats.total }}</dd></div>
+    <div><dt>Themes</dt><dd>Light and dark</dd></div>
+    <div><dt>License</dt><dd>MIT</dd></div>
+  </dl>
+</section>
 
-<p>
-  That structure survives into the CSS rather than being flattened at build time,
-  which is what makes a single stylesheet themeable:
-</p>
+<section class="home-band home-band--ai">
+  <h2>Built for AI-assisted work</h2>
+  <p class="home-band__lede">
+    Ask your assistant for a token system and it can build one: accessible color
+    ramps, spacing and type scales, and light and dark themes, checked for
+    contrast as it goes.
+  </p>
+  <ul class="card-grid">
+    <li>
+      <qds-card class="link-card" variant="elevated">
+        <h3 slot="header"><a href="/ai/mcp/">MCP server</a></h3>
+        <p>
+          {{ ai.mcp.tools | length }} tools for any MCP client, hosted at
+          <code>quieto.dev/mcp</code>. Nothing to install.
+        </p>
+      </qds-card>
+    </li>
+    <li>
+      <qds-card class="link-card" variant="elevated">
+        <h3 slot="header"><a href="/ai/skills/">Skills</a></h3>
+        <p>
+          {{ ai.skills | length }} Claude Code skills that scaffold, audit,
+          migrate, and update a token system.
+        </p>
+      </qds-card>
+    </li>
+  </ul>
+  <pre><code>claude mcp add quieto --transport http {{ ai.mcp.url }}</code></pre>
+</section>
 
-<pre><code>--qds-component-button-primary-color-background-rest: var(--qds-semantic-color-background-primary-rest);
---qds-semantic-color-background-primary-rest:         var(--qds-color-blue-600);
---qds-color-blue-600:                                 #2563eb;</code></pre>
+<section class="home-band">
+  <h2>Explore the docs</h2>
+  <ul class="card-grid card-grid--sections">
+    {% for section in docs.sections %}
+      <li>
+        <qds-card class="link-card" variant="elevated">
+          <h3 slot="header"><a href="{{ section.url }}">{{ section.title }}</a></h3>
+          <p>{{ section.summary }}</p>
+          <p slot="footer" class="link-card__meta">
+            {% if section.key == 'foundations' %}
+              {{ tokens.stats.total }} tokens in three tiers
+            {% elif section.key == 'styles' %}
+              Color, typography, and icons
+            {% elif section.key == 'ai' %}
+              MCP server and skills
+            {% else %}
+              {{ docs.families | length }} components
+            {% endif %}
+          </p>
+        </qds-card>
+      </li>
+    {% endfor %}
+  </ul>
+</section>
 
-<p>
-  Switching to dark mode redefines the middle line and nothing else. Try the theme
-  toggle in the header — every colour on this page moves, and only
-  {{ tokens.stats.modeVarying }} of {{ tokens.stats.total }} variables are
-  redeclared to do it.
-</p>
+<section class="home-band">
+  <h2>{{ docs.families | length }} components, built from its own parts</h2>
+  <p class="home-band__lede">
+    This site is the system's first consumer. Its pages are laid out with
+    <code>qds-stack</code> and <code>qds-card</code>, search is a
+    <code>qds-modal</code>, the token reference is a <code>qds-tabs</code> with a
+    <code>qds-input</code> filter, and every color comes from a semantic token,
+    so if a token is wrong, these pages show it. Try the theme toggle.
+  </p>
 
-<h2>Components</h2>
+  {% example "A few of the components" %}
+    <qds-stack gap="400">
+      <qds-stack direction="inline" gap="200" align="center" wrap>
+        <qds-button>Save</qds-button>
+        <qds-button variant="secondary">Cancel</qds-button>
+        <qds-chip variant="success">Published</qds-chip>
+        <qds-toggle checked>Notifications</qds-toggle>
+      </qds-stack>
+      <qds-progress-bar label="Upload progress" value="64"></qds-progress-bar>
+    </qds-stack>
+  {% endexample %}
 
-{% example "Buttons, in every variant" %}
-  <qds-button variant="primary">Primary</qds-button>
-  <qds-button variant="secondary">Secondary</qds-button>
-  <qds-button variant="ghost">Ghost</qds-button>
-  <qds-button variant="danger">Danger</qds-button>
-{% endexample %}
+  <p><a href="/components/">Every component, with a playground</a></p>
+</section>
 
-<p>
-  Each of those resolves through the component tier, so
-  <code>--qds-component-button-*</code> is at once the token API and the styling
-  API. Overriding one of those variables is the supported way to restyle a button,
-  and it is the same variable the token source defines.
-</p>
+<section class="home-band">
+  <h2>Restyle with one variable</h2>
+  <p class="home-band__lede">
+    A component reads only its own tokens, and each one aliases a semantic token,
+    so it follows the theme. Override one, on one instance or a whole page, and
+    nothing else needs to change.
+  </p>
 
-<h2>Where things are</h2>
+  {% example "One component token, overridden" %}
+    <qds-stack direction="inline" gap="300" wrap>
+      <qds-button>Default</qds-button>
+      <qds-button style="
+        --qds-component-button-primary-color-background-rest: var(--qds-color-purple-600);
+        --qds-component-button-primary-color-background-hover: var(--qds-color-purple-700);
+        --qds-component-button-primary-color-background-active: var(--qds-color-purple-800);
+      ">Restyled</qds-button>
+    </qds-stack>
+  {% endexample %}
 
-<div class="table-scroll">
-  <table>
-    <thead>
-      <tr>
-        <th scope="col">Page</th>
-        <th scope="col">What it covers</th>
-        <th scope="col">Generated from</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a href="/nomenclature/">Nomenclature</a></td>
-        <td>The naming grammar, its vocabularies, and how the build enforces it</td>
-        <td><code>nomenclature.js</code></td>
-      </tr>
-      <tr>
-        <td><a href="/tokens/">Tokens</a></td>
-        <td>All {{ tokens.stats.total }} tokens with values per mode and full reference chains</td>
-        <td><code>design-tokens/dist</code></td>
-      </tr>
-      <tr>
-        <td><a href="/components/">Components</a></td>
-        <td>Properties, slots, events, CSS parts and custom properties</td>
-        <td><code>custom-elements.json</code></td>
-      </tr>
-    </tbody>
-  </table>
-</div>
+  <p><a href="/foundations/tokens/">How the three token tiers fit together</a></p>
+</section>
 
-<h2>Install</h2>
+<section class="home-band">
+  <h2>Get started</h2>
 
-<pre><code>pnpm add @quieto/design-tokens @quieto/ui</code></pre>
+  <ol class="steps">
+    <li>
+      <p>Install the components. The tokens come with them:</p>
+      <pre><code>npm install @quieto/ui</code></pre>
+    </li>
+    <li>
+      <p>Load the tokens once, at the top of your app, then register the components:</p>
+      <pre><code>import '@quieto/design-tokens/css';
+import '@quieto/ui';</code></pre>
+    </li>
+    <li>
+      <p>Use them like any HTML element:</p>
+      <pre><code>&lt;qds-button variant="secondary"&gt;Cancel&lt;/qds-button&gt;</code></pre>
+    </li>
+  </ol>
 
-<p>Load the stylesheet once, at document level, then import the components you need:</p>
-
-<pre><code>import '@quieto/design-tokens/css';
-import '@quieto/ui/qds-button.js';</code></pre>
-
-<p>
-  The stylesheet is not optional. Custom properties inherit through shadow DOM, so
-  it is what themes every component — without it they fall back to hardcoded
-  values, render correctly once, and never respond to the theme again.
-</p>
+  <p>
+    Without the token stylesheet the components still render, from fallbacks
+    built into each one, but nothing follows the theme.
+  </p>
+</section>

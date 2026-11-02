@@ -57,6 +57,8 @@ export default async function () {
          * backticks showing.
          */
         summary: (declaration.description ?? '').trim().replace(/`/g, ''),
+        /** The description as written, Markdown and all, for the paragraphs filter. */
+        description: (declaration.description ?? '').trim(),
         path: module.path,
         properties: (declaration.members ?? []).filter(isPublicMember).map((member) => ({
           name: member.name,

@@ -1,0 +1,123 @@
+---
+layout: layouts/base.njk
+title: Tokens
+description: The three token tiers, and every token with its value in each mode.
+---
+
+{#
+  What the tiers are, and the full reference. How a token is named is on its
+  own page, Tokens Nomenclature (foundations/nomenclature.njk).
+#}
+
+{% set pkg = packages.tokens %}
+{% include "partials/package-links.njk" %}
+
+<dl class="stat-row">
+  <div class="stat">
+    <dt>Tokens</dt>
+    <dd>{{ tokens.stats.total }}</dd>
+  </div>
+  {% for tier in tokens.tiers %}
+    <div class="stat">
+      <dt>{{ tier.tier | capitalize }}</dt>
+      <dd>{{ tier.count }}</dd>
+    </div>
+  {% endfor %}
+  <div class="stat">
+    <dt>Vary by mode</dt>
+    <dd>{{ tokens.stats.modeVarying }}</dd>
+  </div>
+</dl>
+
+<h2>Overview</h2>
+
+<p>
+  Every visual decision in QDS lives in one place and travels one path. A raw value
+  becomes a <strong>primitive</strong>, a primitive is given meaning as a
+  <strong>semantic</strong> token, and a semantic token is applied by a
+  <strong>component</strong> token. Nothing skips a tier, and nothing points
+  backwards.
+</p>
+
+<p>
+  That structure survives into the CSS rather than being flattened at build time,
+  which is what makes a single stylesheet themeable:
+</p>
+
+<pre><code>--qds-component-button-primary-color-background-rest: var(--qds-semantic-color-background-primary-rest);
+--qds-semantic-color-background-primary-rest:         var(--qds-color-blue-600);
+--qds-color-blue-600:                                 #2563eb;</code></pre>
+
+<p>
+  Switching to dark mode redefines the middle line and nothing else: only
+  {{ tokens.stats.modeVarying }} of {{ tokens.stats.total }} variables are
+  redeclared to do it. Reach for a <strong>semantic</strong> token in product
+  code, since it switches with the theme; override a <strong>component</strong>
+  token to restyle a component.
+</p>
+
+<p>
+  Every token's name follows one grammar, checked at build time. The
+  <a href="/foundations/nomenclature/">Tokens Nomenclature</a> page sets it out: each
+  tier's anatomy, the allowed vocabularies, and how the build enforces them.
+</p>
+
+<h2>Token reference</h2>
+
+<p>
+  The primitive and semantic tiers. Values are read from the generated token
+  manifest, so they are the values the CSS actually ships. <strong>Resolves through</strong> walks each token down to
+  the raw value it ends at.
+</p>
+
+<div class="token-filter">
+  <qds-input
+    id="token-filter"
+    type="search"
+    label="Filter tokens"
+    placeholder="Filter by name or value, such as background or #2563eb"
+  ></qds-input>
+  <p id="token-filter-status" class="token-filter__status" role="status"></p>
+</div>
+
+<qds-tabs id="token-tiers" label="Token tiers">
+  {% for tier in tokens.tiers %}{% if tier.tier != 'component' %}
+    <qds-tab slot="tab" data-tier="{{ tier.tier }}">{{ tier.tier | capitalize }} <span class="tab-count">{{ tier.count }}</span></qds-tab>
+  {% endif %}{% endfor %}
+  {% for tier in tokens.tiers %}{% if tier.tier != 'component' %}
+    <qds-tab-panel data-tier="{{ tier.tier }}">
+      <p class="tier-intro">
+        {% if tier.tier == 'primitive' %}
+          Raw values. No references, and no tier identifier in the variable name.
+        {% else %}
+          Intent, aliasing primitives. The only tier where light and dark differ.
+        {% endif %}
+      </p>
+  {% for group in tier.categories %}
+    <h3 id="{{ tier.tier }}-{{ group.category }}" class="token-category">{{ group.category }}</h3>
+
+    {% set rows = group.tokens %}
+    {% include "partials/token-table.njk" %}
+  {% endfor %}
+    </qds-tab-panel>
+  {% endif %}{% endfor %}
+</qds-tabs>
+
+<h2>Component tokens</h2>
+
+<p>
+  Each component's tokens are its public styling API: overriding one is the
+  supported way to restyle that component. They are listed with the component
+  they belong to, on its <strong>Tokens</strong> tab, where they make sense.
+</p>
+
+<ul class="token-components">
+  {% for family in docs.families %}{% if family.tokenCount %}
+    <li>
+      <a href="{{ family.tokensUrl }}" data-token-sets="{{ family.tokenSets | join(' ') }}">{{ family.name }}</a>
+      <span class="token-components__count">{{ family.tokenCount }}</span>
+    </li>
+  {% endif %}{% endfor %}
+</ul>
+
+<script type="module" src="/assets/token-reference.js"></script>

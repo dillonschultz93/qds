@@ -134,8 +134,13 @@ export class QdsTextControl extends QdsElement {
    * the browser's validation bubble points at the text rather than the host.
    */
   protected syncValidity(): void {
-    const { validity, validationMessage } = this.input;
-    if (validity.valid) {
+    const { validity, validationMessage, willValidate } = this.input;
+    // A disabled or read-only input is barred from validation, and the browser
+    // gives it an empty message even when its flags are set (an invalid email
+    // in a disabled field still reports typeMismatch). setValidity throws on
+    // that pair, and the control is not being validated anyway: report valid,
+    // as the native input would be treated.
+    if (validity.valid || !willValidate) {
       this.internals.setValidity({});
     } else {
       this.internals.setValidity(validity, validationMessage, this.input);

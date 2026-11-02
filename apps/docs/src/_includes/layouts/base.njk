@@ -32,24 +32,30 @@
     <script type="module" src="/assets/ui.js"></script>
     <script type="module" src="/assets/theme-toggle.js"></script>
     <script type="module" src="/assets/search.js"></script>
+    <script type="module" src="/assets/page-contents.js"></script>
   </head>
 
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
+
+    {% set section = docs.sections | sectionFor(page.url) %}
 
     <header class="site-header">
       <a class="site-header__brand" href="/">{{ site.shortTitle }}</a>
 
       <nav class="site-nav" aria-label="Main">
         <ul>
-          {% for item in site.nav %}
+          {% for item in docs.sections %}
             <li>
               <a
                 href="{{ item.url }}"
-                {% if page.url == item.url %}aria-current="page"{% endif %}
-              >{{ item.text }}</a>
+                {% if page.url == item.url %}aria-current="page"{% elif section and section.key == item.key %}aria-current="true"{% endif %}
+              >{{ item.title }}</a>
             </li>
           {% endfor %}
+          <li>
+            <a href="/roadmap/"{% if page.url == '/roadmap/' %} aria-current="page"{% endif %}>Roadmap</a>
+          </li>
         </ul>
       </nav>
 
@@ -72,11 +78,24 @@
       </div>
     </header>
 
-    <main id="main" class="prose">
-      {% if title %}<h1>{{ title }}</h1>{% endif %}
-      {% if description %}<p class="lede">{{ description }}</p>{% endif %}
-      {{ content | safe }}
-    </main>
+    {#
+      Three columns where there is room, as Material and Spectrum lay out their
+      docs: the section's pages, the content, and the page's own contents. The
+      contents list is filled in at build time from the page's h2s (see the
+      page-contents transform in eleventy.config.js), and dropped when there are
+      fewer than two.
+    #}
+    <div class="page{% if section %} page--sectioned{% endif %}{% if wide %} page--wide{% endif %}">
+      {% if section %}{% include "partials/sidebar.njk" %}{% endif %}
+
+      <main id="main" class="prose">
+        {% if title and not hideTitle %}<h1>{{ title }}</h1>{% endif %}
+        {% if description and not hideTitle %}<p class="lede">{{ description }}</p>{% endif %}
+        {{ content | safe }}
+      </main>
+
+      {% if toc != false %}<!-- page-contents -->{% endif %}
+    </div>
 
     <qds-modal id="search" heading="Search the docs" light-dismiss>
       <div class="search">
@@ -99,12 +118,35 @@
     </qds-modal>
 
     <footer class="site-footer">
-      <p>
-        Generated from
-        <code>packages/design-tokens</code> and <code>packages/ui</code>.
-        Every table on this site is built from the token manifest or the custom
-        elements manifest — none of it is hand-written.
-      </p>
+      <nav class="site-footer__columns" aria-label="Footer">
+        <div>
+          <h2 class="site-footer__heading">Docs</h2>
+          <ul>
+            {% for item in docs.sections %}{% if item.key != 'ai' %}<li><a href="{{ item.url }}">{{ item.title }}</a></li>{% endif %}{% endfor %}
+            <li><a href="/roadmap/">Roadmap</a></li>
+          </ul>
+        </div>
+        <div>
+          <h2 class="site-footer__heading">AI</h2>
+          <ul>
+            {% for item in (docs.sections | sectionFor('/ai/')).groups[0].pages %}<li><a href="{{ item.url }}">{{ item.title }}</a></li>{% endfor %}
+          </ul>
+        </div>
+        <div>
+          <h2 class="site-footer__heading">Packages</h2>
+          <ul>
+            {% for key in ['ui', 'tokens', 'skills'] %}<li><a href="{{ packages[key].npm }}" rel="noopener">{{ packages[key].name }}</a></li>{% endfor %}
+          </ul>
+        </div>
+        <div>
+          <h2 class="site-footer__heading">Project</h2>
+          <ul>
+            <li><a href="{{ site.repo }}" rel="noopener">GitHub</a></li>
+            <li><a href="{{ site.repo }}/issues" rel="noopener">Report an issue</a></li>
+            <li><a href="{{ site.repo }}/blob/main/LICENSE" rel="noopener">MIT license</a></li>
+          </ul>
+        </div>
+      </nav>
     </footer>
   </body>
 </html>

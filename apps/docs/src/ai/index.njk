@@ -1,0 +1,18 @@
+---
+layout: layouts/base.njk
+title: AI
+toc: false
+eleventyComputed:
+  description: "{{ (docs.sections | sectionFor('/ai/')).summary }}"
+---
+
+<p>
+  Two tools put Quieto's token pipeline in reach of an AI assistant. Both work
+  with <a href="https://www.npmjs.com/package/@quieto/tokens" rel="noopener">Quieto Tokens</a>,
+  the generator for three-tier token systems like the one QDS is built on: the
+  <a href="/ai/mcp/">MCP server</a> gives any MCP client its tools, and the
+  <a href="/ai/skills/">skills</a> wrap its CLI in guided workflows for Claude Code.
+</p>
+
+{% set section = docs.sections | sectionFor('/ai/') %}
+{% include "partials/section-cards.njk" %}

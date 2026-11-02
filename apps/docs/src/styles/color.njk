@@ -1,0 +1,111 @@
+---
+layout: layouts/base.njk
+title: Color
+description: The roles that give color its meaning, and the palette they draw from. Every swatch is painted with its own token, so this page follows the theme toggle.
+---
+
+{#
+  Built from _data/styles.js, which reads the token manifest. Swatches use the
+  tokens' CSS variables, not their values, so switching the theme repaints them.
+  Contrast ratios are computed at build time from the shipped values.
+#}
+
+<p>
+  Use a <strong>role</strong>, not a palette color. A role says what a color is
+  for — <code>--qds-semantic-color-content-error</code> is error text — and
+  switches correctly between light and dark. A palette color such as
+  <code>--qds-color-red-700</code> is the same red in both modes, and is only
+  there for roles to draw from.
+</p>
+
+<pre><code>.notice {
+  color: var(--qds-semantic-color-content-error);
+  background: var(--qds-semantic-color-background-error);
+  border: 1px solid var(--qds-semantic-color-border-error);
+}</code></pre>
+
+{% for group in styles.color.roles %}
+  <h2>{{ group.title }} roles</h2>
+
+  <p>{{ group.summary }}</p>
+  {% if group.property == 'content' %}
+    <p class="role-note">
+      Ratios are against the page background, except <code>inverse</code>, which
+      is measured against the filled surface it sits on
+      (<code>--qds-semantic-color-background-primary-rest</code>).
+    </p>
+  {% elif group.property == 'border' %}
+    <p class="role-note">Ratios are against the page background.</p>
+  {% endif %}
+
+  <ul class="role-grid">
+    {% for role in group.roles %}
+      <li>
+        <qds-card class="role-card">
+          <div
+            slot="media"
+            class="role-swatch role-swatch--{{ group.property }}"
+            {% if role.role == 'inverse' %}style="background: var(--qds-semantic-color-background-primary-rest)"{% endif %}
+          >
+            {% for state in role.states %}
+              <span
+                class="role-swatch__sample"
+                style="--sample: var(--{{ state.name }})"
+                {% if state.state %}title="{{ state.state }}"{% endif %}
+              >{% if group.property == 'content' %}Aa{% endif %}</span>
+            {% endfor %}
+          </div>
+          <h3 slot="header">{{ role.role }}</h3>
+
+          <dl class="role-states">
+            {% for state in role.states %}
+              <div class="role-state">
+                <dt>
+                  {% if state.state %}<span class="role-state__name">{{ state.state }}</span>{% endif %}
+                  <code>--{{ state.name }}</code>
+                </dt>
+                <dd>
+                  <span>Light <code>{{ state.light }}</code></span>
+                  <span>Dark <code>{{ state.dark }}</code></span>
+                  {% if state.contrast %}
+                    <span class="role-state__contrast" title="Contrast against --{{ state.contrast.against }}">
+                      {% for mode in ['light', 'dark'] %}
+                        {% set rating = state.contrast[mode] %}
+                        {% if rating %}
+                          <qds-chip variant="{{ 'success' if rating.passes else 'error' }}">
+                            {{ mode | capitalize }} {{ rating.ratio }}:1{% if not rating.passes %}, below {{ rating.minimum }}:1{% endif %}
+                          </qds-chip>
+                        {% endif %}
+                      {% endfor %}
+                    </span>
+                  {% endif %}
+                </dd>
+              </div>
+            {% endfor %}
+          </dl>
+        </qds-card>
+      </li>
+    {% endfor %}
+  </ul>
+{% endfor %}
+
+<h2>Palette</h2>
+
+<p>
+  The raw colors the roles draw from, the same in both modes. Steps run from
+  lightest (50) to darkest (950). <code>black</code> is the exception: its steps
+  are opacity percentages, for shadows, shown here over a checkerboard.
+</p>
+
+{% for ramp in styles.color.palette %}
+  <h3>{{ ramp.hue }}</h3>
+  <ol class="ramp{% if ramp.alpha %} ramp--alpha{% endif %}">
+    {% for step in ramp.steps %}
+      <li class="ramp__step">
+        <span class="ramp__swatch" style="--sample: var(--{{ step.name }})"></span>
+        <span class="ramp__label">{{ step.step }}</span>
+        <code class="ramp__value">{{ step.value }}</code>
+      </li>
+    {% endfor %}
+  </ol>
+{% endfor %}

@@ -21,6 +21,12 @@ body {
   color: var(--qds-semantic-color-content-default);
   background-color: var(--qds-semantic-color-background-default);
   -webkit-font-smoothing: antialiased;
+
+  /* At least a screen tall, with the page area taking the slack, so on a short
+     page the footer sits at the bottom of the window rather than mid-screen. */
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
 }
 
 .skip-link {
@@ -226,8 +232,8 @@ h3[id] {
 /* ── Prose ────────────────────────────────────────────────────────────────── */
 
 .prose {
-  max-width: 76ch;
-  margin: 0 auto;
+  min-width: 0;
+  max-width: 52rem;
   padding: var(--qds-spacing-600) var(--qds-spacing-500) var(--qds-spacing-800);
 }
 
@@ -344,7 +350,24 @@ pre {
 table {
   width: 100%;
   border-collapse: collapse;
-  font-size: var(--qds-typography-font-size-200);
+  font-size: var(--qds-typography-font-size-100);
+}
+
+/*
+ * Code in a table stays on one line: a token name, value, or type reads whole
+ * rather than breaking at a hyphen. A table that is then wider than the column
+ * scrolls sideways in its .table-scroll, rather than squeezing every column.
+ * Prose in a table (descriptions) still wraps.
+ */
+:is(th, td) code,
+.token-name__id {
+  white-space: nowrap;
+  overflow-wrap: normal;
+}
+
+/* At the table's size, not the larger size code has in running text. */
+:is(th, td) code {
+  font-size: inherit;
 }
 
 th,
@@ -396,7 +419,15 @@ tbody tr:last-child td {
 .token-name {
   font-family: var(--qds-semantic-typography-data-font-family);
   font-size: var(--qds-typography-font-size-100);
-  overflow-wrap: anywhere;
+}
+
+/* A token's description, under its name, wraps at a readable width. */
+.token-name small {
+  display: block;
+  min-width: 16rem;
+  margin-block-start: var(--qds-spacing-100);
+  font-family: var(--qds-semantic-typography-body-font-family);
+  white-space: normal;
 }
 
 /* The reference chain: component → semantic → primitive → raw value. */
@@ -537,34 +568,82 @@ tbody tr:last-child td {
   height: auto;
 }
 
-/* ── Component index ──────────────────────────────────────────────────────── */
+/* ── Card grids ───────────────────────────────────────────────────────────── */
 
 .card-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(16rem, 100%), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(15rem, 100%), 1fr));
   gap: var(--qds-spacing-400);
+  margin-block: 0 var(--qds-spacing-600);
   padding: 0;
   list-style: none;
 }
 
-.card {
-  padding: var(--qds-spacing-400);
-  background: var(--qds-semantic-color-background-subtle);
-  border: var(--qds-semantic-border-default) solid var(--qds-semantic-color-border-subtle);
+.card-grid > li {
+  display: flex;
+  margin: 0;
+}
+
+/*
+ * A qds-card made clickable as a whole: its heading link is stretched over the
+ * card, so the card has one click target with one accessible name. The card is
+ * positioned from out here, since the link's ::after has to find it.
+ */
+.link-card {
+  position: relative;
+  flex: 1;
+  transition: box-shadow var(--qds-semantic-animation-default);
+}
+
+.link-card:hover {
+  box-shadow: var(--qds-semantic-elevation-default);
+}
+
+.link-card a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.link-card a:visited {
+  color: inherit;
+}
+
+.link-card a::after {
+  content: '';
+  position: absolute;
+  inset: 0;
   border-radius: var(--qds-semantic-radius-primary);
 }
 
-.card h2 {
-  margin-block: 0 var(--qds-spacing-200);
-  padding: 0;
-  border: none;
-  font-size: var(--qds-typography-font-size-400);
+.link-card:focus-within {
+  outline: var(--qds-semantic-border-primary) solid var(--qds-semantic-color-border-primary);
+  outline-offset: 0.125rem;
+  border-radius: var(--qds-semantic-radius-primary);
 }
 
-.card p {
-  margin-block-end: 0;
+.link-card a:focus-visible {
+  outline: none;
+}
+
+/* Outer styles beat a card's own ::slotted() rules, so prose margins are reset here. */
+.prose qds-card :is(h2, h3):not(.example__preview *) {
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.prose qds-card p:not(.example__preview *) {
+  margin: 0;
   color: var(--qds-semantic-color-content-subtle);
   font-size: var(--qds-typography-font-size-200);
+}
+
+.link-card qds-chip {
+  align-self: flex-start;
+}
+
+.link-card__meta {
+  font-size: var(--qds-typography-font-size-100);
 }
 
 /* ── Footer ───────────────────────────────────────────────────────────────── */
@@ -624,3 +703,843 @@ p > qds-chip:first-child {
   margin-inline-end: var(--qds-spacing-200);
 }
 
+
+/* ── Page layout ──────────────────────────────────────────────────────────── */
+
+/*
+ * Three columns where there is room, as Material and Spectrum lay out their
+ * docs: the section's pages, the content, and the page's own contents. The
+ * sidebar and contents columns only exist on pages that have them.
+ */
+.page {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  flex: 1 0 auto;
+  width: 100%;
+  max-width: 90rem;
+  margin: 0 auto;
+}
+
+@media (min-width: 64rem) {
+  .page--sectioned {
+    grid-template-columns: 15rem minmax(0, 1fr);
+  }
+
+  .page:has(.page-contents) {
+    grid-template-columns: minmax(0, 1fr) 13rem;
+  }
+
+  .page--sectioned:has(.page-contents) {
+    grid-template-columns: 15rem minmax(0, 1fr) 13rem;
+  }
+}
+
+.page:not(.page--sectioned) > .prose {
+  margin-inline: auto;
+}
+
+/* ── Sidebar ──────────────────────────────────────────────────────────────── */
+
+.sidebar {
+  border-block-end: var(--qds-semantic-border-default) solid var(--qds-semantic-color-border-subtle);
+}
+
+.sidebar__toggle {
+  padding: var(--qds-spacing-300) var(--qds-spacing-500);
+  font-size: var(--qds-typography-font-size-200);
+  font-weight: var(--qds-typography-font-weight-medium);
+  cursor: pointer;
+}
+
+.sidebar__nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--qds-spacing-200);
+  padding: 0 var(--qds-spacing-400) var(--qds-spacing-400);
+
+  /*
+   * The accordion groups, restyled through their own component tokens: smaller
+   * and tighter than an accordion in content, and without dividers.
+   */
+  --qds-component-accordion-trigger-padding-block: var(--qds-spacing-200);
+  --qds-component-accordion-trigger-padding-inline: var(--qds-spacing-200);
+  --qds-component-accordion-trigger-font-size: var(--qds-typography-font-size-100);
+  --qds-component-accordion-trigger-font-weight: var(--qds-typography-font-weight-semibold);
+  --qds-component-accordion-trigger-color-content-rest: var(--qds-semantic-color-content-subtle);
+  --qds-component-accordion-panel-padding-block: 0;
+  --qds-component-accordion-panel-padding-inline: 0;
+  --qds-component-accordion-color-border-rest: transparent;
+}
+
+.sidebar__home,
+.sidebar__list a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--qds-spacing-200);
+  padding: var(--qds-spacing-100) var(--qds-spacing-200);
+  font-size: var(--qds-typography-font-size-200);
+  color: var(--qds-semantic-color-content-default);
+  text-decoration: none;
+  border-radius: var(--qds-semantic-radius-default);
+}
+
+.sidebar__home:hover,
+.sidebar__list a:hover {
+  background: var(--qds-semantic-color-background-subtle);
+}
+
+.sidebar__home[aria-current='page'],
+.sidebar__list a[aria-current='page'] {
+  font-weight: var(--qds-typography-font-weight-semibold);
+  color: var(--qds-semantic-color-content-primary-rest);
+  background: var(--qds-semantic-color-background-info);
+}
+
+.sidebar__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sidebar__list li {
+  margin: 0;
+}
+
+@media (min-width: 64rem) {
+  .sidebar {
+    position: sticky;
+    top: 0;
+    align-self: start;
+    max-height: 100vh;
+    overflow-y: auto;
+    padding-block-start: var(--qds-spacing-500);
+    border-block-end: none;
+    border-inline-end: var(--qds-semantic-border-default) solid var(--qds-semantic-color-border-subtle);
+  }
+
+  /* Always open on wide screens; the toggle is only for narrow ones. */
+  .sidebar__toggle {
+    display: none;
+  }
+}
+
+/* ── On this page ─────────────────────────────────────────────────────────── */
+
+.page-contents {
+  display: none;
+}
+
+@media (min-width: 64rem) {
+  .page-contents {
+    position: sticky;
+    top: 0;
+    align-self: start;
+    display: block;
+    max-height: 100vh;
+    overflow-y: auto;
+    padding: var(--qds-spacing-600) var(--qds-spacing-400);
+    font-size: var(--qds-typography-font-size-100);
+  }
+}
+
+.page-contents__title {
+  margin: 0 0 var(--qds-spacing-200);
+  font-weight: var(--qds-typography-font-weight-semibold);
+  color: var(--qds-semantic-color-content-subtle);
+  text-transform: uppercase;
+  letter-spacing: var(--qds-typography-letter-spacing-wide);
+}
+
+.page-contents ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-inline-start: var(--qds-semantic-border-default) solid var(--qds-semantic-color-border-subtle);
+}
+
+.page-contents a {
+  display: block;
+  margin-inline-start: calc(-1 * var(--qds-semantic-border-default));
+  padding: var(--qds-spacing-100) var(--qds-spacing-300);
+  color: var(--qds-semantic-color-content-subtle);
+  text-decoration: none;
+  border-inline-start: var(--qds-semantic-border-primary) solid transparent;
+}
+
+.page-contents a:hover {
+  color: var(--qds-semantic-color-content-default);
+}
+
+/* The section in view, set by page-contents.js. */
+.page-contents a[aria-current='true'] {
+  color: var(--qds-semantic-color-content-primary-rest);
+  border-inline-start-color: var(--qds-semantic-color-border-primary);
+}
+
+/* ── Component pages ──────────────────────────────────────────────────────── */
+
+.component-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--qds-spacing-300);
+  align-items: center;
+  margin-block-end: var(--qds-spacing-400);
+  font-size: var(--qds-typography-font-size-200);
+  color: var(--qds-semantic-color-content-subtle);
+}
+
+/*
+ * Overview / API, as Material's component tabs: links between two pages, drawn
+ * with qds-tabs' own component tokens so they match the component exactly.
+ */
+.page-tabs {
+  display: flex;
+  gap: var(--qds-component-tabs-gap);
+  margin-block-end: var(--qds-spacing-600);
+  border-block-end: var(--qds-component-tabs-border-width) solid var(--qds-component-tabs-color-border-rest);
+}
+
+.page-tabs a {
+  margin-block-end: calc(-1 * var(--qds-component-tabs-border-width));
+  padding: var(--qds-component-tabs-tab-padding-block) var(--qds-component-tabs-tab-padding-inline);
+  font-size: var(--qds-component-tabs-tab-font-size);
+  font-weight: var(--qds-component-tabs-tab-font-weight);
+  color: var(--qds-component-tabs-tab-color-content-rest);
+  text-decoration: none;
+  border-block-end: var(--qds-component-tabs-indicator-border-width) solid transparent;
+}
+
+.page-tabs a:hover {
+  color: var(--qds-component-tabs-tab-color-content-hover);
+  background: var(--qds-component-tabs-tab-color-background-hover);
+}
+
+.page-tabs a[aria-current='page'] {
+  color: var(--qds-component-tabs-tab-color-content-selected);
+  border-block-end-color: var(--qds-component-tabs-indicator-color-border-selected);
+}
+
+.prose h2 > code {
+  font-size: inherit;
+  background: none;
+  padding: 0;
+}
+
+/* ── Home ─────────────────────────────────────────────────────────────────── */
+
+.page--wide > .prose,
+.prose:has(.hero) {
+  max-width: 64rem;
+}
+
+.hero {
+  padding-block: var(--qds-spacing-700) var(--qds-spacing-600);
+}
+
+.prose h1.hero__title {
+  margin: 0 0 var(--qds-spacing-300);
+  font-family: var(--qds-semantic-typography-display-font-family);
+  font-size: var(--qds-semantic-typography-display-font-size);
+  font-weight: var(--qds-semantic-typography-display-font-weight);
+  line-height: var(--qds-semantic-typography-display-line-height);
+  letter-spacing: var(--qds-semantic-typography-display-letter-spacing);
+}
+
+.prose p.hero__lede {
+  max-width: 40rem;
+  margin: 0 0 var(--qds-spacing-500);
+  font-size: var(--qds-typography-font-size-500);
+  color: var(--qds-semantic-color-content-subtle);
+}
+
+/*
+ * Links that look like buttons, drawn with qds-button's component tokens. A
+ * qds-button is a <button> and cannot navigate, so these stay links.
+ */
+.prose .hero__action {
+  display: inline-block;
+  padding: var(--qds-component-button-lg-padding-block) var(--qds-component-button-lg-padding-inline);
+  font-size: var(--qds-component-button-lg-font-size);
+  font-weight: var(--qds-component-button-font-weight);
+  color: var(--qds-component-button-secondary-color-content-rest);
+  text-decoration: none;
+  background: var(--qds-component-button-secondary-color-background-rest);
+  border: var(--qds-component-button-border-width) solid var(--qds-component-button-secondary-color-border-rest);
+  border-radius: var(--qds-component-button-border-radius);
+}
+
+.prose .hero__action:hover {
+  background: var(--qds-component-button-secondary-color-background-hover);
+}
+
+.prose .hero__action:visited {
+  color: var(--qds-component-button-secondary-color-content-rest);
+}
+
+.card-grid--sections {
+  grid-template-columns: repeat(auto-fill, minmax(min(13rem, 100%), 1fr));
+}
+
+/* ── Color ────────────────────────────────────────────────────────────────── */
+
+.role-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(18rem, 100%), 1fr));
+  gap: var(--qds-spacing-400);
+  margin-block: 0 var(--qds-spacing-600);
+  padding: 0;
+  list-style: none;
+}
+
+.role-grid > li {
+  display: flex;
+  margin: 0;
+}
+
+.role-card {
+  flex: 1;
+  --qds-component-card-padding: var(--qds-spacing-400);
+}
+
+.role-swatch {
+  display: flex;
+  height: 5rem;
+}
+
+.role-swatch__sample {
+  flex: 1;
+  display: grid;
+  place-items: center;
+}
+
+.role-swatch--background .role-swatch__sample {
+  background: var(--sample);
+  /* So a swatch the color of the card itself (default, raised) still has an edge. */
+  box-shadow: inset 0 0 0 var(--qds-semantic-border-default) var(--qds-semantic-color-border-subtle);
+}
+
+.role-swatch--content {
+  background: var(--qds-semantic-color-background-default);
+}
+
+.role-swatch--content .role-swatch__sample {
+  font-size: var(--qds-typography-font-size-700);
+  font-weight: var(--qds-typography-font-weight-semibold);
+  color: var(--sample);
+}
+
+.role-swatch--border {
+  gap: var(--qds-spacing-300);
+  padding: var(--qds-spacing-400);
+  background: var(--qds-semantic-color-background-default);
+}
+
+.role-swatch--border .role-swatch__sample {
+  border: var(--qds-semantic-border-primary) solid var(--sample);
+  border-radius: var(--qds-semantic-radius-default);
+}
+
+.role-states {
+  display: flex;
+  flex-direction: column;
+  gap: var(--qds-spacing-300);
+  margin: 0;
+}
+
+.role-state dt {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--qds-spacing-100) var(--qds-spacing-200);
+  align-items: baseline;
+  font-size: var(--qds-typography-font-size-100);
+}
+
+.role-state__name {
+  font-weight: var(--qds-typography-font-weight-semibold);
+}
+
+.role-state dd {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--qds-spacing-100) var(--qds-spacing-300);
+  margin: var(--qds-spacing-100) 0 0;
+  font-size: var(--qds-typography-font-size-100);
+  color: var(--qds-semantic-color-content-subtle);
+}
+
+.role-state code {
+  padding: 0;
+  font-size: var(--qds-typography-font-size-100);
+  background: none;
+}
+
+.role-state__contrast {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--qds-spacing-100);
+}
+
+.ramp {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(4.5rem, 1fr));
+  gap: var(--qds-spacing-200);
+  margin: 0 0 var(--qds-spacing-500);
+  padding: 0;
+  list-style: none;
+}
+
+.ramp__step {
+  display: flex;
+  flex-direction: column;
+  gap: var(--qds-spacing-100);
+  margin: 0;
+  font-size: var(--qds-typography-font-size-100);
+}
+
+.ramp__swatch {
+  height: 3rem;
+  background: var(--sample);
+  border: var(--qds-semantic-border-default) solid var(--qds-semantic-color-border-subtle);
+  border-radius: var(--qds-semantic-radius-default);
+}
+
+/* Translucent steps are shown over a checkerboard, so their opacity is visible. */
+.ramp--alpha .ramp__swatch {
+  background:
+    linear-gradient(var(--sample), var(--sample)),
+    repeating-conic-gradient(#8884 0% 25%, transparent 0% 50%) 0 0 / 0.75rem 0.75rem;
+}
+
+.ramp__label {
+  font-weight: var(--qds-typography-font-weight-semibold);
+}
+
+.ramp__value {
+  overflow-wrap: anywhere;
+}
+
+/* ── Typography ───────────────────────────────────────────────────────────── */
+
+.type-roles,
+.typefaces,
+.type-scale,
+.type-weights {
+  margin: 0 0 var(--qds-spacing-600);
+  padding: 0;
+  list-style: none;
+}
+
+.type-role {
+  display: grid;
+  gap: var(--qds-spacing-200);
+  margin: 0;
+  padding-block: var(--qds-spacing-500);
+  border-block-end: var(--qds-semantic-border-default) solid var(--qds-semantic-color-border-subtle);
+}
+
+.prose p.type-role__specimen {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.prose h3.type-role__name {
+  margin: 0;
+  font-size: var(--qds-typography-font-size-200);
+}
+
+.prose .type-role__details p:not(.example__preview *) {
+  margin: 0;
+  font-size: var(--qds-typography-font-size-200);
+  color: var(--qds-semantic-color-content-subtle);
+}
+
+.typefaces {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(16rem, 100%), 1fr));
+  gap: var(--qds-spacing-400);
+}
+
+.typeface {
+  margin: 0;
+  padding: var(--qds-spacing-400);
+  background: var(--qds-semantic-color-background-subtle);
+  border-radius: var(--qds-semantic-radius-primary);
+}
+
+.prose .typeface p:not(.example__preview *) {
+  margin: 0;
+}
+
+.prose .typeface p.typeface__specimen:not(.example__preview *) {
+  margin-block-end: var(--qds-spacing-300);
+  font-size: var(--qds-typography-font-size-700);
+}
+
+.typeface__stack {
+  font-size: var(--qds-typography-font-size-100);
+  color: var(--qds-semantic-color-content-subtle);
+}
+
+.type-scale__step {
+  display: grid;
+  grid-template-columns: 6rem 3rem 1fr;
+  gap: var(--qds-spacing-300);
+  align-items: baseline;
+  margin: 0;
+  padding-block: var(--qds-spacing-200);
+  border-block-end: var(--qds-semantic-border-default) solid var(--qds-semantic-color-border-subtle);
+}
+
+.type-scale__sample {
+  line-height: 1;
+}
+
+.type-scale__label {
+  font-weight: var(--qds-typography-font-weight-semibold);
+}
+
+.type-weights {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--qds-spacing-500);
+  font-size: var(--qds-typography-font-size-500);
+}
+
+/* ── Token reference ──────────────────────────────────────────────────────── */
+
+.token-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--qds-spacing-300);
+  align-items: center;
+  margin-block-end: var(--qds-spacing-400);
+}
+
+.token-filter qds-input {
+  flex: 1 1 20rem;
+}
+
+.prose p.token-filter__status {
+  margin: 0;
+  font-size: var(--qds-typography-font-size-200);
+  color: var(--qds-semantic-color-content-subtle);
+}
+
+.tab-count {
+  margin-inline-start: var(--qds-spacing-100);
+  padding: 0 0.4em;
+  font-size: 0.85em;
+  font-variant-numeric: tabular-nums;
+  background: var(--qds-semantic-color-background-neutral);
+  border-radius: var(--qds-semantic-radius-subtle);
+}
+
+.prose p.tier-intro {
+  margin-block: var(--qds-spacing-400);
+  color: var(--qds-semantic-color-content-subtle);
+}
+
+.prose p.role-note {
+  font-size: var(--qds-typography-font-size-200);
+  color: var(--qds-semantic-color-content-subtle);
+}
+
+/* ── Playground ───────────────────────────────────────────────────────────── */
+
+/*
+ * As Spectrum lays out its component previews: the component and its code on
+ * one side, its controls on the other; stacked where the column is narrow.
+ */
+.playground {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  margin-block-end: var(--qds-spacing-600);
+  border: var(--qds-semantic-border-default) solid var(--qds-semantic-color-border-subtle);
+  border-radius: var(--qds-semantic-radius-primary);
+  overflow: hidden;
+}
+
+@container (min-width: 40rem) {
+  .playground {
+    grid-template-columns: minmax(0, 1fr) 16rem;
+  }
+}
+
+/*
+ * The content column is a container, so the playground can lay itself out by
+ * the column's width rather than the window's. Size containment means the
+ * column no longer takes its width from its content, so it needs one of its
+ * own: without width: 100%, a column centered with auto margins (pages without
+ * a sidebar) collapses to its padding.
+ */
+.prose {
+  container-type: inline-size;
+  width: 100%;
+}
+
+.playground__stage {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.playground__preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--qds-spacing-300);
+  align-items: center;
+  justify-content: center;
+  min-height: 12rem;
+  padding: var(--qds-spacing-600) var(--qds-spacing-500);
+  background: var(--qds-semantic-color-background-default);
+}
+
+/* A block component (stack, card, tabs) takes the stage's width, as it would on a page. */
+.playground__preview > :is(qds-stack, qds-card, qds-tabs, qds-accordion, qds-progress-bar, qds-radio-group, qds-text-field) {
+  flex: 1 1 100%;
+}
+
+.playground__code {
+  position: relative;
+  border-block-start: var(--qds-semantic-border-default) solid var(--qds-semantic-color-border-subtle);
+}
+
+.playground__code pre {
+  margin: 0;
+  padding-block-end: var(--qds-spacing-700);
+  border: none;
+  border-radius: 0;
+}
+
+.playground__copy {
+  position: absolute;
+  inset-block-end: var(--qds-spacing-200);
+  inset-inline-end: var(--qds-spacing-200);
+  display: flex;
+  gap: var(--qds-spacing-200);
+  align-items: center;
+}
+
+.playground__copied {
+  font-size: var(--qds-typography-font-size-100);
+  color: var(--qds-semantic-color-content-subtle);
+}
+
+.playground__controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--qds-spacing-400);
+  padding: var(--qds-spacing-400);
+  background: var(--qds-semantic-color-background-subtle);
+  border-block-start: var(--qds-semantic-border-default) solid var(--qds-semantic-color-border-subtle);
+
+  /* Labels and options a size smaller than in content, as a settings panel. */
+  --qds-component-radio-group-font-size: var(--qds-typography-font-size-100);
+  --qds-component-radio-font-size: var(--qds-typography-font-size-100);
+  --qds-component-toggle-font-size: var(--qds-typography-font-size-100);
+  --qds-component-text-field-label-font-size: var(--qds-typography-font-size-100);
+}
+
+@container (min-width: 40rem) {
+  .playground__controls {
+    border-block-start: none;
+    border-inline-start: var(--qds-semantic-border-default) solid var(--qds-semantic-color-border-subtle);
+  }
+}
+
+/* ── Component tokens list (Tokens page) ──────────────────────────────────── */
+
+.token-components {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(12rem, 100%), 1fr));
+  gap: var(--qds-spacing-200);
+  margin: 0 0 var(--qds-spacing-600);
+  padding: 0;
+  list-style: none;
+}
+
+.token-components li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--qds-spacing-200);
+  margin: 0;
+  padding: var(--qds-spacing-200) var(--qds-spacing-300);
+  border: var(--qds-semantic-border-default) solid var(--qds-semantic-color-border-subtle);
+  border-radius: var(--qds-semantic-radius-default);
+}
+
+.token-components__count {
+  font-size: var(--qds-typography-font-size-100);
+  font-variant-numeric: tabular-nums;
+  color: var(--qds-semantic-color-content-subtle);
+}
+
+/* ── Package links ────────────────────────────────────────────────────────── */
+
+.package-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--qds-spacing-200) var(--qds-spacing-500);
+  align-items: center;
+  margin-block-end: var(--qds-spacing-500);
+  padding: var(--qds-spacing-300) var(--qds-spacing-400);
+  background: var(--qds-semantic-color-background-subtle);
+  border: var(--qds-semantic-border-default) solid var(--qds-semantic-color-border-subtle);
+  border-radius: var(--qds-semantic-radius-primary);
+}
+
+.prose p.package-links__name {
+  display: flex;
+  gap: var(--qds-spacing-200);
+  align-items: center;
+  margin: 0;
+}
+
+.package-links__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--qds-spacing-400);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--qds-typography-font-size-200);
+}
+
+.prose .package-links__list li {
+  margin: 0;
+}
+
+/* The install command fills the row's last line. */
+.prose pre.package-links__install {
+  flex: 1 1 100%;
+  margin: 0;
+  padding: var(--qds-spacing-200) var(--qds-spacing-300);
+  background: var(--qds-semantic-color-background-default);
+}
+
+/* ── Home bands ───────────────────────────────────────────────────────────── */
+
+/*
+ * Mantine's home page rhythm: a hero with the numbers that matter, then one
+ * band per idea, each with a short lede and something live to look at.
+ */
+.prose p.hero__eyebrow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--qds-spacing-300);
+  align-items: center;
+  margin: 0 0 var(--qds-spacing-400);
+  font-size: var(--qds-typography-font-size-200);
+}
+
+.prose p.hero__eyebrow qds-chip {
+  margin: 0;
+}
+
+.hero-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(9rem, 100%), 1fr));
+  gap: var(--qds-spacing-400);
+  margin: var(--qds-spacing-700) 0 0;
+  padding-block-start: var(--qds-spacing-500);
+  border-block-start: var(--qds-semantic-border-default) solid var(--qds-semantic-color-border-subtle);
+}
+
+.hero-stats dt {
+  font-size: var(--qds-typography-font-size-100);
+  color: var(--qds-semantic-color-content-subtle);
+}
+
+.hero-stats dd {
+  margin: 0;
+  font-size: var(--qds-typography-font-size-500);
+  font-weight: var(--qds-typography-font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+}
+
+.home-band {
+  padding-block: var(--qds-spacing-500);
+}
+
+.prose .home-band > h2 {
+  margin-block-start: 0;
+  border: none;
+  font-size: var(--qds-typography-font-size-600);
+}
+
+.prose p.home-band__lede {
+  max-width: 44rem;
+  margin-block: 0 var(--qds-spacing-500);
+  color: var(--qds-semantic-color-content-subtle);
+}
+
+/* The AI band sits on its own surface, as Mantine sets theirs apart. */
+.home-band--ai {
+  padding: var(--qds-spacing-400);
+  background: var(--qds-semantic-color-background-subtle);
+  border: var(--qds-semantic-border-default) solid var(--qds-semantic-color-border-subtle);
+  border-radius: var(--qds-semantic-radius-primary);
+}
+
+@media (min-width: 40rem) {
+  .home-band--ai {
+    padding: var(--qds-spacing-600);
+  }
+}
+
+.home-band--ai .card-grid {
+  margin-block-end: var(--qds-spacing-400);
+}
+
+.home-band--ai pre {
+  margin: 0;
+  background: var(--qds-semantic-color-background-default);
+}
+
+.steps {
+  padding-inline-start: var(--qds-spacing-500);
+}
+
+.steps > li + li {
+  margin-block-start: var(--qds-spacing-400);
+}
+
+/* ── Client tabs (MCP server page) ────────────────────────────────────────── */
+
+.client-tabs pre {
+  margin-block-end: 0;
+}
+
+/* ── Footer columns ───────────────────────────────────────────────────────── */
+
+.site-footer__columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(8rem, 100%), 1fr));
+  gap: var(--qds-spacing-500);
+  max-width: 64rem;
+  margin: 0 auto;
+  text-align: start;
+}
+
+.site-footer__heading {
+  margin: 0 0 var(--qds-spacing-200);
+  font-size: var(--qds-typography-font-size-200);
+  font-weight: var(--qds-typography-font-weight-semibold);
+  color: var(--qds-semantic-color-content-default);
+}
+
+.site-footer__columns ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.site-footer__columns li + li {
+  margin-block-start: var(--qds-spacing-100);
+}
+
+.site-footer__columns a {
+  color: var(--qds-semantic-color-content-subtle);
+}

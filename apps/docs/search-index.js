@@ -24,7 +24,7 @@ import { join } from 'node:path';
 
 import { tokens as manifest } from '@quieto/design-tokens';
 
-import loadComponents from './src/_data/components.js';
+import loadDocs from './src/_data/docs.js';
 
 /**
  * Pages whose headings are not indexed as sections: each component page, and the
@@ -118,38 +118,51 @@ export function createSearchIndex() {
       }
     }
 
-    for (const component of await loadComponents()) {
-      const tag = component.tagName;
-      const url = `/components/${tag}/`;
+    // One entry per component FAMILY (Tabs, not qds-tab), found by its element
+    // names too; API entries link into the family's API page, to the element's
+    // own section.
+    for (const family of (await loadDocs()).families) {
       out.push({
         type: 'component',
-        title: `<${tag}>`,
-        detail: summarize(component.summary),
-        url,
-        // So "toggle" is an exact match for <qds-toggle>, as it would be for a person.
-        keywords: tag.replace(/^qds-/, ''),
+        title: family.name,
+        detail: summarize(family.summary),
+        url: family.url,
+        // So "toggle" and "qds-tab" both find their component.
+        keywords: [family.slug, ...family.members.map((member) => member.tagName)].join(' '),
       });
 
-      const api = [
-        ['property', 'properties', component.properties],
-        ['event', 'events', component.events],
-        ['slot', 'slots', component.slots.filter((slot) => slot.name !== '(default)')],
-        ['part', 'css-parts', component.cssParts],
-      ];
-      for (const [type, section, items] of api) {
-        // An unnamed entry is an analyzer artifact, and would be a blank result.
-        for (const item of items.filter((entry) => entry.name)) {
-          out.push({
-            type,
-            title: item.name,
-            detail: summarize(`<${tag}> · ${item.description}`),
-            url: `${url}#${section}`,
-            // A property is found by its attribute name too: full-width → fullWidth.
-            keywords: item.attribute && item.attribute !== item.name ? item.attribute : undefined,
-          });
+      for (const member of family.members) {
+        const tag = member.tagName;
+        const api = [
+          ['property', 'properties', member.properties],
+          ['event', 'events', member.events],
+          ['slot', 'slots', member.slots.filter((slot) => slot.name !== '(default)')],
+          ['part', 'css-parts', member.cssParts],
+        ];
+        for (const [type, section, items] of api) {
+          // An unnamed entry is an analyzer artifact, and would be a blank result.
+          for (const item of items.filter((entry) => entry.name)) {
+            out.push({
+              type,
+              title: item.name,
+              detail: summarize(`<${tag}> · ${item.description}`),
+              url: `${family.apiUrl}#${tag}-${section}`,
+              // A property is found by its attribute name too: full-width → fullWidth.
+              keywords: item.attribute && item.attribute !== item.name ? item.attribute : undefined,
+            });
+          }
         }
       }
     }
+
+    // Component tokens are listed on their component's Tokens tab, not the
+    // Tokens page, so that is where their results go.
+    const families = (await loadDocs()).families;
+    const tokenPage = (token) => {
+      if (token.tier !== 'component') return '/foundations/tokens/';
+      const set = token.set.replace(/^component\//, '');
+      return families.find((family) => family.tokenSets.includes(set))?.tokensUrl ?? '/foundations/tokens/';
+    };
 
     for (const token of manifest) {
       const { light, dark } = token.modes;
@@ -158,7 +171,7 @@ export function createSearchIndex() {
         type: 'token',
         title: `--${token.name}`,
         detail: light === dark ? value(light) : `${value(light)} · dark ${value(dark)}`,
-        url: `/tokens/#${token.name}`,
+        url: `${tokenPage(token)}#${token.name}`,
         color: token.type === 'color' ? true : undefined,
       });
     }

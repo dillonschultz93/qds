@@ -2,6 +2,7 @@ import { readFile, readdir } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { dirname, join, basename } from 'node:path';
 
+import { RenderPlugin } from '@11ty/eleventy';
 import litPlugin from '@lit-labs/eleventy-plugin-lit';
 
 import { createSearchIndex } from './search-index.js';
@@ -60,6 +61,37 @@ export default async function (eleventyConfig) {
   eleventyConfig.addTransform('search-anchors', search.transform);
   eleventyConfig.on('eleventy.after', search.write);
 
+  /**
+   * "On this page": the page's h2s, listed beside the content, as Material and
+   * Spectrum show them. Built here rather than in the layout, because the layout
+   * renders before the content's headings exist. Runs after search-anchors, so
+   * every h2 already has the id it links to. Pages with fewer than two h2s get no
+   * list.
+   */
+  eleventyConfig.addTransform('page-contents', function (content) {
+    if (!this.page.outputPath?.endsWith('.html')) return content;
+    const marker = '<!-- page-contents -->';
+    if (!content.includes(marker)) return content;
+
+    const main = content.match(/<main[^>]*>([\s\S]*?)<\/main>/)?.[1] ?? '';
+    const headings = [...main.matchAll(/<h2 id="([^"]+)"[^>]*>([\s\S]*?)<\/h2>/g)].map(([, id, inner]) => ({
+      id,
+      text: inner.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim(),
+    }));
+    if (headings.length < 2) return content.replace(marker, '');
+
+    const items = headings
+      .map(({ id, text }) => `<li><a href="#${id}">${text}</a></li>`)
+      .join('');
+    return content.replace(
+      marker,
+      `<nav class="page-contents" aria-label="On this page"><p class="page-contents__title">On this page</p><ul>${items}</ul></nav>`,
+    );
+  });
+
+  // Renders the token spec's Markdown inside the Tokens page (renderContent).
+  eleventyConfig.addPlugin(RenderPlugin);
+
   // The built token CSS and the component JS are consumed as static assets, so
   // the site works without a bundler.
   eleventyConfig.addPassthroughCopy({
@@ -73,7 +105,17 @@ export default async function (eleventyConfig) {
   // Filters
   // ---------------------------------------------------------------------------
 
+  // For markup built in JavaScript (the example shortcode). In a template, let
+  // Nunjucks' autoescaping do it: running this first as well escaped every
+  // example's source twice, showing &lt;qds-button&gt; instead of <qds-button>.
   eleventyConfig.addFilter('escapeHtml', escapeHtml);
+
+  /**
+   * The first item whose `key` equals `value`. Nunjucks' selectattr only tests
+   * an attribute for truthiness — selectattr('name', 'equalto', x) ignores the
+   * comparison and returns everything — so a lookup needs its own filter.
+   */
+  eleventyConfig.addFilter('findBy', (items, key, value) => (items ?? []).find((item) => item?.[key] === value));
 
   /** `qds-color-blue-400` → `var(--qds-color-blue-400)` */
   eleventyConfig.addFilter('cssVar', (name) => `var(--${name})`);
@@ -83,7 +125,31 @@ export default async function (eleventyConfig) {
     value !== null && typeof value === 'object' ? JSON.stringify(value) : String(value),
   );
 
+  /**
+   * JSON for a <script type="application/json">, with < escaped so no value can
+   * close the script element early.
+   */
+  eleventyConfig.addFilter('json', (value) => JSON.stringify(value).replace(/</g, '\\u003c'));
+
   eleventyConfig.addFilter('startsWith', (value, prefix) => String(value).startsWith(prefix));
+
+  /**
+   * A JSDoc description as paragraphs of plain text: fenced code examples are
+   * dropped (the page shows live examples instead), and inline code marks are
+   * removed, since the text is escaped rather than rendered as Markdown.
+   */
+  eleventyConfig.addFilter('paragraphs', (text) =>
+    String(text ?? '')
+      .replace(/```[\s\S]*?```/g, '')
+      .split(/\n\s*\n/)
+      .map((paragraph) => paragraph.replace(/`/g, '').replace(/\s+/g, ' ').trim())
+      .filter(Boolean),
+  );
+
+  /** The section a URL belongs to, for the header and the sidebar: /styles/color/ → Styles. */
+  eleventyConfig.addFilter('sectionFor', (sections, url) =>
+    sections.find((section) => String(url).startsWith(section.url)) ?? null,
+  );
 
   // ---------------------------------------------------------------------------
   // Shortcodes
@@ -161,12 +227,8 @@ export default async function (eleventyConfig) {
     // The first heading is replaced by the layout's page title.
     .replace(/^# Design Tokens\n/, '');
 
-  eleventyConfig.addTemplate('nomenclature.md', spec, {
-    title: 'Nomenclature',
-    description: 'The three-tier token naming grammar, and how it is enforced.',
-    layout: 'layouts/base.njk',
-    eleventyNavigation: { key: 'Nomenclature', order: 2 },
-  });
+  // Rendered by the Nomenclature page (foundations/nomenclature.njk).
+  eleventyConfig.addGlobalData('spec', spec);
 
   return {
     dir: {

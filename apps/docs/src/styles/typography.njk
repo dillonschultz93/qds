@@ -1,0 +1,88 @@
+---
+layout: layouts/base.njk
+title: Typography
+description: The typefaces, the type roles that set every piece of text, and the scale they are built from. Each specimen is set with its own tokens.
+---
+
+{#
+  Built from _data/styles.js. Specimens are set with the tokens' CSS variables,
+  so they render exactly as the roles do in product code.
+#}
+
+<p>
+  Set text with a <strong>type role</strong>. A role bundles a family, size,
+  weight, line height, and letter spacing that belong together, as five
+  variables that share a prefix:
+</p>
+
+<pre><code>.card-title {
+  font-family: var(--qds-semantic-typography-title-font-family);
+  font-size: var(--qds-semantic-typography-title-font-size);
+  font-weight: var(--qds-semantic-typography-title-font-weight);
+  line-height: var(--qds-semantic-typography-title-line-height);
+  letter-spacing: var(--qds-semantic-typography-title-letter-spacing);
+}</code></pre>
+
+<h2>Type roles</h2>
+
+<ol class="type-roles">
+  {% for role in styles.typography.roles %}
+    <li class="type-role">
+      <p
+        class="type-role__specimen"
+        style="font-family: var(--{{ role.prefix }}-font-family); font-size: var(--{{ role.prefix }}-font-size); font-weight: var(--{{ role.prefix }}-font-weight); line-height: var(--{{ role.prefix }}-line-height); letter-spacing: var(--{{ role.prefix }}-letter-spacing);"
+      >{% if role.role == 'data' %}--qds-semantic-color-content-default{% else %}Quiet systems scale well{% endif %}</p>
+      <div class="type-role__details">
+        <h3 class="type-role__name">{{ role.role | capitalize }}</h3>
+        <p>{{ role.use }}</p>
+        <p class="type-role__values">
+          <code>{{ role.fontSize }}</code> · weight <code>{{ role.fontWeight }}</code> · line height
+          <code>{{ role.lineHeight }}</code> · <code>--{{ role.prefix }}-*</code>
+        </p>
+      </div>
+    </li>
+  {% endfor %}
+</ol>
+
+<h2>Typefaces</h2>
+
+<p>
+  Three families. <strong>The tokens name the faces but do not load them</strong>:
+  load Inter and JetBrains Mono in your app, or each falls back to the system
+  face listed after it. This site does not load them, so what you see here is
+  the fallback.
+</p>
+
+<ul class="typefaces">
+  {% for family in styles.typography.families %}
+    <li class="typeface">
+      <p class="typeface__specimen" style="font-family: var(--{{ family.name }})">Aa Bb Cc 0123</p>
+      <p class="typeface__name"><strong>{{ family.step | capitalize }}</strong> <code>--{{ family.name }}</code></p>
+      <p class="typeface__stack"><code>{{ family.value }}</code></p>
+    </li>
+  {% endfor %}
+</ul>
+
+<h2>Size scale</h2>
+
+<p>The primitive sizes the roles draw from. Use a role in product code; reach for a step directly only when building a new one.</p>
+
+<ol class="type-scale">
+  {% for size in styles.typography.sizes | reverse %}
+    <li class="type-scale__step">
+      <span class="type-scale__sample" style="font-size: var(--{{ size.name }})">Ag</span>
+      <span class="type-scale__label">{{ size.step }}</span>
+      <code>{{ size.value }}</code>
+    </li>
+  {% endfor %}
+</ol>
+
+<h2>Weights</h2>
+
+<ul class="type-weights">
+  {% for weight in styles.typography.weights %}
+    <li style="font-weight: var(--{{ weight.name }})">
+      {{ weight.step | capitalize }} <code>{{ weight.value }}</code>
+    </li>
+  {% endfor %}
+</ul>

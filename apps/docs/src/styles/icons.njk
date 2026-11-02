@@ -1,0 +1,68 @@
+---
+layout: layouts/base.njk
+title: Icons
+description: The icon set and the qds-icon component are planned, and not built yet. Until then, this is how to use icons with QDS components.
+---
+
+<p><qds-chip variant="info">Planned</qds-chip> Tier 1 on the <a href="/roadmap/">roadmap</a>, and the first component on it.</p>
+
+<h2>What is coming</h2>
+
+<p>
+  Every icon in the library today is a typed character — <code>+</code>,
+  <code>→</code>, <code>✓</code>. Buttons, chips, inputs, and the planned alerts
+  and menus all need real icons, so the icon component comes before them.
+</p>
+
+<ul>
+  <li>
+    <strong>An icon set.</strong> One consistent set, chosen once, rather than
+    icons drawn per component. Not chosen yet.
+  </li>
+  <li>
+    <strong><code>&lt;qds-icon&gt;</code>.</strong> Renders an icon by name,
+    sized and colored by tokens, and hidden from assistive technology unless it is
+    given a label.
+  </li>
+  <li>
+    <strong>Icon size tokens.</strong> So an icon in a button and an icon in a
+    heading are sized from the same scale as the type around them.
+  </li>
+</ul>
+
+<h2>Until then</h2>
+
+<p>
+  Use inline SVG. Draw with <code>currentColor</code>, so the icon takes the color
+  of the text around it in either mode; size it in <code>em</code>, so it scales
+  with that text; and hide it with <code>aria-hidden="true"</code> when the text
+  next to it already says what it means.
+</p>
+
+{% example "An inline SVG icon in a button's start slot" %}
+  <qds-button>
+    <svg slot="start" width="1em" height="1em" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+      <path d="M8 3v10M3 8h10"></path>
+    </svg>
+    New item
+  </qds-button>
+  <qds-button variant="secondary">
+    Continue
+    <svg slot="end" width="1em" height="1em" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M3 8h10M9 4l4 4-4 4"></path>
+    </svg>
+  </qds-button>
+{% endexample %}
+
+<p>
+  An icon with no text beside it needs a name of its own. On a button, that is the
+  <code>label</code> attribute:
+</p>
+
+{% example "An icon-only button" %}
+  <qds-button variant="ghost" label="Close">
+    <svg width="1em" height="1em" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+      <path d="M4 4l8 8M12 4l-8 8"></path>
+    </svg>
+  </qds-button>
+{% endexample %}

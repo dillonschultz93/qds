@@ -1,0 +1,56 @@
+---
+layout: layouts/base.njk
+pagination:
+  data: docs.families
+  size: 1
+  alias: family
+permalink: "{{ family.tokensUrl }}"
+eleventyComputed:
+  title: "{{ family.name }} tokens"
+  description: "{% if family.tokenSets | length %}The component tokens {{ family.name | lower }} reads, with their values in each mode. Override one to restyle it.{% else %}{{ family.name }} has no component tokens of its own: it is laid out with the spacing scale.{% endif %}"
+---
+
+{#
+  A component's own tokens: the component tier of the token reference, shown
+  with the component it belongs to rather than in one long list. The family's
+  token sets come from _data/docs.js; the rows from _data/tokens.js, through the
+  same table as the Tokens page.
+#}
+
+{% include "partials/component-header.njk" %}
+
+{% set componentTier = tokens.tiers | findBy('tier', 'component') %}
+
+{% if family.tokenSets | length %}
+  <p>
+    These are {{ family.name | lower }}'s public styling API. Each is a CSS
+    variable the component reads, defined by
+    <code>@quieto/design-tokens</code> and aliasing a semantic token, so it
+    follows the theme. Overriding one is the supported way to restyle the
+    component, on one instance or on a whole page:
+  </p>
+
+  <pre><code>.brand {{ family.primary.tagName }} {
+  --{{ family.sampleToken }}: var(--qds-color-purple-600);
+}</code></pre>
+
+  {% for set in family.tokenSets %}
+    {% set group = componentTier.categories | findBy('category', set) %}
+    <h2 id="tokens-{{ set }}"><code>{{ set }}</code> tokens <span class="tab-count">{{ group.tokens | length }}</span></h2>
+    {% set rows = group.tokens %}
+    {% include "partials/token-table.njk" %}
+  {% endfor %}
+{% else %}
+  <p>
+    {{ family.name }} has no component tokens of its own. It is laid out entirely
+    with the <a href="/foundations/tokens/#token-reference">spacing scale</a>
+    (<code>--qds-spacing-*</code>), which it reads directly.
+  </p>
+{% endif %}
+
+<p>
+  <a href="/foundations/tokens/">All primitive and semantic tokens</a> are on the
+  Tokens page.
+</p>
+
+<script type="module" src="/assets/token-target.js"></script>

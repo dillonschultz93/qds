@@ -18,7 +18,9 @@ permalink: /404.html
 </p>
 
 <ul>
-  {% for item in site.nav %}
-    <li><a href="{{ item.url }}">{{ item.text }}</a></li>
+  <li><a href="/">Home</a></li>
+  {% for section in docs.sections %}
+    <li><a href="{{ section.url }}">{{ section.title }}</a></li>
   {% endfor %}
+  <li><a href="/roadmap/">Roadmap</a></li>
 </ul>
