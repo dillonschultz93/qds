@@ -1367,3 +1367,46 @@ p > qds-chip:first-child {
   font-variant-numeric: tabular-nums;
   color: var(--qds-semantic-color-content-subtle);
 }
+
+/* ── Package links ────────────────────────────────────────────────────────── */
+
+.package-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--qds-spacing-200) var(--qds-spacing-500);
+  align-items: center;
+  margin-block-end: var(--qds-spacing-500);
+  padding: var(--qds-spacing-300) var(--qds-spacing-400);
+  background: var(--qds-semantic-color-background-subtle);
+  border: var(--qds-semantic-border-default) solid var(--qds-semantic-color-border-subtle);
+  border-radius: var(--qds-semantic-radius-primary);
+}
+
+.prose p.package-links__name {
+  display: flex;
+  gap: var(--qds-spacing-200);
+  align-items: center;
+  margin: 0;
+}
+
+.package-links__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--qds-spacing-400);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--qds-typography-font-size-200);
+}
+
+.prose .package-links__list li {
+  margin: 0;
+}
+
+/* The install command fills the row's last line. */
+.prose pre.package-links__install {
+  flex: 1 1 100%;
+  margin: 0;
+  padding: var(--qds-spacing-200) var(--qds-spacing-300);
+  background: var(--qds-semantic-color-background-default);
+}

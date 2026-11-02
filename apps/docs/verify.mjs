@@ -284,6 +284,18 @@ check('token page renders full reference chains',
   chains.threeStep > 0 && chains.swatches > 100,
   `chains=${chains.total} full-depth=${chains.threeStep} swatches=${chains.swatches}\n    e.g. ${chains.sample.join('  ')}`);
 
+// The package the page documents, with its version read from package.json.
+const tokensPackage = JSON.parse(await readFile(new URL('../../packages/design-tokens/package.json', import.meta.url), 'utf8'));
+const packageLinks = await page.evaluate(() => ({
+  text: document.querySelector('.package-links')?.textContent.replace(/\s+/g, ' ').trim() ?? '',
+  hrefs: [...document.querySelectorAll('.package-links a')].map((a) => a.href),
+}));
+check('the Tokens page links to its package on npm and GitHub',
+  packageLinks.text.includes(`@quieto/design-tokens ${tokensPackage.version}`) &&
+    packageLinks.hrefs.includes('https://www.npmjs.com/package/@quieto/design-tokens') &&
+    packageLinks.hrefs.some((href) => href.endsWith('/tree/main/packages/design-tokens')),
+  packageLinks.hrefs.join('  '));
+
 // ── 7. Nomenclature page: the naming spec, with inline anatomy SVG ───────────
 await gotoReady('/foundations/nomenclature/');
 const nomen = await page.evaluate(() => {
