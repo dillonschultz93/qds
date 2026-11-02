@@ -818,6 +818,7 @@ check('an old link to a component token on the Tokens page forwards to its compo
 
 // ── 8. Console cleanliness across every page ─────────────────────────────────
 const narrow = [];
+const noFooter = [];
 for (const path of builtPages) {
   await gotoReady(path);
   // A layout regression can collapse the content column without any error: the
@@ -825,6 +826,7 @@ for (const path of builtPages) {
   // column should be most of its 52rem maximum.
   const width = await page.evaluate(() => document.querySelector('main').getBoundingClientRect().width);
   if (width < 600) narrow.push(`${path} (${Math.round(width)}px)`);
+  if (!(await page.locator('.site-footer__columns a').count())) noFooter.push(path);
 }
 // The AI section: the MCP server's client tabs work, and both tools' tables are there.
 await gotoReady('/ai/mcp/');
@@ -888,6 +890,7 @@ check('every component page links to @quieto/ui on npm and GitHub',
   missingPackage.join(', ') || `${componentPages.length} pages, version ${uiPackage.version}`);
 check('every page\'s content column is full width, not collapsed',
   narrow.length === 0, narrow.join(', ') || `${builtPages.length} pages`);
+check('every page has the footer links', noFooter.length === 0, noFooter.join(', ') || `${builtPages.length} pages`);
 check('no console errors on any page', consoleErrors.length === 0,
   consoleErrors.slice(0, 5).join('\n    ') || 'clean');
 

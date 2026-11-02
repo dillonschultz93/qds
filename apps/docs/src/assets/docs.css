@@ -1511,7 +1511,7 @@ p > qds-chip:first-child {
   grid-template-columns: repeat(auto-fit, minmax(min(8rem, 100%), 1fr));
   gap: var(--qds-spacing-500);
   max-width: 64rem;
-  margin: 0 auto var(--qds-spacing-500);
+  margin: 0 auto;
   text-align: start;
 }
 
