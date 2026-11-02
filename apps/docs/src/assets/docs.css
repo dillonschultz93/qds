@@ -1235,8 +1235,16 @@ p > qds-chip:first-child {
   }
 }
 
+/*
+ * The content column is a container, so the playground can lay itself out by
+ * the column's width rather than the window's. Size containment means the
+ * column no longer takes its width from its content, so it needs one of its
+ * own: without width: 100%, a column centered with auto margins (pages without
+ * a sidebar) collapses to its padding.
+ */
 .prose {
   container-type: inline-size;
+  width: 100%;
 }
 
 .playground__stage {

@@ -761,9 +761,17 @@ check('each shipped component on the roadmap links to its own page',
   wrongLinks.map(([name, href]) => `${name} → ${href}`).join(', ') || `${roadmapLinks.length} links`);
 
 // ── 8. Console cleanliness across every page ─────────────────────────────────
+const narrow = [];
 for (const path of builtPages) {
   await gotoReady(path);
+  // A layout regression can collapse the content column without any error: the
+  // page still renders, one word per line. At this window size every page's
+  // column should be most of its 52rem maximum.
+  const width = await page.evaluate(() => document.querySelector('main').getBoundingClientRect().width);
+  if (width < 600) narrow.push(`${path} (${Math.round(width)}px)`);
 }
+check('every page\'s content column is full width, not collapsed',
+  narrow.length === 0, narrow.join(', ') || `${builtPages.length} pages`);
 check('no console errors on any page', consoleErrors.length === 0,
   consoleErrors.slice(0, 5).join('\n    ') || 'clean');
 
