@@ -1,5 +1,6 @@
 {#
-  The top of a component page: its status, and the Overview / API / Tokens tabs.
+  The top of a component page: its status, the package it ships in, and the
+  Overview / API / Tokens tabs.
 
   The tabs are links between two pages, as Material's component tabs are, not a
   qds-tabs: each has its own URL, so search results and shared links can point at
@@ -11,6 +12,9 @@
   <span>Since <code>@quieto/ui</code> {{ family.since }}</span>
   <span>{{ family.category }}</span>
 </div>
+
+{% set pkg = packages.ui %}
+{% include "partials/package-links.njk" %}
 
 <nav class="page-tabs" aria-label="{{ family.name }} documentation">
   <a href="{{ family.url }}"{% if page.url == family.url %} aria-current="page"{% endif %}>Overview</a>

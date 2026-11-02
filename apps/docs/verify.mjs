@@ -826,6 +826,22 @@ for (const path of builtPages) {
   const width = await page.evaluate(() => document.querySelector('main').getBoundingClientRect().width);
   if (width < 600) narrow.push(`${path} (${Math.round(width)}px)`);
 }
+// Every component page, on every tab, and the Components landing page name the
+// package they ship in.
+const uiPackage = JSON.parse(await readFile(new URL('../../packages/ui/package.json', import.meta.url), 'utf8'));
+const componentPages = builtPages.filter((path) => path.startsWith('/components/'));
+const missingPackage = [];
+for (const path of componentPages) {
+  await gotoReady(path);
+  const links = await page.evaluate(() => ({
+    text: document.querySelector('.package-links')?.textContent.replace(/\s+/g, ' ').trim() ?? '',
+    npm: [...document.querySelectorAll('.package-links a')].some((a) => a.href === 'https://www.npmjs.com/package/@quieto/ui'),
+  }));
+  if (!links.text.includes(`@quieto/ui ${uiPackage.version}`) || !links.npm) missingPackage.push(path);
+}
+check('every component page links to @quieto/ui on npm and GitHub',
+  componentPages.length > 0 && missingPackage.length === 0,
+  missingPackage.join(', ') || `${componentPages.length} pages, version ${uiPackage.version}`);
 check('every page\'s content column is full width, not collapsed',
   narrow.length === 0, narrow.join(', ') || `${builtPages.length} pages`);
 check('no console errors on any page', consoleErrors.length === 0,

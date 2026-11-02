@@ -6,6 +6,9 @@ toc: false
 permalink: /components/
 ---
 
+{% set pkg = packages.ui %}
+{% include "partials/package-links.njk" %}
+
 {% set section = docs.sections | sectionFor('/components/') %}
 {% include "partials/section-cards.njk" %}
 
