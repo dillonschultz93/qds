@@ -1,0 +1,19 @@
+---
+layout: layouts/base.njk
+title: Nomenclature
+description: The three-tier token naming grammar, and how it is enforced.
+---
+
+{#
+  The naming spec lives with the tokens it governs
+  (packages/design-tokens/docs/nomenclature.md) and is rendered here rather than
+  copied, so the two cannot drift. See the spec global in eleventy.config.js.
+#}
+
+<p>
+  Every token in the <a href="/foundations/tokens/#token-reference">token
+  reference</a> is named by the grammar below, and the build rejects any name that
+  breaks it.
+</p>
+
+{{ spec | renderContent("md") | safe }}

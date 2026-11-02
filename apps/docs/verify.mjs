@@ -284,8 +284,8 @@ check('token page renders full reference chains',
   chains.threeStep > 0 && chains.swatches > 100,
   `chains=${chains.total} full-depth=${chains.threeStep} swatches=${chains.swatches}\n    e.g. ${chains.sample.join('  ')}`);
 
-// ── 7. The naming spec, on the Tokens page: inline anatomy SVG ───────────────
-await gotoReady('/foundations/tokens/');
+// ── 7. Nomenclature page: the naming spec, with inline anatomy SVG ───────────
+await gotoReady('/foundations/nomenclature/');
 const nomen = await page.evaluate(() => {
   const svgs = [...document.querySelectorAll('.anatomy svg')];
   return {
@@ -299,7 +299,7 @@ const nomen = await page.evaluate(() => {
     brokenWikilinks: (document.body.textContent.match(/!\[\[/g) || []).length,
   };
 });
-check('the Tokens page inlines all three anatomy diagrams',
+check('the Nomenclature page inlines all three anatomy diagrams',
   nomen.anatomyCount === 3 && nomen.inlined,
   `count=${nomen.anatomyCount} widths=${nomen.svgWidths}`);
 check('no unrendered Obsidian wikilinks remain', nomen.brokenWikilinks === 0);

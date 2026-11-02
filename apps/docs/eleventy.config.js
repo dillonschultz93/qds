@@ -227,10 +227,8 @@ export default async function (eleventyConfig) {
     // The first heading is replaced by the layout's page title.
     .replace(/^# Design Tokens\n/, '');
 
-  // Rendered inside the Tokens page, which merged the old Nomenclature page.
-  // From its first section on: the page's own Overview replaces the spec's
-  // introduction, which would otherwise say the same thing twice.
-  eleventyConfig.addGlobalData('spec', spec.slice(spec.indexOf('\n## ') + 1));
+  // Rendered by the Nomenclature page (foundations/nomenclature.njk).
+  eleventyConfig.addGlobalData('spec', spec);
 
   return {
     dir: {

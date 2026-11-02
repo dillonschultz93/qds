@@ -1,14 +1,12 @@
 ---
 layout: layouts/base.njk
 title: Tokens
-description: The three token tiers, the grammar that names them, and every token with its value in each mode.
+description: The three token tiers, and every token with its value in each mode.
 ---
 
 {#
-  Tokens and Nomenclature, merged: what the tiers are, how a token is named, and
-  the full reference. The naming spec lives with the tokens it governs
-  (packages/design-tokens/docs/nomenclature.md) and is rendered here rather than
-  copied, so the two cannot drift.
+  What the tiers are, and the full reference. How a token is named is on its
+  own page, Nomenclature (foundations/nomenclature.njk).
 #}
 
 <dl class="stat-row">
@@ -55,7 +53,11 @@ description: The three token tiers, the grammar that names them, and every token
   token to restyle a component.
 </p>
 
-{{ spec | renderContent("md") | safe }}
+<p>
+  Every token's name follows one grammar, checked at build time. The
+  <a href="/foundations/nomenclature/">Nomenclature</a> page sets it out: each
+  tier's anatomy, the allowed vocabularies, and how the build enforces them.
+</p>
 
 <h2>Token reference</h2>
 

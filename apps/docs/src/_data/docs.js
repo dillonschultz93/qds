@@ -64,7 +64,12 @@ export default async function () {
             {
               title: 'Tokens',
               url: '/foundations/tokens/',
-              summary: 'The three token tiers, how they are named, and every token with its value in each mode.',
+              summary: 'The three token tiers, and every token with its value in each mode.',
+            },
+            {
+              title: 'Nomenclature',
+              url: '/foundations/nomenclature/',
+              summary: 'The grammar that names every token: each tier\u2019s anatomy, its vocabularies, and how the build enforces them.',
             },
           ],
         },
@@ -119,7 +124,7 @@ export default async function () {
     /** Old addresses, and where they live now. Written out as _redirects. */
     redirects: [
       ['/tokens/', '/foundations/tokens/'],
-      ['/nomenclature/', '/foundations/tokens/'],
+      ['/nomenclature/', '/foundations/nomenclature/'],
       ...families.flatMap((family) => family.members.map((member) => [`/components/${member.tagName}/`, family.url])),
     ],
   };
