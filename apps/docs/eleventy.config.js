@@ -105,7 +105,17 @@ export default async function (eleventyConfig) {
   // Filters
   // ---------------------------------------------------------------------------
 
+  // For markup built in JavaScript (the example shortcode). In a template, let
+  // Nunjucks' autoescaping do it: running this first as well escaped every
+  // example's source twice, showing &lt;qds-button&gt; instead of <qds-button>.
   eleventyConfig.addFilter('escapeHtml', escapeHtml);
+
+  /**
+   * The first item whose `key` equals `value`. Nunjucks' selectattr only tests
+   * an attribute for truthiness — selectattr('name', 'equalto', x) ignores the
+   * comparison and returns everything — so a lookup needs its own filter.
+   */
+  eleventyConfig.addFilter('findBy', (items, key, value) => (items ?? []).find((item) => item?.[key] === value));
 
   /** `qds-color-blue-400` → `var(--qds-color-blue-400)` */
   eleventyConfig.addFilter('cssVar', (name) => `var(--${name})`);
@@ -114,6 +124,12 @@ export default async function (eleventyConfig) {
   eleventyConfig.addFilter('tokenValue', (value) =>
     value !== null && typeof value === 'object' ? JSON.stringify(value) : String(value),
   );
+
+  /**
+   * JSON for a <script type="application/json">, with < escaped so no value can
+   * close the script element early.
+   */
+  eleventyConfig.addFilter('json', (value) => JSON.stringify(value).replace(/</g, '\\u003c'));
 
   eleventyConfig.addFilter('startsWith', (value, prefix) => String(value).startsWith(prefix));
 

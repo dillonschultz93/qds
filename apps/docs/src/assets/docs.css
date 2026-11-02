@@ -1213,3 +1213,98 @@ p > qds-chip:first-child {
   font-size: var(--qds-typography-font-size-200);
   color: var(--qds-semantic-color-content-subtle);
 }
+
+/* ── Playground ───────────────────────────────────────────────────────────── */
+
+/*
+ * As Spectrum lays out its component previews: the component and its code on
+ * one side, its controls on the other; stacked where the column is narrow.
+ */
+.playground {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  margin-block-end: var(--qds-spacing-600);
+  border: var(--qds-semantic-border-default) solid var(--qds-semantic-color-border-subtle);
+  border-radius: var(--qds-semantic-radius-primary);
+  overflow: hidden;
+}
+
+@container (min-width: 40rem) {
+  .playground {
+    grid-template-columns: minmax(0, 1fr) 16rem;
+  }
+}
+
+.prose {
+  container-type: inline-size;
+}
+
+.playground__stage {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.playground__preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--qds-spacing-300);
+  align-items: center;
+  justify-content: center;
+  min-height: 12rem;
+  padding: var(--qds-spacing-600) var(--qds-spacing-500);
+  background: var(--qds-semantic-color-background-default);
+}
+
+/* A block component (stack, card, tabs) takes the stage's width, as it would on a page. */
+.playground__preview > :is(qds-stack, qds-card, qds-tabs, qds-accordion, qds-progress-bar, qds-radio-group, qds-text-field) {
+  flex: 1 1 100%;
+}
+
+.playground__code {
+  position: relative;
+  border-block-start: var(--qds-semantic-border-default) solid var(--qds-semantic-color-border-subtle);
+}
+
+.playground__code pre {
+  margin: 0;
+  padding-block-end: var(--qds-spacing-700);
+  border: none;
+  border-radius: 0;
+}
+
+.playground__copy {
+  position: absolute;
+  inset-block-end: var(--qds-spacing-200);
+  inset-inline-end: var(--qds-spacing-200);
+  display: flex;
+  gap: var(--qds-spacing-200);
+  align-items: center;
+}
+
+.playground__copied {
+  font-size: var(--qds-typography-font-size-100);
+  color: var(--qds-semantic-color-content-subtle);
+}
+
+.playground__controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--qds-spacing-400);
+  padding: var(--qds-spacing-400);
+  background: var(--qds-semantic-color-background-subtle);
+  border-block-start: var(--qds-semantic-border-default) solid var(--qds-semantic-color-border-subtle);
+
+  /* Labels and options a size smaller than in content, as a settings panel. */
+  --qds-component-radio-group-font-size: var(--qds-typography-font-size-100);
+  --qds-component-radio-font-size: var(--qds-typography-font-size-100);
+  --qds-component-toggle-font-size: var(--qds-typography-font-size-100);
+  --qds-component-text-field-label-font-size: var(--qds-typography-font-size-100);
+}
+
+@container (min-width: 40rem) {
+  .playground__controls {
+    border-block-start: none;
+    border-inline-start: var(--qds-semantic-border-default) solid var(--qds-semantic-color-border-subtle);
+  }
+}

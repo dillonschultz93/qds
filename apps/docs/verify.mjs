@@ -401,7 +401,8 @@ check('qds-accordion opens an item on click and closes the others when exclusive
  */
 await gotoReady('/components/tabs/');
 const tabsState = await page.evaluate(async () => {
-  const [basic, initial] = document.querySelectorAll('qds-tabs');
+  // The examples' tabs, not the playground's, which comes first on the page.
+  const [basic, initial] = document.querySelectorAll('.example qds-tabs');
   const visible = (tabs) =>
     [...tabs.querySelectorAll('qds-tab-panel')].map((p) => getComputedStyle(p).display !== 'none');
   const before = { basic: visible(basic), initial: visible(initial) };
@@ -671,6 +672,93 @@ const contrast = await page.evaluate(() => ({
 check('every content and border role meets its contrast minimum in both modes',
   contrast.judged > 20 && contrast.failing.length === 0,
   contrast.failing.join('; ') || `${contrast.judged} ratios, all passing`);
+
+// ── Component playgrounds ────────────────────────────────────────────────────
+/**
+ * Every component page has a playground, and every control in it works: each is
+ * exercised as a reader would (a radio picked, a toggle flipped, a field typed
+ * into) and must change the rendered component and the code shown. This is what
+ * keeps a playground from quietly drifting from its component.
+ */
+{
+  const { default: loadPlaygrounds } = await import('./src/_data/playgrounds.js');
+  const playgrounds = await loadPlaygrounds();
+  const broken = [];
+  let exercised = 0;
+
+  for (const playground of playgrounds) {
+    await gotoReady(`/components/${playground.slug}/`);
+    const result = await page.evaluate((tag) => {
+      const root = document.querySelector('[data-playground]');
+      if (!root) return { problems: ['no playground'], exercised: 0 };
+      const preview = () => root.querySelector(`.playground__preview ${tag}`);
+      const code = () => root.querySelector('.playground__code code').textContent;
+      const problems = [];
+      if (!preview()) problems.push('preview has no component');
+      if (!code().startsWith('<') || code().includes('&lt;')) problems.push('code is not plain markup');
+
+      let exercised = 0;
+      for (const control of root.querySelectorAll('.playground__controls [data-control]')) {
+        const name = control.dataset.control;
+        if (name === 'content') continue;
+        let expect;
+        if (control.localName === 'qds-radio-group') {
+          const other = [...control.querySelectorAll('qds-radio')].find((radio) => radio.value !== control.value);
+          other.click();
+          expect = (el) => el.getAttribute(name) === other.value || (!el.hasAttribute(name) && code().includes(`<${tag}`));
+          // A choice back to the default is omitted; anything else must be shown.
+          if (!code().includes(`${name}="${other.value}"`) && preview()?.getAttribute(name) !== null) {
+            problems.push(`${name}: code does not show "${other.value}"`);
+          }
+        } else if (control.localName === 'qds-toggle') {
+          const was = preview()?.hasAttribute(name);
+          control.shadowRoot.querySelector('button').click();
+          expect = (el) => el.hasAttribute(name) !== was;
+        } else {
+          const input = control.shadowRoot.querySelector('input');
+          const value = input.type === 'number' ? '7' : 'Changed';
+          input.value = value;
+          input.dispatchEvent(new InputEvent('input', { bubbles: true, composed: true }));
+          expect = (el) => el.getAttribute(name) === value && code().includes(`${name}="${value}"`);
+        }
+        const el = preview();
+        if (!el || !expect(el)) problems.push(`${name} did not change the component`);
+        exercised++;
+      }
+      return { problems, exercised };
+    }, playground.tag);
+    exercised += result.exercised;
+    broken.push(...result.problems.map((problem) => `${playground.tag}: ${problem}`));
+  }
+
+  check('every component has a playground, and every control changes the component and its code',
+    broken.length === 0 && exercised > 40,
+    broken.slice(0, 6).join('; ') || `${playgrounds.length} playgrounds, ${exercised} controls`);
+}
+
+// Example source is shown as markup, not as escaped markup.
+{
+  const doubled = [];
+  for (const path of builtPages.filter((p) => p.startsWith('/components/') && !p.endsWith('/api/'))) {
+    await gotoReady(path);
+    const bad = await page.evaluate(() =>
+      [...document.querySelectorAll('.example__source code')].filter((code) => code.textContent.includes('&lt;')).length,
+    );
+    if (bad) doubled.push(`${path} (${bad})`);
+  }
+  check('example source is shown as markup, not escaped twice',
+    doubled.length === 0, doubled.join(', ') || 'all examples');
+}
+
+// Each shipped component on the roadmap links to its own page.
+await gotoReady('/roadmap/');
+const roadmapLinks = await page.evaluate(() =>
+  [...document.querySelectorAll('#shipped + .table-scroll tbody th a')].map((a) => [a.textContent.trim(), a.getAttribute('href')]),
+);
+const wrongLinks = roadmapLinks.filter(([name, href]) => href !== `/components/${name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}/`);
+check('each shipped component on the roadmap links to its own page',
+  roadmapLinks.length > 0 && wrongLinks.length === 0,
+  wrongLinks.map(([name, href]) => `${name} → ${href}`).join(', ') || `${roadmapLinks.length} links`);
 
 // ── 8. Console cleanliness across every page ─────────────────────────────────
 for (const path of builtPages) {

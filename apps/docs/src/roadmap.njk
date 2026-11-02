@@ -84,7 +84,7 @@ description: The components QDS has, the ones it needs next, and the ones it lea
       {% for component in roadmap.shipped %}
         <tr>
           <th scope="row">
-            <a href="{{ (docs.families | selectattr('name', 'equalto', component.name) | first).url }}">{{ component.name }}</a>
+            <a href="{{ (docs.families | findBy('name', component.name)).url }}">{{ component.name }}</a>
           </th>
           <td>
             {% for tag in component.elements %}<code>&lt;{{ tag }}&gt;</code>{% if not loop.last %}<br />{% endif %}{% endfor %}

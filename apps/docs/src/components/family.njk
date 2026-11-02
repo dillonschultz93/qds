@@ -18,6 +18,8 @@ eleventyComputed:
 
 {% include "partials/component-header.njk" %}
 
+{% include "partials/playground.njk" %}
+
 <h2>About</h2>
 
 {% for paragraph in family.primary.description | paragraphs %}
@@ -35,7 +37,7 @@ eleventyComputed:
       <div class="example__preview">{{ demo.html | safe }}</div>
       <details class="example__source">
         <summary>Source</summary>
-        <pre><code class="language-html">{{ demo.html | escapeHtml }}</code></pre>
+        <pre><code class="language-html">{{ demo.html }}</code></pre>
       </details>
     </figure>
   {% endfor %}
@@ -75,3 +77,5 @@ eleventyComputed:
   <a href="{{ family.apiUrl }}">API</a> for every property, slot, event, part, and
   token.
 </p>
+
+<script type="module" src="/assets/playground.js"></script>
