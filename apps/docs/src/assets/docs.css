@@ -344,7 +344,24 @@ pre {
 table {
   width: 100%;
   border-collapse: collapse;
-  font-size: var(--qds-typography-font-size-200);
+  font-size: var(--qds-typography-font-size-100);
+}
+
+/*
+ * Code in a table stays on one line: a token name, value, or type reads whole
+ * rather than breaking at a hyphen. A table that is then wider than the column
+ * scrolls sideways in its .table-scroll, rather than squeezing every column.
+ * Prose in a table (descriptions) still wraps.
+ */
+:is(th, td) code,
+.token-name__id {
+  white-space: nowrap;
+  overflow-wrap: normal;
+}
+
+/* At the table's size, not the larger size code has in running text. */
+:is(th, td) code {
+  font-size: inherit;
 }
 
 th,
@@ -396,7 +413,15 @@ tbody tr:last-child td {
 .token-name {
   font-family: var(--qds-semantic-typography-data-font-family);
   font-size: var(--qds-typography-font-size-100);
-  overflow-wrap: anywhere;
+}
+
+/* A token's description, under its name, wraps at a readable width. */
+.token-name small {
+  display: block;
+  min-width: 16rem;
+  margin-block-start: var(--qds-spacing-100);
+  font-family: var(--qds-semantic-typography-body-font-family);
+  white-space: normal;
 }
 
 /* The reference chain: component → semantic → primitive → raw value. */

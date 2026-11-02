@@ -19,9 +19,9 @@
       {% for token in rows %}
         <tr id="{{ token.name }}">
           <th scope="row" class="token-name">
-            --{{ token.name }}
+            <span class="token-name__id">--{{ token.name }}</span>
             {% if token.description %}
-              <br /><small>{{ token.description }}</small>
+              <small>{{ token.description }}</small>
             {% endif %}
           </th>
 
