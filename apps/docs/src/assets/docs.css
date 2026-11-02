@@ -970,7 +970,7 @@ p > qds-chip:first-child {
 }
 
 .card-grid--sections {
-  grid-template-columns: repeat(auto-fill, minmax(min(17rem, 100%), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(13rem, 100%), 1fr));
 }
 
 /* ── Color ────────────────────────────────────────────────────────────────── */
@@ -1409,4 +1409,129 @@ p > qds-chip:first-child {
   margin: 0;
   padding: var(--qds-spacing-200) var(--qds-spacing-300);
   background: var(--qds-semantic-color-background-default);
+}
+
+/* ── Home bands ───────────────────────────────────────────────────────────── */
+
+/*
+ * Mantine's home page rhythm: a hero with the numbers that matter, then one
+ * band per idea, each with a short lede and something live to look at.
+ */
+.prose p.hero__eyebrow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--qds-spacing-300);
+  align-items: center;
+  margin: 0 0 var(--qds-spacing-400);
+  font-size: var(--qds-typography-font-size-200);
+}
+
+.prose p.hero__eyebrow qds-chip {
+  margin: 0;
+}
+
+.hero-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(9rem, 100%), 1fr));
+  gap: var(--qds-spacing-400);
+  margin: var(--qds-spacing-700) 0 0;
+  padding-block-start: var(--qds-spacing-500);
+  border-block-start: var(--qds-semantic-border-default) solid var(--qds-semantic-color-border-subtle);
+}
+
+.hero-stats dt {
+  font-size: var(--qds-typography-font-size-100);
+  color: var(--qds-semantic-color-content-subtle);
+}
+
+.hero-stats dd {
+  margin: 0;
+  font-size: var(--qds-typography-font-size-500);
+  font-weight: var(--qds-typography-font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+}
+
+.home-band {
+  padding-block: var(--qds-spacing-500);
+}
+
+.prose .home-band > h2 {
+  margin-block-start: 0;
+  border: none;
+  font-size: var(--qds-typography-font-size-600);
+}
+
+.prose p.home-band__lede {
+  max-width: 44rem;
+  margin-block: 0 var(--qds-spacing-500);
+  color: var(--qds-semantic-color-content-subtle);
+}
+
+/* The AI band sits on its own surface, as Mantine sets theirs apart. */
+.home-band--ai {
+  padding: var(--qds-spacing-400);
+  background: var(--qds-semantic-color-background-subtle);
+  border: var(--qds-semantic-border-default) solid var(--qds-semantic-color-border-subtle);
+  border-radius: var(--qds-semantic-radius-primary);
+}
+
+@media (min-width: 40rem) {
+  .home-band--ai {
+    padding: var(--qds-spacing-600);
+  }
+}
+
+.home-band--ai .card-grid {
+  margin-block-end: var(--qds-spacing-400);
+}
+
+.home-band--ai pre {
+  margin: 0;
+  background: var(--qds-semantic-color-background-default);
+}
+
+.steps {
+  padding-inline-start: var(--qds-spacing-500);
+}
+
+.steps > li + li {
+  margin-block-start: var(--qds-spacing-400);
+}
+
+/* ── Client tabs (MCP server page) ────────────────────────────────────────── */
+
+.client-tabs pre {
+  margin-block-end: 0;
+}
+
+/* ── Footer columns ───────────────────────────────────────────────────────── */
+
+.site-footer__columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(8rem, 100%), 1fr));
+  gap: var(--qds-spacing-500);
+  max-width: 64rem;
+  margin: 0 auto var(--qds-spacing-500);
+  text-align: start;
+}
+
+.site-footer__heading {
+  margin: 0 0 var(--qds-spacing-200);
+  font-size: var(--qds-typography-font-size-200);
+  font-weight: var(--qds-typography-font-weight-semibold);
+  color: var(--qds-semantic-color-content-default);
+}
+
+.site-footer__columns ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.site-footer__columns li + li {
+  margin-block-start: var(--qds-spacing-100);
+}
+
+.site-footer__columns a {
+  color: var(--qds-semantic-color-content-subtle);
 }

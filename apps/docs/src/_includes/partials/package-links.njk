@@ -1,16 +1,17 @@
 {#
-  A published package's name and version, where to get it, and how to install
-  it. Expects `pkg`, from _data/packages.js.
+  A package's name and version, where to get it, and how to install it.
+  Expects `pkg`, from _data/packages.js. A package without a version, an npm
+  page, a changelog, or an install command leaves that part out.
 #}
 <div class="package-links">
   <p class="package-links__name">
     <code>{{ pkg.name }}</code>
-    <qds-chip>{{ pkg.version }}</qds-chip>
+    {% if pkg.version %}<qds-chip>{{ pkg.version }}</qds-chip>{% endif %}
   </p>
   <ul class="package-links__list">
-    <li><a href="{{ pkg.npm }}" rel="noopener">npm</a></li>
+    {% if pkg.npm %}<li><a href="{{ pkg.npm }}" rel="noopener">npm</a></li>{% endif %}
     <li><a href="{{ pkg.source }}" rel="noopener">Source on GitHub</a></li>
-    <li><a href="{{ pkg.changelog }}" rel="noopener">Changelog</a></li>
+    {% if pkg.changelog %}<li><a href="{{ pkg.changelog }}" rel="noopener">Changelog</a></li>{% endif %}
   </ul>
-  <pre class="package-links__install"><code>npm install {{ pkg.name }}</code></pre>
+  {% if pkg.install %}<pre class="package-links__install"><code>{{ pkg.install }}</code></pre>{% endif %}
 </div>

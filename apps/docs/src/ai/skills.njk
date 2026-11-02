@@ -1,0 +1,58 @@
+---
+layout: layouts/base.njk
+title: Skills
+description: Claude Code skills that scaffold, audit, migrate, and update a design token system.
+---
+
+{% set pkg = packages.skills %}
+{% include "partials/package-links.njk" %}
+
+<p>
+  Quieto Skills turn the
+  <a href="https://www.npmjs.com/package/@quieto/tokens" rel="noopener">Quieto Tokens</a>
+  CLI's commands into guided conversations in Claude Code. Each one asks for what
+  it needs, runs the command, and explains what changed.
+</p>
+
+<h2 id="install">Install</h2>
+
+<p>The skills drive the Quieto Tokens CLI, so the project needs it first:</p>
+
+<pre><code>npm install @quieto/tokens</code></pre>
+
+<p>
+  Then install the skills. They are copied into <code>.claude/skills/</code> in
+  the current directory, or in the directory you name:
+</p>
+
+<pre><code>npx @quieto/skills install
+npx @quieto/skills install path/to/project</code></pre>
+
+<h2 id="skills">Skills</h2>
+
+<div class="table-scroll">
+  <table>
+    <thead>
+      <tr><th scope="col">Command</th><th scope="col">What it does</th></tr>
+    </thead>
+    <tbody>
+      {% for skill in ai.skills %}
+        <tr><td><code>/{{ skill.name }}</code></td><td>{{ skill.what }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<h2 id="use">Use them</h2>
+
+<p>
+  Run one by its command, such as <code>/design-token-init</code>, or describe
+  the task (“audit my tokens for contrast problems”) and Claude Code loads the
+  skill that fits.
+</p>
+
+<p>
+  For an assistant other than Claude Code, the
+  <a href="/ai/mcp/">MCP server</a> offers the same generation and checks as
+  tools.
+</p>

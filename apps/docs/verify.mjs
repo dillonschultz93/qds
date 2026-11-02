@@ -826,6 +826,50 @@ for (const path of builtPages) {
   const width = await page.evaluate(() => document.querySelector('main').getBoundingClientRect().width);
   if (width < 600) narrow.push(`${path} (${Math.round(width)}px)`);
 }
+// The AI section: the MCP server's client tabs work, and both tools' tables are there.
+await gotoReady('/ai/mcp/');
+const mcpPage = await page.evaluate(async () => {
+  const tabs = document.querySelector('.client-tabs');
+  const names = [...tabs.querySelectorAll('qds-tab')].map((tab) => tab.textContent.trim());
+  tabs.selectedIndex = names.indexOf('Cursor');
+  await tabs.updateComplete;
+  const open = [...tabs.querySelectorAll('qds-tab-panel')].find((panel) => panel.checkVisibility());
+  return {
+    names,
+    cursorShowsConfig: open?.textContent.includes('"mcpServers"') ?? false,
+    tools: document.querySelectorAll('#tools ~ .table-scroll tbody tr').length,
+  };
+});
+check('the MCP server page switches between clients and lists its tools',
+  mcpPage.names.length === 5 && mcpPage.cursorShowsConfig && mcpPage.tools === 7,
+  `tabs=${mcpPage.names.join('/')} cursor=${mcpPage.cursorShowsConfig} tools=${mcpPage.tools}`);
+
+await gotoReady('/ai/skills/');
+const skillsPage = await page.evaluate(() => ({
+  skills: [...document.querySelectorAll('tbody td:first-child code')].map((code) => code.textContent),
+  npm: !!document.querySelector('.package-links a[href="https://www.npmjs.com/package/@quieto/skills"]'),
+}));
+check('the Skills page lists every skill and links to the package',
+  skillsPage.skills.length === 7 && skillsPage.skills.every((name) => name.startsWith('/design-token-')) && skillsPage.npm,
+  skillsPage.skills.join(' '));
+
+// The home page: the hero's numbers, the AI band, and the site footer.
+await gotoReady('/');
+const home = await page.evaluate(() => ({
+  stats: [...document.querySelectorAll('.hero-stats dd')].map((dd) => dd.textContent.trim()),
+  aiLinks: [...document.querySelectorAll('.home-band--ai .link-card a')].map((a) => a.getAttribute('href')),
+  footerLinks: document.querySelectorAll('.site-footer__columns a').length,
+}));
+check('the home page shows its numbers, the AI tools, and the footer links',
+  /^\d+$/.test(home.stats[0]) && /^\d+$/.test(home.stats[1]) &&
+    home.aiLinks.join() === '/ai/mcp/,/ai/skills/' && home.footerLinks >= 10,
+  `stats=${home.stats.join(' / ')} ai=${home.aiLinks.join(' ')} footer links=${home.footerLinks}`);
+
+const searchIndex = JSON.parse(await readFile(join(SITE, 'search-index.json'), 'utf8'));
+const indexText = JSON.stringify(searchIndex);
+check('the AI pages are searchable, and the footer headings are not indexed as sections',
+  indexText.includes('/ai/mcp/') && indexText.includes('/ai/skills/') && !indexText.includes('"Packages"'));
+
 // Every component page, on every tab, and the Components landing page name the
 // package they ship in.
 const uiPackage = JSON.parse(await readFile(new URL('../../packages/ui/package.json', import.meta.url), 'utf8'));

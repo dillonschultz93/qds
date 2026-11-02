@@ -1,10 +1,11 @@
 /**
  * The site's information architecture: three sections, as Material 3 and
- * Spectrum organise theirs.
+ * Spectrum organise theirs, and a fourth for the AI tools, as Mantine has.
  *
  *   Foundations  what the system is built from: the tokens and their grammar
  *   Styles       how it looks: color, typography, icons
  *   Components   what it is made of: one page per component family
+ *   AI           the MCP server and skills that build token systems
  *
  * The header, each section's sidebar and landing page, and the search index all
  * read from here, so a page is added in one place.
@@ -153,6 +154,29 @@ export default async function () {
           .filter((family) => family.category === category)
           .map((family) => ({ title: family.name, url: family.url, summary: family.summary })),
       })).filter((group) => group.pages.length > 0),
+    },
+    {
+      key: 'ai',
+      title: 'AI',
+      url: '/ai/',
+      summary: 'Build and check token systems from your AI tools: a hosted MCP server, and skills for Claude Code.',
+      groups: [
+        {
+          title: null,
+          pages: [
+            {
+              title: 'MCP server',
+              url: '/ai/mcp/',
+              summary: 'Generate ramps, scales, and themes, and check contrast, from any MCP client. Hosted at quieto.dev/mcp.',
+            },
+            {
+              title: 'Skills',
+              url: '/ai/skills/',
+              summary: 'Claude Code skills that scaffold, audit, migrate, and update a token system.',
+            },
+          ],
+        },
+      ],
     },
   ];
 

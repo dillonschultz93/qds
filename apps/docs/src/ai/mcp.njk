@@ -1,0 +1,103 @@
+---
+layout: layouts/base.njk
+title: MCP server
+description: Generate color ramps, spacing and type scales, and light and dark themes, and check contrast, from any MCP client.
+---
+
+{% set pkg = packages.mcp %}
+{% include "partials/package-links.njk" %}
+
+<p>
+  The Quieto MCP server gives an AI assistant the tools of
+  <a href="https://www.npmjs.com/package/@quieto/tokens" rel="noopener">Quieto Tokens</a>,
+  so it can build an accessible token system, or check one, while it works on
+  your code. It is hosted, so there is nothing to install: point your client at
+  <code>{{ ai.mcp.url }}</code>.
+</p>
+
+<h2 id="connect">Connect your client</h2>
+
+<qds-tabs label="MCP clients" class="client-tabs">
+  <qds-tab slot="tab">Claude Code</qds-tab>
+  <qds-tab slot="tab">Cursor</qds-tab>
+  <qds-tab slot="tab">VS Code</qds-tab>
+  <qds-tab slot="tab">Claude Desktop</qds-tab>
+  <qds-tab slot="tab">Other clients</qds-tab>
+
+  <qds-tab-panel>
+    <p>Run, in your project:</p>
+    <pre><code>claude mcp add quieto --transport http {{ ai.mcp.url }}</code></pre>
+  </qds-tab-panel>
+
+  <qds-tab-panel>
+    <p>
+      Add the server to <code>.cursor/mcp.json</code> for one project, or to
+      <code>~/.cursor/mcp.json</code> for all of them:
+    </p>
+    <pre><code>{
+  "mcpServers": {
+    "quieto": {
+      "url": "{{ ai.mcp.url }}"
+    }
+  }
+}</code></pre>
+  </qds-tab-panel>
+
+  <qds-tab-panel>
+    <p>
+      Add the server to <code>.vscode/mcp.json</code>. VS Code's key is
+      <code>servers</code>, not <code>mcpServers</code>:
+    </p>
+    <pre><code>{
+  "servers": {
+    "quieto": {
+      "type": "http",
+      "url": "{{ ai.mcp.url }}"
+    }
+  }
+}</code></pre>
+  </qds-tab-panel>
+
+  <qds-tab-panel>
+    <p>
+      In <strong>Settings → Connectors</strong>, choose <strong>Add custom
+      connector</strong>, name it Quieto, and enter <code>{{ ai.mcp.url }}</code>.
+    </p>
+  </qds-tab-panel>
+
+  <qds-tab-panel>
+    <p>
+      Any client that speaks Streamable HTTP can connect to
+      <code>{{ ai.mcp.url }}</code>. Older clients that only speak SSE can use
+      <code>{{ ai.mcp.sseUrl }}</code>.
+    </p>
+  </qds-tab-panel>
+</qds-tabs>
+
+<h2 id="tools">Tools</h2>
+
+<div class="table-scroll">
+  <table>
+    <thead>
+      <tr><th scope="col">Tool</th><th scope="col">What it does</th></tr>
+    </thead>
+    <tbody>
+      {% for tool in ai.mcp.tools %}
+        <tr><td><code>{{ tool.name }}</code></td><td>{{ tool.what }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<h2 id="prompts">Try it</h2>
+
+<p>Once connected, ask for what you want; the assistant picks the tools:</p>
+
+<ul>
+  {% for prompt in ai.mcp.prompts %}<li>{{ prompt }}</li>{% endfor %}
+</ul>
+
+<p>
+  The server builds and checks tokens. It does not document the QDS components
+  yet; for those, use these pages.
+</p>

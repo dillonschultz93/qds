@@ -118,11 +118,40 @@
     </qds-modal>
 
     <footer class="site-footer">
+      <nav class="site-footer__columns" aria-label="Footer">
+        <div>
+          <h2 class="site-footer__heading">Docs</h2>
+          <ul>
+            {% for item in docs.sections %}{% if item.key != 'ai' %}<li><a href="{{ item.url }}">{{ item.title }}</a></li>{% endif %}{% endfor %}
+            <li><a href="/roadmap/">Roadmap</a></li>
+          </ul>
+        </div>
+        <div>
+          <h2 class="site-footer__heading">AI</h2>
+          <ul>
+            {% for item in (docs.sections | sectionFor('/ai/')).groups[0].pages %}<li><a href="{{ item.url }}">{{ item.title }}</a></li>{% endfor %}
+          </ul>
+        </div>
+        <div>
+          <h2 class="site-footer__heading">Packages</h2>
+          <ul>
+            {% for key in ['ui', 'tokens', 'skills'] %}<li><a href="{{ packages[key].npm }}" rel="noopener">{{ packages[key].name }}</a></li>{% endfor %}
+          </ul>
+        </div>
+        <div>
+          <h2 class="site-footer__heading">Project</h2>
+          <ul>
+            <li><a href="{{ site.repo }}" rel="noopener">GitHub</a></li>
+            <li><a href="{{ site.repo }}/issues" rel="noopener">Report an issue</a></li>
+            <li><a href="{{ site.repo }}/blob/main/LICENSE" rel="noopener">MIT license</a></li>
+          </ul>
+        </div>
+      </nav>
       <p>
         Generated from
         <code>packages/design-tokens</code> and <code>packages/ui</code>.
-        Every table on this site is built from the token manifest or the custom
-        elements manifest — none of it is hand-written.
+        Every token and component table on this site is built from the token
+        manifest or the custom elements manifest — none of it is hand-written.
       </p>
     </footer>
   </body>
