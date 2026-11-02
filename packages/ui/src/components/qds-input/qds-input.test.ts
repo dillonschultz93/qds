@@ -145,6 +145,27 @@ describe('qds-input', () => {
       expect(inner(element).value).to.equal('Ada');
     });
 
+    /**
+     * A disabled input is barred from constraint validation, so the browser gives
+     * it an empty validation message — while its validity flags can still be set
+     * (here, typeMismatch). Passing that pair to setValidity throws.
+     */
+    it('renders disabled with a value that would be invalid, without throwing', async () => {
+      const errors: string[] = [];
+      const onError = (event: ErrorEvent) => errors.push(event.message);
+      window.addEventListener('error', onError);
+      try {
+        const element = await fixture<QdsInput>(
+          html`<qds-input label="Email" type="email" value="not an email" disabled></qds-input>`,
+        );
+        await elementUpdated(element);
+        expect(errors, errors.join('; ')).to.be.empty;
+        expect(element.checkValidity(), 'a disabled control is not validated').to.be.true;
+      } finally {
+        window.removeEventListener('error', onError);
+      }
+    });
+
     it('follows a disabled fieldset and is left out of submission', async () => {
       const form = await fixture<HTMLFormElement>(html`
         <form>
