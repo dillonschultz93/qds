@@ -156,3 +156,6 @@ custom-elements.json
 
 # Netlify CLI local state
 .netlify/
+
+# Wrangler local state (wrangler dev)
+.wrangler/

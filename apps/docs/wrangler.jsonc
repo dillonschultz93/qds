@@ -1,0 +1,34 @@
+// Cloudflare Workers: the documentation site, served at https://quieto.dev.
+//
+// Static files only — no Worker script. The built site (_site) is uploaded as
+// assets and served as-is.
+//
+// ROUTING LIVES IN THE CLOUDFLARE DASHBOARD, NOT HERE. quieto.dev is attached to
+// this Worker as a Custom Domain, and the MCP server (the quieto-mcp Worker)
+// takes quieto.dev/mcp* and quieto.dev/sse* with Routes, which win over a
+// Custom Domain on the same hostname. A deploy REPLACES a Worker's routes and
+// domains with whatever this file lists, so adding a `routes` key here would
+// detach quieto.dev from the dashboard's setup unless it listed it too. Leave
+// it out, and deploys leave the dashboard's routing alone.
+//
+// Deploys with the docs build (see the deploy commands in the Workers Builds
+// settings), from the repository root:
+//
+//   pnpm turbo build --filter=docs
+//   pnpm --filter docs exec wrangler deploy
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "quieto-docs",
+  "compatibility_date": "2026-10-01",
+
+  "assets": {
+    "directory": "./_site",
+    // Unknown paths get the site's own 404 page (404.html), with a 404 status.
+    "not_found_handling": "404-page",
+  },
+
+  // The workers.dev address, for checking a deploy before it is on quieto.dev,
+  // and preview URLs for builds of other branches.
+  "workers_dev": true,
+  "preview_urls": true,
+}

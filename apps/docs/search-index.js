@@ -105,6 +105,8 @@ export function createSearchIndex() {
 
     for (const [url, page] of [...pages.entries()].sort(([a], [b]) => a.localeCompare(b))) {
       if (isComponentPage(url) && url !== '/components/') continue;
+      // Not a destination: it is what an unknown address shows.
+      if (url === '/404.html') continue;
       out.push({ type: 'page', title: page.title, detail: summarize(page.description), url });
       for (const section of page.sections) {
         out.push({

@@ -1,0 +1,24 @@
+---
+layout: layouts/base.njk
+title: Page not found
+description: There is no page at this address.
+permalink: /404.html
+---
+
+{#
+  Served by Cloudflare for any path with no page (not_found_handling in
+  wrangler.jsonc), with a 404 status. Links are root-relative, since the page
+  can be shown at any depth.
+#}
+
+<p>
+  The page may have moved, or the address may be mistyped. Try
+  <button type="button" class="search-button" onclick="document.getElementById('search-open').click()">searching the docs</button>,
+  or start from one of these:
+</p>
+
+<ul>
+  {% for item in site.nav %}
+    <li><a href="{{ item.url }}">{{ item.text }}</a></li>
+  {% endfor %}
+</ul>
