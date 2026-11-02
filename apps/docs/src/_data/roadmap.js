@@ -54,43 +54,47 @@ const COMPONENTS = [
   { name: 'Toggle', category: 'Inputs', elements: ['qds-toggle'], since: '0.1.0',
     what: 'An on/off switch, for settings that apply immediately.' },
 
-  // ── Tier 1: gaps that block ordinary product screens ───────────────────────
+  // ── Shipped from Tier 1: gaps that blocked ordinary product screens ───────
   {
     name: 'Icon', category: 'Display',
-    elements: ['qds-icon'],
+    elements: ['qds-icon'], since: '0.2.0',
+    what: 'An icon from Lucide’s set, sized by tokens, decorative unless labelled.',
     tier: 1,
     why: 'Every icon in the library today is a typed character (+, →, ✓). Buttons, chips, inputs, alerts, and menus all need real icons, so this comes first.',
     needs: ['A choice of icon set', 'Icon size tokens'],
   },
   {
     name: 'Select', category: 'Inputs',
-    elements: ['qds-select'],
+    elements: ['qds-select'], since: '0.2.0',
+    what: 'A native select with a label, hint, and error message.',
     tier: 1,
     why: 'The most common form control still missing. Wraps the native select, keeping its accessibility and the mobile pickers.',
     needs: [],
   },
   {
     name: 'Alert', category: 'Feedback',
-    elements: ['qds-alert'],
+    elements: ['qds-alert'], since: '0.2.0',
+    what: 'An inline info, success, warning, or error message.',
     tier: 1,
     why: 'Inline info, success, warning, and error messages: a form-level error, a "saved" notice. The status roles, error included, exist for exactly this.',
     needs: ['Announcements to assistive technology'],
   },
   {
     name: 'Tooltip', category: 'Feedback',
-    elements: ['qds-tooltip'],
+    elements: ['qds-tooltip'], since: '0.2.0',
+    what: 'A short label on hover and focus, such as an icon-only button’s name.',
     tier: 1,
     why: 'An icon-only button needs a visible label on hover and focus, not just an accessible name.',
     needs: ['Floating panels', 'An inverse background role'],
   },
   {
     name: 'Menu', category: 'Actions',
-    elements: ['qds-menu', 'qds-menu-item'],
+    elements: ['qds-menu', 'qds-menu-item'], since: '0.2.0',
+    what: 'A menu of actions opened by a button, with full keyboard support.',
     tier: 1,
     why: 'Action menus: the "More ⋯" button. Shares the floating-panel foundation with Tooltip, so the two are cheaper built together.',
     needs: ['Floating panels'],
   },
-
   // ── Tier 2: common, and cheap once Tier 1 exists ───────────────────────────
   {
     name: 'Toast', category: 'Feedback',
@@ -190,17 +194,20 @@ const INFRASTRUCTURE = [
   {
     name: 'Floating panels',
     for: ['Tooltip', 'Menu', 'Combobox', 'Popover'],
-    note: 'Positioned panels that sit above the page. The real cost of Tier 1. Built on the browser’s native popover support, with a fallback where it cannot yet position them.',
+    note: 'Positioned panels that sit above the page. Drawn in the browser’s top layer with the native Popover API, so no ancestor can clip them, and placed beside their trigger, flipping and shifting to stay on screen.',
+    built: '0.2.0',
   },
   {
     name: 'Announcements to assistive technology',
     for: ['Alert', 'Toast'],
-    note: 'One shared way to announce a message, so the two do not compete or double-announce.',
+    note: 'One shared way to announce a message, so the two do not compete or double-announce. Exported as announce(), for apps too.',
+    built: '0.2.0',
   },
   {
     name: 'New tokens',
     for: ['Tooltip', 'Icon'],
-    note: 'An inverse background role for dark tooltip surfaces (the inverse role covers only text today), and icon size tokens.',
+    note: 'An inverse background role for tooltip surfaces, and icon size tokens.',
+    built: '0.2.0',
   },
 ];
 

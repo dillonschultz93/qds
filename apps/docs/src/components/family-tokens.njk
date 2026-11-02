@@ -31,7 +31,7 @@ eleventyComputed:
   </p>
 
   <pre><code>.brand {{ family.primary.tagName }} {
-  --{{ family.sampleToken }}: var(--qds-color-purple-600);
+  --{{ family.sampleToken }}: {{ family.sampleValue }};
 }</code></pre>
 
   {% for set in family.tokenSets %}

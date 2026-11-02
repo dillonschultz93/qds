@@ -37,17 +37,19 @@ export default function () {
       },
       {
         title: 'Icons in the start and end slots',
+        description:
+          'A qds-icon beside text is decorative, so it is hidden from assistive technology. An icon-only button needs a label, here given by a tooltip.',
         html: `<qds-button>
-  <span slot="start" aria-hidden="true">+</span>
+  <qds-icon slot="start" name="plus" size="sm"></qds-icon>
   New item
 </qds-button>
 <qds-button variant="secondary">
   Continue
-  <span slot="end" aria-hidden="true">&rarr;</span>
+  <qds-icon slot="end" name="arrow-right" size="sm"></qds-icon>
 </qds-button>
-<qds-button variant="ghost" label="Dismiss">
-  <span aria-hidden="true">&times;</span>
-</qds-button>`,
+<qds-tooltip text="Dismiss">
+  <qds-button variant="ghost"><qds-icon name="x" size="sm"></qds-icon></qds-button>
+</qds-tooltip>`,
       },
       {
         title: 'Inside a form',
@@ -523,6 +525,143 @@ export default function () {
 <qds-modal id="info-modal" heading="What's new in 0.2" light-dismiss>
   <p style="margin: 0;">Eleven new components, from checkboxes to tabs.</p>
 </qds-modal>`,
+      },
+    ],
+    'qds-icon': [
+      {
+        title: 'Sizes',
+        description: 'Three sizes from the icon size tokens. An icon takes the color of the text around it.',
+        html: `<qds-stack direction="inline" gap="400" align="center">
+  <qds-icon name="search" size="sm"></qds-icon>
+  <qds-icon name="search" size="md"></qds-icon>
+  <qds-icon name="search" size="lg"></qds-icon>
+</qds-stack>`,
+      },
+      {
+        title: 'Decorative or labelled',
+        description:
+          'Beside text, an icon is decorative and hidden from assistive technology. Standing alone, it needs a label, which makes it an image with that name.',
+        html: `<p style="margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+  <qds-icon name="circle-check" size="sm"></qds-icon> All checks passed
+</p>
+<qds-icon name="triangle-alert" label="Warning"></qds-icon>`,
+      },
+    ],
+    'qds-select': [
+      {
+        title: 'With a placeholder, required',
+        description:
+          'The placeholder is an empty first choice that a required select will not accept. Its message appears once the field is left, or the form is submitted.',
+        html: `<qds-select label="Country" name="country" placeholder="Choose a country" required>
+  <option value="ca">Canada</option>
+  <option value="mx">Mexico</option>
+  <option value="us">United States</option>
+</qds-select>`,
+      },
+      {
+        title: 'Groups, a hint, and a disabled option',
+        html: `<qds-select label="Plan" hint="You can change plans at any time." value="pro">
+  <option value="free">Free</option>
+  <optgroup label="Paid">
+    <option value="pro">Pro</option>
+    <option value="team">Team</option>
+    <option value="enterprise" disabled>Enterprise (contact us)</option>
+  </optgroup>
+</qds-select>`,
+      },
+      {
+        title: 'An error from the server',
+        description: 'An error message is shown at once, and marks the select invalid to assistive technology.',
+        html: `<qds-select label="Time zone" error="That time zone is not available for your plan.">
+  <option>UTC</option>
+  <option>America/Toronto</option>
+</qds-select>`,
+      },
+    ],
+    'qds-alert': [
+      {
+        title: 'Variants',
+        description:
+          'The heading and message carry the meaning; color and icon only reinforce it.',
+        html: `<qds-stack gap="300">
+  <qds-alert heading="Scheduled maintenance">The service will be read-only on Sunday from 02:00 to 03:00 UTC.</qds-alert>
+  <qds-alert variant="success" heading="Changes saved">Your profile is up to date.</qds-alert>
+  <qds-alert variant="warning" heading="Storage almost full">You have used 92% of your space.</qds-alert>
+  <qds-alert variant="error" heading="Payment failed">Your card was declined. Update it to keep your plan.</qds-alert>
+</qds-stack>`,
+      },
+      {
+        title: 'Dismissible, with actions',
+        html: `<qds-alert variant="info" heading="A new version is ready" dismissible>
+  Restart to finish updating.
+  <qds-button slot="actions" size="sm">Restart now</qds-button>
+  <qds-button slot="actions" size="sm" variant="ghost">Later</qds-button>
+</qds-alert>`,
+      },
+      {
+        title: 'Announced when it appears',
+        description:
+          'An alert shown after the page loads is read out by screen readers: errors and warnings at once, others when the reader pauses.',
+        html: `<qds-button variant="secondary" onclick="document.getElementById('save-alert').hidden = false">Save</qds-button>
+<qds-alert id="save-alert" variant="success" heading="Saved" dismissible hidden style="margin-top: 1rem;">
+  Your draft was saved at 10:42.
+</qds-alert>`,
+      },
+    ],
+    'qds-tooltip': [
+      {
+        title: 'Naming icon-only buttons',
+        description:
+          'An icon-only button has no visible name. The tooltip shows one on hover and focus, and gives the button that name for assistive technology.',
+        html: `<qds-stack direction="inline" gap="200">
+  <qds-tooltip text="Add"><qds-button variant="ghost"><qds-icon name="plus" size="sm"></qds-icon></qds-button></qds-tooltip>
+  <qds-tooltip text="Search"><qds-button variant="ghost"><qds-icon name="search" size="sm"></qds-icon></qds-button></qds-tooltip>
+  <qds-tooltip text="More actions"><qds-button variant="ghost"><qds-icon name="ellipsis" size="sm"></qds-icon></qds-button></qds-tooltip>
+</qds-stack>`,
+      },
+      {
+        title: 'Placement',
+        description: 'A tooltip flips to the other side when there is not room on the one asked for.',
+        html: `<qds-stack direction="inline" gap="300" wrap>
+  <qds-tooltip text="Above" placement="top"><qds-button variant="secondary">Top</qds-button></qds-tooltip>
+  <qds-tooltip text="Below" placement="bottom"><qds-button variant="secondary">Bottom</qds-button></qds-tooltip>
+  <qds-tooltip text="To the left" placement="left"><qds-button variant="secondary">Left</qds-button></qds-tooltip>
+  <qds-tooltip text="To the right" placement="right"><qds-button variant="secondary">Right</qds-button></qds-tooltip>
+</qds-stack>`,
+      },
+    ],
+    'qds-menu': [
+      {
+        title: 'An actions menu',
+        description:
+          'Open it with a click, Enter, or Down Arrow. The arrow keys move between items, a letter jumps to an item, and Escape closes it.',
+        html: `<qds-menu id="file-menu">
+  <qds-button slot="trigger" variant="secondary">
+    Actions
+    <qds-icon slot="end" name="chevron-down" size="sm"></qds-icon>
+  </qds-button>
+  <qds-menu-item value="rename">Rename</qds-menu-item>
+  <qds-menu-item value="duplicate">Duplicate</qds-menu-item>
+  <qds-menu-item value="archive" disabled>Archive</qds-menu-item>
+  <qds-menu-item value="delete" variant="danger">Delete</qds-menu-item>
+</qds-menu>
+<p id="file-menu-result" style="margin: 0.75rem 0 0;" role="status"></p>
+<script>
+  document.getElementById('file-menu').addEventListener('qds-select', (event) => {
+    document.getElementById('file-menu-result').textContent = 'Chose: ' + event.detail.value;
+  });
+</script>`,
+      },
+      {
+        title: 'An icon-only trigger, with icons on the items',
+        html: `<qds-menu placement="bottom-end" label="More actions">
+  <qds-tooltip slot="trigger" text="More actions">
+    <qds-button variant="ghost"><qds-icon name="ellipsis" size="sm"></qds-icon></qds-button>
+  </qds-tooltip>
+  <qds-menu-item><qds-icon slot="start" name="check" size="sm"></qds-icon>Mark as done</qds-menu-item>
+  <qds-menu-item><qds-icon slot="start" name="arrow-right" size="sm"></qds-icon>Move to…</qds-menu-item>
+  <qds-menu-item variant="danger"><qds-icon slot="start" name="x" size="sm"></qds-icon>Remove</qds-menu-item>
+</qds-menu>`,
       },
     ],
   };
