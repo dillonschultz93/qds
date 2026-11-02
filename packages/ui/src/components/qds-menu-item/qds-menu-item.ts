@@ -27,6 +27,7 @@ export type QdsMenuItemVariant = 'default' | 'danger';
  * @cssprop [--qds-component-menu-item-gap] - Space between the icon and text.
  * @cssprop [--qds-component-menu-item-padding-block] - Vertical padding.
  * @cssprop [--qds-component-menu-item-padding-inline] - Horizontal padding.
+ * @cssprop [--qds-component-menu-item-border-radius] - Corner radius of the highlight.
  * @cssprop [--qds-component-menu-item-font-size] - Text size.
  * @cssprop [--qds-component-menu-item-line-height] - Text line height.
  * @cssprop [--qds-component-menu-item-color-content-{state}] - Text color: `rest`, `disabled`.
@@ -41,6 +42,7 @@ export class QdsMenuItem extends QdsElement {
     css`
       :host {
         display: block;
+        border-radius: var(--qds-component-menu-item-border-radius, 0.25rem);
         outline: none;
         cursor: pointer;
         user-select: none;
@@ -57,6 +59,7 @@ export class QdsMenuItem extends QdsElement {
         line-height: var(--qds-component-menu-item-line-height, 1.5);
         color: var(--qds-component-menu-item-color-content-rest, #0f172a);
         white-space: nowrap;
+        border-radius: inherit;
       }
 
       ::slotted([slot='start']) {

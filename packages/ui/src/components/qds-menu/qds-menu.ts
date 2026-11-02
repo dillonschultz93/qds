@@ -15,6 +15,9 @@ import '../qds-menu-item/qds-menu-item.js';
 
 export type QdsMenuPlacement = 'bottom-start' | 'bottom-end' | 'top-start' | 'top-end';
 
+/** What can be a menu's trigger: a button, a QDS button, or anything focusable. */
+const FOCUSABLE = 'button, qds-button, a[href], [tabindex]';
+
 /**
  * A menu of actions, opened by a button: the "More ⋯" menu.
  *
@@ -38,7 +41,8 @@ export type QdsMenuPlacement = 'bottom-start' | 'bottom-end' | 'top-start' | 'to
  *
  * @element qds-menu
  *
- * @slot trigger - The button that opens the menu. One element.
+ * @slot trigger - The button that opens the menu. One element: a button, or an
+ * element wrapping one, such as a `qds-tooltip` around an icon-only button.
  * @slot - The menu's `qds-menu-item` elements.
  *
  * @fires {CustomEvent<{ value: string, item: QdsMenuItem }>} qds-select - Fired
@@ -47,7 +51,7 @@ export type QdsMenuPlacement = 'bottom-start' | 'bottom-end' | 'top-start' | 'to
  * @csspart menu - The menu's box.
  *
  * @cssprop [--qds-component-menu-gap] - Distance from the trigger.
- * @cssprop [--qds-component-menu-padding-block] - Space above the first item and below the last.
+ * @cssprop [--qds-component-menu-padding] - Space between the menu's edge and its items.
  * @cssprop [--qds-component-menu-border-radius] - Corner radius.
  * @cssprop [--qds-component-menu-border-width] - Border thickness.
  * @cssprop [--qds-component-menu-box-shadow] - Elevation.
@@ -68,7 +72,12 @@ export class QdsMenu extends QdsElement {
         min-width: max-content;
         max-height: calc(100vh - 1rem);
         overflow-y: auto;
-        padding: var(--qds-component-menu-padding-block, 0.25rem) 0;
+        /*
+         * Padding on every side, and rounded items inside it: a page's own focus
+         * ring around the focused item then fits within the menu, rather than
+         * being clipped by its scrolling edge.
+         */
+        padding: var(--qds-component-menu-padding, 0.25rem);
 
         background-color: var(--qds-component-menu-color-background-rest, #f8fafc);
         border: var(--qds-component-menu-border-width, 0.0625rem) solid
@@ -132,8 +141,22 @@ export class QdsMenu extends QdsElement {
     if (returnFocus) this.#trigger?.focus();
   }
 
-  #onTriggerSlotChange(event: Event): void {
-    this.#trigger = ((event.target as HTMLSlotElement).assignedElements()[0] as HTMLElement | undefined) ?? null;
+  protected override firstUpdated(): void {
+    // Server-rendered content is already slotted when the element hydrates, so
+    // slotchange never fires for it: read the slot once, as qds-text-field does.
+    void this.updateComplete.then(() => this.#readTrigger());
+  }
+
+  #onTriggerSlotChange(): void {
+    this.#readTrigger();
+  }
+
+  #readTrigger(): void {
+    const slot = this.renderRoot.querySelector<HTMLSlotElement>('slot[name="trigger"]');
+    const slotted = slot?.assignedElements()[0] as HTMLElement | undefined;
+    // The control itself, which may be inside what was slotted: a button
+    // wrapped in a qds-tooltip. Its state and focus belong on the control.
+    this.#trigger = slotted?.matches(FOCUSABLE) ? slotted : (slotted?.querySelector<HTMLElement>(FOCUSABLE) ?? slotted ?? null);
     this.#syncTrigger();
     // The menu's default name is the trigger's text, which is only known now.
     this.requestUpdate();

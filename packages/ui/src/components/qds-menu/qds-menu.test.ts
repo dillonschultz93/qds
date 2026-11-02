@@ -1,6 +1,7 @@
 import { expect, fixture, html, oneEvent, elementUpdated } from '@open-wc/testing';
 
 import '../qds-button/qds-button.js';
+import '../qds-tooltip/qds-tooltip.js';
 import type { QdsButton } from '../qds-button/qds-button.js';
 import type { QdsMenuItem } from '../qds-menu-item/qds-menu-item.js';
 import './qds-menu.js';
@@ -168,5 +169,23 @@ describe('qds-menu', () => {
     expect(panel.top).to.be.at.least(trigger.bottom);
     expect(Math.round(panel.left)).to.equal(Math.round(trigger.left));
     menu.hide();
+  });
+
+  it('finds the button inside a wrapped trigger, such as a tooltip', async () => {
+    const menu = await fixture<QdsMenu>(html`
+      <qds-menu label="More actions">
+        <qds-tooltip slot="trigger" text="More actions"><qds-button variant="ghost"></qds-button></qds-tooltip>
+        <qds-menu-item>Rename</qds-menu-item>
+      </qds-menu>
+    `);
+    const button = menu.querySelector<QdsButton>('qds-button')!;
+    await elementUpdated(button);
+    expect(button.shadowRoot!.querySelector('button')!.getAttribute('aria-haspopup')).to.equal('menu');
+
+    button.click();
+    await elementUpdated(menu);
+    press(menu.items[0]!, 'Escape');
+    await elementUpdated(menu);
+    expect(document.activeElement === button, 'focus returns to the button').to.be.true;
   });
 });

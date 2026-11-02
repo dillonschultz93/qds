@@ -203,8 +203,19 @@ export class QdsTooltip extends QdsElement {
     });
   }
 
-  #onSlotChange(event: Event): void {
-    const element = (event.target as HTMLSlotElement).assignedElements()[0] as HTMLElement | undefined;
+  protected override firstUpdated(): void {
+    // Server-rendered content is already slotted when the element hydrates, so
+    // slotchange never fires for it: read the slot once, as qds-text-field does.
+    void this.updateComplete.then(() => this.#readTrigger());
+  }
+
+  #onSlotChange(): void {
+    this.#readTrigger();
+  }
+
+  #readTrigger(): void {
+    const slot = this.renderRoot.querySelector<HTMLSlotElement>('slot:not([name])');
+    const element = slot?.assignedElements()[0] as HTMLElement | undefined;
     if (element === this.#trigger) return;
     this.#removeText();
     this.#trigger = element ?? null;
