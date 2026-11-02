@@ -67,7 +67,7 @@ export default async function () {
               summary: 'The three token tiers, and every token with its value in each mode.',
             },
             {
-              title: 'Nomenclature',
+              title: 'Tokens Nomenclature',
               url: '/foundations/nomenclature/',
               summary: 'The grammar that names every token: each tier\u2019s anatomy, its vocabularies, and how the build enforces them.',
             },
