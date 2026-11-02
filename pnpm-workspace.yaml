@@ -6,3 +6,8 @@ packages:
 allowBuilds:
   esbuild: true
   rs-module-lexer: true
+  # From wrangler, which deploys the docs to Cloudflare. workerd is the local
+  # Workers runtime that `wrangler dev` runs the site in; sharp is only used by
+  # an image-processing feature the docs do not use.
+  sharp: false
+  workerd: true
