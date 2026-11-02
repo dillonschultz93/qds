@@ -1,0 +1,9 @@
+---
+permalink: /_redirects
+eleventyExcludeFromCollections: true
+---
+# Old addresses, and where they live now. Generated from _data/docs.js.
+# Cloudflare Workers reads _redirects from the assets directory and serves
+# these as permanent redirects; the file itself is not served.
+{% for pair in docs.redirects %}{{ pair[0] }} {{ pair[1] }} 301
+{% endfor %}

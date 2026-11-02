@@ -1,0 +1,41 @@
+{#
+  The current section's pages, as Material's and Spectrum's left navigation.
+  Component categories are qds-accordion-items, open by default. Below 64rem
+  the whole list folds behind a disclosure: it opens on wide screens from the
+  inline script below, before first paint, so a desktop reader never sees it
+  closed.
+#}
+<details class="sidebar" id="sidebar">
+  <summary class="sidebar__toggle">{{ section.title }} pages</summary>
+  <nav class="sidebar__nav" aria-label="{{ section.title }}">
+    <a class="sidebar__home" href="{{ section.url }}"{% if page.url == section.url %} aria-current="page"{% endif %}>{{ section.title }} overview</a>
+    {% for group in section.groups %}
+      {% set list %}
+        <ul class="sidebar__list">
+          {% for item in group.pages %}
+            <li>
+              <a href="{{ item.url }}"{% if page.url | startsWith(item.url) %} aria-current="page"{% endif %}>
+                {{ item.title }}
+                {% if item.status %}<qds-chip variant="info">{{ item.status }}</qds-chip>{% endif %}
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      {% endset %}
+      {% if group.title %}
+        <qds-accordion-item class="sidebar__group" heading="{{ group.title }}" heading-level="2" open>{{ list | safe }}</qds-accordion-item>
+      {% else %}
+        {{ list | safe }}
+      {% endif %}
+    {% endfor %}
+  </nav>
+</details>
+<script>
+  (function () {
+    var sidebar = document.getElementById('sidebar');
+    var wide = window.matchMedia('(min-width: 64rem)');
+    var sync = function () { sidebar.open = wide.matches; };
+    sync();
+    wide.addEventListener('change', sync);
+  })();
+</script>

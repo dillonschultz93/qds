@@ -1,0 +1,18 @@
+{#
+  The top of a component page: its status, and the Overview / API tabs.
+
+  The tabs are links between two pages, as Material's component tabs are, not a
+  qds-tabs: each has its own URL, so search results and shared links can point at
+  either. They are styled with qds-tabs' own component tokens, so they look like
+  the component without pretending to be one.
+#}
+<div class="component-meta">
+  <qds-chip variant="success">Stable</qds-chip>
+  <span>Since <code>@quieto/ui</code> {{ family.since }}</span>
+  <span>{{ family.category }}</span>
+</div>
+
+<nav class="page-tabs" aria-label="{{ family.name }} documentation">
+  <a href="{{ family.url }}"{% if page.url == family.url %} aria-current="page"{% endif %}>Overview</a>
+  <a href="{{ family.apiUrl }}"{% if page.url == family.apiUrl %} aria-current="page"{% endif %}>API</a>
+</nav>

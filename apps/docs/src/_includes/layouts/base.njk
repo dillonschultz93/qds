@@ -32,24 +32,30 @@
     <script type="module" src="/assets/ui.js"></script>
     <script type="module" src="/assets/theme-toggle.js"></script>
     <script type="module" src="/assets/search.js"></script>
+    <script type="module" src="/assets/page-contents.js"></script>
   </head>
 
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
+
+    {% set section = docs.sections | sectionFor(page.url) %}
 
     <header class="site-header">
       <a class="site-header__brand" href="/">{{ site.shortTitle }}</a>
 
       <nav class="site-nav" aria-label="Main">
         <ul>
-          {% for item in site.nav %}
+          {% for item in docs.sections %}
             <li>
               <a
                 href="{{ item.url }}"
-                {% if page.url == item.url %}aria-current="page"{% endif %}
-              >{{ item.text }}</a>
+                {% if page.url == item.url %}aria-current="page"{% elif section and section.key == item.key %}aria-current="true"{% endif %}
+              >{{ item.title }}</a>
             </li>
           {% endfor %}
+          <li>
+            <a href="/roadmap/"{% if page.url == '/roadmap/' %} aria-current="page"{% endif %}>Roadmap</a>
+          </li>
         </ul>
       </nav>
 
@@ -72,11 +78,24 @@
       </div>
     </header>
 
-    <main id="main" class="prose">
-      {% if title %}<h1>{{ title }}</h1>{% endif %}
-      {% if description %}<p class="lede">{{ description }}</p>{% endif %}
-      {{ content | safe }}
-    </main>
+    {#
+      Three columns where there is room, as Material and Spectrum lay out their
+      docs: the section's pages, the content, and the page's own contents. The
+      contents list is filled in at build time from the page's h2s (see the
+      page-contents transform in eleventy.config.js), and dropped when there are
+      fewer than two.
+    #}
+    <div class="page{% if section %} page--sectioned{% endif %}{% if wide %} page--wide{% endif %}">
+      {% if section %}{% include "partials/sidebar.njk" %}{% endif %}
+
+      <main id="main" class="prose">
+        {% if title and not hideTitle %}<h1>{{ title }}</h1>{% endif %}
+        {% if description and not hideTitle %}<p class="lede">{{ description }}</p>{% endif %}
+        {{ content | safe }}
+      </main>
+
+      {% if toc != false %}<!-- page-contents -->{% endif %}
+    </div>
 
     <qds-modal id="search" heading="Search the docs" light-dismiss>
       <div class="search">

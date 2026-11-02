@@ -17,7 +17,9 @@ import loadComponents from './components.js';
 const BUDGET = 30;
 
 /**
- * Every component, shipped or planned. `since` is the @quieto/ui version a
+ * Every component, shipped or planned. `category` groups it in the docs'
+ * component navigation, as Spectrum's and Material's sidebars group theirs.
+ * `since` is the @quieto/ui version a
  * component first shipped in, and `what` a one-line description for the
  * roadmap — the manifest's own descriptions open with API detail, not a
  * summary. `tier` and `why` are for planned components, and stay as a record
@@ -25,64 +27,64 @@ const BUDGET = 30;
  */
 const COMPONENTS = [
   // ── Shipped ────────────────────────────────────────────────────────────────
-  { name: 'Accordion', elements: ['qds-accordion', 'qds-accordion-item'], since: '0.1.0',
+  { name: 'Accordion', category: 'Containment', elements: ['qds-accordion', 'qds-accordion-item'], since: '0.1.0',
     what: 'Collapsible sections, optionally exclusive so only one is open.' },
-  { name: 'Button', elements: ['qds-button'], since: '0.1.0',
+  { name: 'Button', category: 'Actions', elements: ['qds-button'], since: '0.1.0',
     what: 'A button: four variants, three sizes, and a loading state. Submits forms.' },
-  { name: 'Card', elements: ['qds-card'], since: '0.1.0',
+  { name: 'Card', category: 'Containment', elements: ['qds-card'], since: '0.1.0',
     what: 'A container with media, header, body, and footer regions.' },
-  { name: 'Checkbox', elements: ['qds-checkbox'], since: '0.1.0',
+  { name: 'Checkbox', category: 'Inputs', elements: ['qds-checkbox'], since: '0.1.0',
     what: 'A checkbox, including the indeterminate state.' },
-  { name: 'Chip', elements: ['qds-chip'], since: '0.1.0',
+  { name: 'Chip', category: 'Actions', elements: ['qds-chip'], since: '0.1.0',
     what: 'A compact status or category label. Removable, or selectable as a filter chip.' },
-  { name: 'Input', elements: ['qds-input'], since: '0.1.0',
+  { name: 'Input', category: 'Inputs', elements: ['qds-input'], since: '0.1.0',
     what: 'A bare single-line text input, named by its label attribute.' },
-  { name: 'Modal', elements: ['qds-modal'], since: '0.1.0',
+  { name: 'Modal', category: 'Containment', elements: ['qds-modal'], since: '0.1.0',
     what: 'A modal dialog, built on the native dialog element.' },
-  { name: 'Progress bar', elements: ['qds-progress-bar'], since: '0.1.0',
+  { name: 'Progress bar', category: 'Feedback', elements: ['qds-progress-bar'], since: '0.1.0',
     what: 'Determinate or indeterminate progress.' },
-  { name: 'Radio group', elements: ['qds-radio-group', 'qds-radio'], since: '0.1.0',
+  { name: 'Radio group', category: 'Inputs', elements: ['qds-radio-group', 'qds-radio'], since: '0.1.0',
     what: 'A set of options of which one is chosen.' },
-  { name: 'Stack', elements: ['qds-stack'], since: '0.1.0',
+  { name: 'Stack', category: 'Layout', elements: ['qds-stack'], since: '0.1.0',
     what: 'Lays its children out with gaps from the spacing scale.' },
-  { name: 'Tabs', elements: ['qds-tabs', 'qds-tab', 'qds-tab-panel'], since: '0.1.0',
+  { name: 'Tabs', category: 'Navigation', elements: ['qds-tabs', 'qds-tab', 'qds-tab-panel'], since: '0.1.0',
     what: 'Tabs, each showing one panel.' },
-  { name: 'Text field', elements: ['qds-text-field'], since: '0.1.0',
+  { name: 'Text field', category: 'Inputs', elements: ['qds-text-field'], since: '0.1.0',
     what: 'A complete text field: visible label, input, hint, and error message.' },
-  { name: 'Toggle', elements: ['qds-toggle'], since: '0.1.0',
+  { name: 'Toggle', category: 'Inputs', elements: ['qds-toggle'], since: '0.1.0',
     what: 'An on/off switch, for settings that apply immediately.' },
 
   // ── Tier 1: gaps that block ordinary product screens ───────────────────────
   {
-    name: 'Icon',
+    name: 'Icon', category: 'Display',
     elements: ['qds-icon'],
     tier: 1,
     why: 'Every icon in the library today is a typed character (+, →, ✓). Buttons, chips, inputs, alerts, and menus all need real icons, so this comes first.',
     needs: ['A choice of icon set', 'Icon size tokens'],
   },
   {
-    name: 'Select',
+    name: 'Select', category: 'Inputs',
     elements: ['qds-select'],
     tier: 1,
     why: 'The most common form control still missing. Wraps the native select, keeping its accessibility and the mobile pickers.',
     needs: [],
   },
   {
-    name: 'Alert',
+    name: 'Alert', category: 'Feedback',
     elements: ['qds-alert'],
     tier: 1,
     why: 'Inline info, success, warning, and error messages: a form-level error, a "saved" notice. The status roles, error included, exist for exactly this.',
     needs: ['Announcements to assistive technology'],
   },
   {
-    name: 'Tooltip',
+    name: 'Tooltip', category: 'Feedback',
     elements: ['qds-tooltip'],
     tier: 1,
     why: 'An icon-only button needs a visible label on hover and focus, not just an accessible name.',
     needs: ['Floating panels', 'An inverse background role'],
   },
   {
-    name: 'Menu',
+    name: 'Menu', category: 'Actions',
     elements: ['qds-menu', 'qds-menu-item'],
     tier: 1,
     why: 'Action menus: the "More ⋯" button. Shares the floating-panel foundation with Tooltip, so the two are cheaper built together.',
@@ -91,42 +93,42 @@ const COMPONENTS = [
 
   // ── Tier 2: common, and cheap once Tier 1 exists ───────────────────────────
   {
-    name: 'Toast',
+    name: 'Toast', category: 'Feedback',
     elements: ['qds-toast'],
     tier: 2,
     why: 'Short-lived confirmations ("Saved", "Copied") that screen readers announce without moving focus.',
     needs: ['Announcements to assistive technology'],
   },
   {
-    name: 'Checkbox group',
+    name: 'Checkbox group', category: 'Inputs',
     elements: ['qds-checkbox-group'],
     tier: 2,
     why: 'Radios have a group with a label and required; checkboxes do not. A set of checkboxes has no group label, no "pick at least one", and no group error.',
     needs: [],
   },
   {
-    name: 'Spinner',
+    name: 'Spinner', category: 'Feedback',
     elements: ['qds-spinner'],
     tier: 2,
     why: 'A standalone loading indicator. The button already draws one inside itself, so this mostly lifts it out.',
     needs: [],
   },
   {
-    name: 'Avatar',
+    name: 'Avatar', category: 'Display',
     elements: ['qds-avatar'],
     tier: 2,
     why: 'A person’s image with an initials fallback. Common in nearly every app.',
     needs: [],
   },
   {
-    name: 'Breadcrumbs',
+    name: 'Breadcrumbs', category: 'Navigation',
     elements: ['qds-breadcrumbs'],
     tier: 2,
     why: 'Navigation through a hierarchy. Small, with a well-defined accessible pattern.',
     needs: [],
   },
   {
-    name: 'Pagination',
+    name: 'Pagination', category: 'Navigation',
     elements: ['qds-pagination'],
     tier: 2,
     why: 'Moving through long lists and tables.',

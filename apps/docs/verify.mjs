@@ -17,7 +17,7 @@
  */
 
 import { createServer } from 'node:http';
-import { readFile, stat } from 'node:fs/promises';
+import { readdir, readFile, stat } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { dirname, join, normalize, extname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -55,6 +55,12 @@ const port = await new Promise((resolve) => {
 });
 
 const BASE = `http://127.0.0.1:${port}`;
+
+/** Every page the build wrote, as a URL path: what the console sweep visits. */
+const builtPages = (await readdir(SITE, { recursive: true }))
+  .filter((file) => file.endsWith('index.html') || file === '404.html')
+  .map((file) => '/' + file.replace(/index\.html$/, ''))
+  .sort();
 const results = [];
 const check = (name, pass, detail = '') => {
   results.push({ name, pass, detail });
@@ -87,7 +93,7 @@ const gotoReady = async (path) => {
 };
 
 // ── 1. Component page: SSR + styling ───────────────────────────────────────────
-await gotoReady('/components/qds-button/');
+await gotoReady('/components/button/');
 
 const dsd = await page.evaluate(() => {
   const el = document.querySelector('qds-button');
@@ -151,8 +157,11 @@ check('component-tier variable is defined at document level',
 
 // ── 2. Theme toggle ────────────────────────────────────────────────────────────
 const readTheme = () =>
-  page.evaluate(() => {
+  page.evaluate(async () => {
     const btn = document.querySelector('qds-button').shadowRoot.querySelector('button');
+    // The button transitions its colors; read once that has finished, or a read
+    // can land at the start of the transition and still see the old theme.
+    await Promise.all(btn.getAnimations().map((animation) => animation.finished));
     return {
       theme: document.documentElement.dataset.theme ?? 'system',
       bodyBg: getComputedStyle(document.body).backgroundColor,
@@ -191,27 +200,27 @@ check('dark mode reaches inside shadow DOM (button recoloured)',
   `button bg ${light.buttonBg} → ${dark.buttonBg}`);
 
 // ── 3. API tables generated from the manifest ─────────────────────────────────
+// On the component's API page, one section per element, each table under an
+// h3 whose id is prefixed with the element (qds-button-properties).
+await gotoReady('/components/button/api/');
 const api = await page.evaluate(() => {
-  const headings = [...document.querySelectorAll('h2')].map((h) => h.textContent.trim());
-  const rowsUnder = (text) => {
-    const h = [...document.querySelectorAll('h2')].find((x) => x.textContent.trim() === text);
-    if (!h) return 0;
-    let n = h.nextElementSibling;
+  const rowsUnder = (id) => {
+    let n = document.getElementById(id)?.nextElementSibling;
     while (n && n.tagName !== 'DIV') n = n.nextElementSibling;
     return n?.querySelectorAll('tbody tr').length ?? 0;
   };
   return {
-    headings,
-    properties: rowsUnder('Properties'),
-    slots: rowsUnder('Slots'),
-    events: rowsUnder('Events'),
-    cssProps: rowsUnder('CSS custom properties'),
-    firstProp: document.querySelector('tbody tr th code')?.textContent,
+    properties: rowsUnder('qds-button-properties'),
+    slots: rowsUnder('qds-button-slots'),
+    events: rowsUnder('qds-button-events'),
+    cssProps: rowsUnder('qds-button-tokens'),
   };
 });
 check('API tables populated from custom-elements.json',
   api.properties >= 6 && api.slots === 3 && api.events === 1 && api.cssProps >= 8,
   `properties=${api.properties} slots=${api.slots} events=${api.events} cssProps=${api.cssProps}`);
+
+await gotoReady('/components/button/');
 
 // ── 4. Interaction: qds-click and loading guard ───────────────────────────────
 const interaction = await page.evaluate(async () => {
@@ -257,7 +266,7 @@ check('a shadow-DOM button submits the form around it',
   formResult.output === 'Submitted', `output="${formResult.output}"`);
 
 // ── 6. Tokens page: reference chains ─────────────────────────────────────────
-await gotoReady('/tokens/');
+await gotoReady('/foundations/tokens/');
 const chains = await page.evaluate(() => {
   const chainLists = [...document.querySelectorAll('.chain')];
   const threeStep = chainLists.filter((c) => c.querySelectorAll('li').length >= 4);
@@ -275,8 +284,8 @@ check('token page renders full reference chains',
   chains.threeStep > 0 && chains.swatches > 100,
   `chains=${chains.total} full-depth=${chains.threeStep} swatches=${chains.swatches}\n    e.g. ${chains.sample.join('  ')}`);
 
-// ── 7. Nomenclature page: vocab tables + inline anatomy SVG ──────────────────
-await gotoReady('/nomenclature/');
+// ── 7. The naming spec, on the Tokens page: inline anatomy SVG ───────────────
+await gotoReady('/foundations/tokens/');
 const nomen = await page.evaluate(() => {
   const svgs = [...document.querySelectorAll('.anatomy svg')];
   return {
@@ -290,7 +299,7 @@ const nomen = await page.evaluate(() => {
     brokenWikilinks: (document.body.textContent.match(/!\[\[/g) || []).length,
   };
 });
-check('nomenclature page inlines all three anatomy diagrams',
+check('the Tokens page inlines all three anatomy diagrams',
   nomen.anatomyCount === 3 && nomen.inlined,
   `count=${nomen.anatomyCount} widths=${nomen.svgWidths}`);
 check('no unrendered Obsidian wikilinks remain', nomen.brokenWikilinks === 0);
@@ -319,7 +328,7 @@ check('inlined anatomy SVG follows the page theme toggle',
  * slotchange arrives. A group that only synced on slotchange showed nothing
  * checked and stayed enabled when disabled. Only a hydrated page shows it.
  */
-await gotoReady('/components/qds-radio-group/');
+await gotoReady('/components/radio-group/');
 const radioSync = await page.evaluate(() => {
   const groups = [...document.querySelectorAll('qds-radio-group')];
   const valued = groups.find((g) => g.getAttribute('value') === 'standard');
@@ -337,7 +346,7 @@ check('qds-radio-group syncs its options after hydration',
  * A slotted hint is already assigned when the server-rendered field hydrates, so
  * no slotchange arrives. A field that only checked on slotchange kept it hidden.
  */
-await gotoReady('/components/qds-text-field/');
+await gotoReady('/components/text-field/');
 const slottedHint = await page.evaluate(() => {
   const field = [...document.querySelectorAll('qds-text-field')].find((f) =>
     f.querySelector('[slot="hint"]'),
@@ -352,7 +361,7 @@ check('qds-text-field shows a slotted hint after hydration',
   slottedHint.visible && slottedHint.describedBy === 'hint', JSON.stringify(slottedHint));
 
 // ── Chip: remove example ─────────────────────────────────────────────────────
-await gotoReady('/components/qds-chip/');
+await gotoReady('/components/chip/');
 const chipRemoval = await page.evaluate(() => {
   const list = document.getElementById('filters');
   const before = list.querySelectorAll('qds-chip').length;
@@ -374,7 +383,7 @@ check('a disabled filter chip does not change on hover',
   fillAtRest === fillHovered, JSON.stringify({ fillAtRest, fillHovered }));
 
 // ── Accordion: interaction after hydration ───────────────────────────────────
-await gotoReady('/components/qds-accordion/');
+await gotoReady('/components/accordion/');
 const accordionToggle = await page.evaluate(() => {
   const exclusive = document.querySelector('qds-accordion[exclusive]');
   const items = [...exclusive.querySelectorAll('qds-accordion-item')];
@@ -390,7 +399,7 @@ check('qds-accordion opens an item on click and closes the others when exclusive
  * has to be resolved without slotchange. Panels are hidden until it is, so a
  * failure shows up as every panel hidden.
  */
-await gotoReady('/components/qds-tabs/');
+await gotoReady('/components/tabs/');
 const tabsState = await page.evaluate(async () => {
   const [basic, initial] = document.querySelectorAll('qds-tabs');
   const visible = (tabs) =>
@@ -412,7 +421,7 @@ check('qds-tabs shows the selected panel after hydration, and switches on click'
  * The native dialog supplies Escape, inertness, and focus return. Driven with a
  * real key press, since a synthetic event exercises none of them.
  */
-await gotoReady('/components/qds-modal/');
+await gotoReady('/components/modal/');
 const opener = page.locator('qds-button', { hasText: 'Delete project' }).first();
 await opener.click();
 await page.waitForFunction(() => document.getElementById('delete-modal').open);
@@ -461,11 +470,18 @@ const openAfterBackdrop = await page
 check('qds-modal light dismiss: a border click keeps it open, a backdrop click closes it',
   openAfterBorder && !openAfterBackdrop, JSON.stringify({ openAfterBorder, openAfterBackdrop }));
 
-// ── Component summaries are escaped exactly once ─────────────────────────────
-await gotoReady('/components/qds-modal/');
-const lede = await page.evaluate(() => document.querySelector('.lede')?.textContent ?? '');
-check('component page summaries are not double-escaped',
-  lede.includes('<dialog>') && !lede.includes('&lt;'), lede.slice(0, 120));
+// ── Component descriptions are escaped exactly once ──────────────────────────
+// The modal's description mentions <dialog>: double-escaping printed "&lt;dialog&gt;".
+await gotoReady('/components/modal/');
+const about = await page.evaluate(() => {
+  const heading = document.getElementById('about');
+  let text = '';
+  for (let n = heading?.nextElementSibling; n && n.tagName === 'P'; n = n.nextElementSibling) text += n.textContent;
+  return { text, meta: document.querySelector('meta[name="description"]')?.getAttribute('content') ?? '' };
+});
+check('component descriptions are not double-escaped',
+  about.text.includes('<dialog>') && !about.text.includes('&lt;') && !about.meta.includes('&amp;'),
+  about.text.slice(0, 120));
 
 // ── Focus ring: drawn, and following the semantic token ─────────────────────
 /**
@@ -496,9 +512,9 @@ const ringColor = async (path, tag, ringSelector) => {
   );
 };
 const rings = {
-  button: await ringColor('/components/qds-button/', 'qds-button', 'button'),
-  checkbox: await ringColor('/components/qds-checkbox/', 'qds-checkbox', '.control'),
-  tab: await ringColor('/components/qds-tabs/', 'qds-tab', null),
+  button: await ringColor('/components/button/', 'qds-button', 'button'),
+  checkbox: await ringColor('/components/checkbox/', 'qds-checkbox', '.control'),
+  tab: await ringColor('/components/tabs/', 'qds-tab', null),
 };
 check('focus rings appear on keyboard focus and follow the semantic focus color',
   Object.values(rings).every((color) => color === 'rgb(1, 2, 3)'), JSON.stringify(rings));
@@ -533,9 +549,9 @@ await page.keyboard.type('toggle');
 await page.waitForFunction(() => document.querySelectorAll('.search__option').length > 0);
 const firstResult = await page.evaluate(() => document.querySelector('.search__option .search__title').textContent);
 await page.keyboard.press('Enter');
-await page.waitForURL('**/components/qds-toggle/');
+await page.waitForURL('**/components/toggle/');
 check('search opens on "/", ranks the component first, and Enter goes to it',
-  firstResult === '<qds-toggle>' && page.url().endsWith('/components/qds-toggle/'), firstResult);
+  firstResult === 'Toggle' && page.url().endsWith('/components/toggle/'), firstResult);
 
 // A token result lands on its own row.
 await gotoReady('/');
@@ -544,14 +560,23 @@ await page.waitForFunction(() => document.activeElement?.id === 'search-input');
 await page.keyboard.type('background primary rest');
 await page.waitForFunction(() => document.querySelectorAll('.search__option').length > 0);
 await page.keyboard.press('Enter');
-await page.waitForURL('**/tokens/#qds-semantic-color-background-primary-rest');
-const landed = await page.evaluate(() => document.querySelector(':target')?.id);
-check('a token search result lands on that token\'s row',
-  landed === 'qds-semantic-color-background-primary-rest', String(landed));
+await page.waitForURL('**/foundations/tokens/#qds-semantic-color-background-primary-rest');
+// The row is in the Semantic tab: token-reference.js has to open it.
+await page.waitForFunction(() => {
+  const row = document.querySelector(':target');
+  return row && row.getBoundingClientRect().height > 0;
+});
+const landed = await page.evaluate(() => ({
+  id: document.querySelector(':target')?.id,
+  tab: document.querySelector('qds-tab[selected]')?.dataset.tier,
+}));
+check('a token search result opens its tier\'s tab and lands on its row',
+  landed.id === 'qds-semantic-color-background-primary-rest' && landed.tab === 'semantic',
+  JSON.stringify(landed));
 
 // "/" typed into a component's input is text, not the shortcut. The keypress
 // is retargeted to the component host, which is not itself an input.
-await gotoReady('/components/qds-text-field/');
+await gotoReady('/components/text-field/');
 await page.locator('qds-text-field').first().click();
 await page.keyboard.type('a/b');
 const typed = await page.evaluate(() => ({
@@ -585,8 +610,70 @@ check('"/" typed in a qds-text-field stays in the field',
     rendered.join() === expected.join(), `${rendered.length} shipped`);
 }
 
+// ── Information architecture ─────────────────────────────────────────────────
+/**
+ * Every old address in _redirects must lead to a page that exists, and every
+ * element that used to have its own page must have a redirect — or a link
+ * someone saved before the restructure ends in a 404.
+ */
+{
+  const lines = (await readFile(join(SITE, '_redirects'), 'utf8'))
+    .split('\n')
+    .filter((line) => line.trim() && !line.startsWith('#'));
+  const pairs = lines.map((line) => line.trim().split(/\s+/));
+  const dangling = pairs.filter(([, to]) => !builtPages.includes(to)).map(([from, to]) => `${from} → ${to}`);
+  const manifest = JSON.parse(await readFile(require.resolve('@quieto/ui/custom-elements.json'), 'utf8'));
+  const tags = manifest.modules.flatMap((mod) => mod.declarations ?? []).map((d) => d.tagName).filter(Boolean);
+  const missing = tags.filter((tag) => !pairs.some(([from]) => from === `/components/${tag}/`));
+  check('every old address redirects to a page that exists',
+    pairs.length > 0 && dangling.length === 0 && missing.length === 0,
+    [...dangling, ...missing.map((tag) => `no redirect for /components/${tag}/`)].join(', ') || `${pairs.length} redirects`);
+}
+
+// The sidebar marks the page being read, and long pages list their sections.
+await gotoReady('/components/tabs/api/');
+const chrome = await page.evaluate(() => ({
+  sidebarCurrent: document.querySelector('.sidebar [aria-current="page"]')?.textContent.trim(),
+  headerCurrent: document.querySelector('.site-nav [aria-current]')?.textContent.trim(),
+  tabCurrent: document.querySelector('.page-tabs [aria-current="page"]')?.textContent.trim(),
+  contents: [...document.querySelectorAll('.page-contents a')].map((a) => a.textContent.trim()),
+}));
+check('a component API page marks its place in the header, sidebar, and tabs, and lists its sections',
+  chrome.sidebarCurrent === 'Tabs' && chrome.headerCurrent === 'Components' && chrome.tabCurrent === 'API' &&
+    chrome.contents.join() === '<qds-tabs>,<qds-tab>,<qds-tab-panel>',
+  JSON.stringify(chrome));
+
+// The token reference filter narrows every tier, and switches to one with matches.
+await gotoReady('/foundations/tokens/');
+await page.locator('#token-filter').click();
+await page.keyboard.type('button primary background rest');
+await page.waitForFunction(() => document.getElementById('token-filter-status').textContent.includes('match'));
+const filtered = await page.evaluate(() => ({
+  status: document.getElementById('token-filter-status').textContent,
+  counts: [...document.querySelectorAll('qds-tab .tab-count')].map((c) => c.textContent),
+  tab: document.querySelector('qds-tab[selected]')?.dataset.tier,
+  visible: [...document.querySelectorAll('qds-tab-panel[active] tbody tr:not([hidden])')].map((r) => r.id),
+}));
+check('the token filter narrows every tier and opens the one with matches',
+  filtered.counts.join() === '0,0,1' && filtered.tab === 'component' &&
+    filtered.visible.join() === 'qds-component-button-primary-color-background-rest',
+  JSON.stringify(filtered));
+
+// Every color role meets its contrast minimum, in both modes. The ratios are
+// computed at build time from the shipped values; a failure here is a token
+// that is not accessible, not a page bug.
+await gotoReady('/styles/color/');
+const contrast = await page.evaluate(() => ({
+  judged: document.querySelectorAll('.role-state__contrast qds-chip').length,
+  failing: [...document.querySelectorAll('.role-state__contrast qds-chip[variant="error"]')].map((chip) =>
+    `${chip.closest('.role-state').querySelector('code').textContent} ${chip.textContent.trim()}`),
+}));
+check('every content and border role meets its contrast minimum in both modes',
+  contrast.judged > 20 && contrast.failing.length === 0,
+  contrast.failing.join('; ') || `${contrast.judged} ratios, all passing`);
+
 // ── 8. Console cleanliness across every page ─────────────────────────────────
-for (const path of ['/', '/tokens/', '/components/', '/components/qds-stack/', '/components/qds-checkbox/', '/components/qds-radio-group/', '/components/qds-radio/', '/components/qds-toggle/', '/components/qds-input/', '/components/qds-text-field/', '/components/qds-chip/', '/components/qds-card/', '/components/qds-progress-bar/', '/components/qds-accordion/', '/components/qds-accordion-item/', '/components/qds-tabs/', '/components/qds-tab/', '/components/qds-tab-panel/', '/components/qds-modal/', '/roadmap/', '/404.html']) {
+for (const path of builtPages) {
   await gotoReady(path);
 }
 check('no console errors on any page', consoleErrors.length === 0,

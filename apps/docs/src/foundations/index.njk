@@ -1,0 +1,10 @@
+---
+layout: layouts/base.njk
+title: Foundations
+toc: false
+eleventyComputed:
+  description: "{{ (docs.sections | sectionFor('/foundations/')).summary }}"
+---
+
+{% set section = docs.sections | sectionFor('/foundations/') %}
+{% include "partials/section-cards.njk" %}
