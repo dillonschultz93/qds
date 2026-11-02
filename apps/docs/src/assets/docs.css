@@ -1314,3 +1314,31 @@ p > qds-chip:first-child {
     border-inline-start: var(--qds-semantic-border-default) solid var(--qds-semantic-color-border-subtle);
   }
 }
+
+/* ── Component tokens list (Tokens page) ──────────────────────────────────── */
+
+.token-components {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(12rem, 100%), 1fr));
+  gap: var(--qds-spacing-200);
+  margin: 0 0 var(--qds-spacing-600);
+  padding: 0;
+  list-style: none;
+}
+
+.token-components li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--qds-spacing-200);
+  margin: 0;
+  padding: var(--qds-spacing-200) var(--qds-spacing-300);
+  border: var(--qds-semantic-border-default) solid var(--qds-semantic-color-border-subtle);
+  border-radius: var(--qds-semantic-radius-default);
+}
+
+.token-components__count {
+  font-size: var(--qds-typography-font-size-100);
+  font-variant-numeric: tabular-nums;
+  color: var(--qds-semantic-color-content-subtle);
+}

@@ -1,0 +1,71 @@
+{#
+  A table of tokens: name, value in each mode (with a swatch for colors), and
+  the reference chain each resolves through. Expects `rows`, a list of tokens
+  from _data/tokens.js. Shared by the Tokens page and each component's Tokens
+  tab, so a token reads the same wherever it is listed.
+#}
+<div class="table-scroll">
+  <table>
+    <thead>
+      <tr>
+        <th scope="col">Token</th>
+        {% for mode in tokens.modes %}
+          <th scope="col">{{ mode | capitalize }}</th>
+        {% endfor %}
+        <th scope="col">Resolves through</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for token in rows %}
+        <tr id="{{ token.name }}">
+          <th scope="row" class="token-name">
+            --{{ token.name }}
+            {% if token.description %}
+              <br /><small>{{ token.description }}</small>
+            {% endif %}
+          </th>
+
+          {% for mode in tokens.modes %}
+            <td>
+              {% if token.isColor %}
+                <span class="swatch" title="{{ token.modes[mode] }}">
+                  <span
+                    class="swatch__fill"
+                    style="background: {{ token.modes[mode] }}"
+                  ></span>
+                </span>
+              {% endif %}
+              <code>{{ token.modes[mode] | tokenValue }}</code>
+            </td>
+          {% endfor %}
+
+          <td>
+            {% if token.compositeReferences %}
+              <ul class="chain">
+                {% for reference in token.compositeReferences %}
+                  <li><code>--{{ reference }}</code></li>
+                {% endfor %}
+              </ul>
+            {% elif token.chains.light | length > 1 %}
+              <ul class="chain">
+                {% for step in token.chains.light %}
+                  <li>
+                    {% if step.tier %}
+                      <span class="tier-badge" data-tier="{{ step.tier }}">{{ step.tier | truncate(4, true, "") }}</span>
+                    {% endif %}
+                    <code>--{{ step.name }}</code>
+                  </li>
+                {% endfor %}
+                <li class="chain__raw">
+                  <code>{{ token.modes.light | tokenValue }}</code>
+                </li>
+              </ul>
+            {% else %}
+              <span class="chain__raw">raw value</span>
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

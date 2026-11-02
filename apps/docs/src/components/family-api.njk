@@ -107,9 +107,9 @@ eleventyComputed:
   {% if member.cssProperties | length %}
     <h3 id="{{ member.tagName }}-tokens">CSS custom properties</h3>
     <p>
-      These are the component-tier tokens this element reads. Overriding one is the
-      supported way to restyle it — and they are the same variables
-      <a href="/foundations/tokens/#token-reference">the token reference</a> defines.
+      The patterns of component tokens this element reads. Every one, with its
+      values, is on the <a href="{{ family.tokensUrl }}">Tokens</a> tab; overriding
+      one is the supported way to restyle the component.
     </p>
     <div class="table-scroll">
       <table>

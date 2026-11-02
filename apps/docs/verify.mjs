@@ -647,7 +647,7 @@ check('a component API page marks its place in the header, sidebar, and tabs, an
 // The token reference filter narrows every tier, and switches to one with matches.
 await gotoReady('/foundations/tokens/');
 await page.locator('#token-filter').click();
-await page.keyboard.type('button primary background rest');
+await page.keyboard.type('semantic background primary rest');
 await page.waitForFunction(() => document.getElementById('token-filter-status').textContent.includes('match'));
 const filtered = await page.evaluate(() => ({
   status: document.getElementById('token-filter-status').textContent,
@@ -656,8 +656,8 @@ const filtered = await page.evaluate(() => ({
   visible: [...document.querySelectorAll('qds-tab-panel[active] tbody tr:not([hidden])')].map((r) => r.id),
 }));
 check('the token filter narrows every tier and opens the one with matches',
-  filtered.counts.join() === '0,0,1' && filtered.tab === 'component' &&
-    filtered.visible.join() === 'qds-component-button-primary-color-background-rest',
+  filtered.counts.join() === '0,1' && filtered.tab === 'semantic' &&
+    filtered.visible.join() === 'qds-semantic-color-background-primary-rest',
   JSON.stringify(filtered));
 
 // Every color role meets its contrast minimum, in both modes. The ratios are
@@ -759,6 +759,50 @@ const wrongLinks = roadmapLinks.filter(([name, href]) => href !== `/components/$
 check('each shipped component on the roadmap links to its own page',
   roadmapLinks.length > 0 && wrongLinks.length === 0,
   wrongLinks.map(([name, href]) => `${name} → ${href}`).join(', ') || `${roadmapLinks.length} links`);
+
+// ── Component tokens live on their components' pages ─────────────────────────
+/**
+ * Every component token is listed on exactly one component's Tokens tab, and
+ * none is left on the Tokens page: the move must not lose or duplicate a token.
+ */
+{
+  const { tokens: manifestTokens } = await import('@quieto/design-tokens');
+  const expected = manifestTokens.filter((token) => token.tier === 'component').map((token) => token.name);
+  const seen = new Map();
+  for (const path of builtPages.filter((p) => p.endsWith('/tokens/'))) {
+    const html = await readFile(join(SITE, path, 'index.html'), 'utf8');
+    for (const [, id] of html.matchAll(/<tr id="(qds-component-[^"]+)"/g)) {
+      seen.set(id, [...(seen.get(id) ?? []), path]);
+    }
+  }
+  const missing = expected.filter((name) => !seen.has(name));
+  const duplicated = [...seen].filter(([, paths]) => paths.length > 1).map(([name]) => name);
+  const onTokensPage = [...seen].filter(([, paths]) => paths.includes('/foundations/tokens/')).map(([name]) => name);
+  check('every component token is on exactly one component page, and none on the Tokens page',
+    expected.length > 200 && missing.length === 0 && duplicated.length === 0 && onTokensPage.length === 0,
+    [...missing.slice(0, 3).map((n) => `missing ${n}`), ...duplicated.slice(0, 3).map((n) => `twice ${n}`),
+      ...onTokensPage.slice(0, 3).map((n) => `still on Tokens: ${n}`)].join(', ') || `${expected.length} tokens`);
+}
+
+// A component token's search result lands on its row, on its component's Tokens tab.
+await gotoReady('/');
+await page.keyboard.press('/');
+await page.waitForFunction(() => document.activeElement?.id === 'search-input');
+await page.keyboard.type('chip selected background rest');
+await page.waitForFunction(() => document.querySelectorAll('.search__option').length > 0);
+await page.keyboard.press('Enter');
+await page.waitForURL('**/components/chip/tokens/**');
+const componentTarget = await page.evaluate(() => document.querySelector(':target')?.id);
+check('a component token search result lands on its row on the component\'s Tokens tab',
+  componentTarget === 'qds-component-chip-selected-color-background-rest', String(componentTarget));
+
+// A link to a component token on the Tokens page, from before the move, is forwarded.
+await page.goto(`${BASE}/foundations/tokens/#qds-component-radio-group-gap`);
+const forwarded = await page
+  .waitForURL('**/components/radio-group/tokens/#qds-component-radio-group-gap', { timeout: 5000 })
+  .then(() => true, () => false);
+check('an old link to a component token on the Tokens page forwards to its component',
+  forwarded, page.url().replace(BASE, ''));
 
 // ── 8. Console cleanliness across every page ─────────────────────────────────
 const narrow = [];

@@ -15,6 +15,8 @@
  * element's API from the custom elements manifest — neither is written twice.
  */
 
+import { tokens } from '@quieto/design-tokens';
+
 import loadComponents from './components.js';
 import loadRoadmap from './roadmap.js';
 
@@ -30,7 +32,20 @@ const CATEGORIES = ['Actions', 'Inputs', 'Containment', 'Navigation', 'Feedback'
 
 export default async function () {
   const elements = new Map((await loadComponents()).map((element) => [element.tagName, element]));
+
+  // Component token sets that exist, by name: 'component/radio' → 'radio'.
+  const tokenSets = new Set(
+    tokens.filter((token) => token.tier === 'component').map((token) => token.set.replace(/^component\//, '')),
+  );
   const roadmap = await loadRoadmap();
+
+  /** A shipped family's own component tokens. */
+  const own = (family) =>
+    tokens.filter(
+      (token) =>
+        token.tier === 'component' &&
+        family.elements.some((tag) => token.set === `component/${tag.replace(/^qds-/, '')}`),
+    );
 
   const families = roadmap.shipped
     .map((family) => {
@@ -41,6 +56,29 @@ export default async function () {
         slug,
         url: `/components/${slug}/`,
         apiUrl: `/components/${slug}/api/`,
+        tokensUrl: `/components/${slug}/tokens/`,
+        /**
+         * The family's own token sets, found from its element names: qds-radio
+         * owns component/radio. A family with none (Stack, which reads the
+         * spacing scale) has an empty list.
+         */
+        tokenSets: family.elements.map((tag) => tag.replace(/^qds-/, '')).filter((name) => tokenSets.has(name)),
+        tokenCount: own(family).length,
+        /**
+         * The token the Tokens tab's restyle example overrides: the most
+         * representative color — a primary or default resting background —
+         * since the example sets a color.
+         */
+        sampleToken: (
+          // The default variant's background, by whichever name it has…
+          own(family).find((token) => /-(primary|neutral|default|outlined)-color-background-rest$/.test(token.name)) ??
+          // …or the component's own, unvarianted background…
+          own(family).find((token) => /^qds-component-[a-z-]+?-color-background-rest$/.test(token.name) &&
+            family.elements.some((tag) => token.name === `qds-component-${tag.replace(/^qds-/, '')}-color-background-rest`)) ??
+          // …or any resting or checked background, or failing that any color.
+          own(family).find((token) => /-color-background-(rest|checked)$/.test(token.name)) ??
+          own(family).find((token) => token.type === 'color')
+        )?.name,
         category: family.category,
         since: family.since,
         summary: family.what ?? family.summary,

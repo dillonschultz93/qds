@@ -155,6 +155,15 @@ export function createSearchIndex() {
       }
     }
 
+    // Component tokens are listed on their component's Tokens tab, not the
+    // Tokens page, so that is where their results go.
+    const families = (await loadDocs()).families;
+    const tokenPage = (token) => {
+      if (token.tier !== 'component') return '/foundations/tokens/';
+      const set = token.set.replace(/^component\//, '');
+      return families.find((family) => family.tokenSets.includes(set))?.tokensUrl ?? '/foundations/tokens/';
+    };
+
     for (const token of manifest) {
       const { light, dark } = token.modes;
       const value = (v) => (v !== null && typeof v === 'object' ? 'composite' : String(v));
@@ -162,7 +171,7 @@ export function createSearchIndex() {
         type: 'token',
         title: `--${token.name}`,
         detail: light === dark ? value(light) : `${value(light)} · dark ${value(dark)}`,
-        url: `/foundations/tokens/#${token.name}`,
+        url: `${tokenPage(token)}#${token.name}`,
         color: token.type === 'color' ? true : undefined,
       });
     }

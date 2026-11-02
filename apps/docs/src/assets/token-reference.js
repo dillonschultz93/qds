@@ -1,5 +1,6 @@
 /**
- * The token reference on the Tokens page: a qds-tabs per tier, and a qds-input
+ * The token reference on the Tokens page: a qds-tabs per tier (primitive and
+ * semantic; component tokens are on their components' pages), and a qds-input
  * that filters every tier at once.
  *
  * Two jobs:
@@ -22,9 +23,29 @@ const rows = [...tabs.querySelectorAll('tbody tr')].map((row) => ({
   text: row.textContent.toLowerCase().replace(/\s+/g, ' '),
 }));
 
+/**
+ * A component token's address from before component tokens moved to their
+ * components' pages: forward it to that component's Tokens tab. The longest
+ * matching set wins, so a set named like the start of another cannot claim its
+ * tokens.
+ */
+function forwardComponentToken(id) {
+  if (!id.startsWith('qds-component-')) return false;
+  const links = [...document.querySelectorAll('[data-token-sets]')].flatMap((link) =>
+    link.dataset.tokenSets.split(' ').map((set) => ({ set, href: link.getAttribute('href') })),
+  );
+  const match = links
+    .filter(({ set }) => id.startsWith(`qds-component-${set}-`))
+    .sort((a, b) => b.set.length - a.set.length)[0];
+  if (!match) return false;
+  location.replace(`${match.href}#${id}`);
+  return true;
+}
+
 /** Open the tab holding the hash's target row, then bring the row into view. */
 async function revealTarget() {
   const id = decodeURIComponent(location.hash.slice(1));
+  if (forwardComponentToken(id)) return;
   const target = id ? document.getElementById(id) : null;
   const panel = target?.closest('qds-tab-panel');
   if (!panel) return;

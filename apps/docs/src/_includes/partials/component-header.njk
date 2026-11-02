@@ -1,5 +1,5 @@
 {#
-  The top of a component page: its status, and the Overview / API tabs.
+  The top of a component page: its status, and the Overview / API / Tokens tabs.
 
   The tabs are links between two pages, as Material's component tabs are, not a
   qds-tabs: each has its own URL, so search results and shared links can point at
@@ -15,4 +15,5 @@
 <nav class="page-tabs" aria-label="{{ family.name }} documentation">
   <a href="{{ family.url }}"{% if page.url == family.url %} aria-current="page"{% endif %}>Overview</a>
   <a href="{{ family.apiUrl }}"{% if page.url == family.apiUrl %} aria-current="page"{% endif %}>API</a>
+  <a href="{{ family.tokensUrl }}"{% if page.url == family.tokensUrl %} aria-current="page"{% endif %}>Tokens</a>
 </nav>
