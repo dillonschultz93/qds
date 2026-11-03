@@ -1048,6 +1048,30 @@ await page.keyboard.press('Escape');
 check('a drawer is a modal dialog against the end edge, full height',
   drawer.modal && drawer.right && drawer.fullHeight, JSON.stringify(drawer));
 
+// ── Color ramps run lightest first ─────────────────────────────────────────────
+// Sorted as text, "50" lands between "400" and "500"; every ramp must ascend.
+const unordered = [];
+await gotoReady('/styles/color/');
+unordered.push(...await page.evaluate(() =>
+  [...document.querySelectorAll('.ramp')]
+    .map((ramp) => [...ramp.querySelectorAll('.ramp__label')].map((label) => Number(label.textContent)))
+    .filter((steps) => steps.some((step, i) => i > 0 && step <= steps[i - 1]))
+    .map((steps) => `Color page: ${steps.join(' ')}`)));
+await gotoReady('/foundations/tokens/');
+unordered.push(...await page.evaluate(() => {
+  const ramps = new Map();
+  for (const row of document.querySelectorAll('qds-tab-panel[data-tier="primitive"] tbody tr[id^="qds-color-"]')) {
+    const [, hue, step] = row.id.match(/^qds-color-([a-z]+)-(\d+)$/) ?? [];
+    if (!hue) continue;
+    if (!ramps.has(hue)) ramps.set(hue, []);
+    ramps.get(hue).push(Number(step));
+  }
+  return [...ramps].filter(([, steps]) => steps.some((step, i) => i > 0 && step <= steps[i - 1]))
+    .map(([hue, steps]) => `Tokens page ${hue}: ${steps.join(' ')}`);
+}));
+check('every color ramp runs from its lightest step to its darkest, on both pages',
+  unordered.length === 0, unordered.join('; ') || 'in order');
+
 // ── llms.txt and llms-full.txt ────────────────────────────────────────────────
 // Plain Markdown for AI assistants: an index of every page, and the full API.
 const llmsIndex = await readFile(join(SITE, 'llms.txt'), 'utf8');

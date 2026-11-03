@@ -260,7 +260,9 @@ async function main() {
     }
   }
 
-  const tokens = [...byName.values()].sort((a, b) => a.name.localeCompare(b.name));
+  // Numeric collation, so a ramp runs 50, 100, … 900 rather than 100, … 400, 50,
+  // 500: compared as text, "50" sorts after "400".
+  const tokens = [...byName.values()].sort((a, b) => a.name.localeCompare(b.name, 'en', { numeric: true }));
 
   // Resolve each reference path to the CSS variable name it actually points at.
   //

@@ -39,7 +39,7 @@ const rating = (ratio, minimum) =>
 
 // ── Color ────────────────────────────────────────────────────────────────────
 
-/** Palette ramps, one per hue, in source order. */
+/** Palette ramps, one per hue, in the manifest's order: lightest step first. */
 function palette() {
   const hues = new Map();
   for (const token of tokens) {
