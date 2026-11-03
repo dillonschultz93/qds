@@ -1,5 +1,11 @@
 # @quieto/design-tokens
 
+## 1.0.1
+
+### Patch Changes
+
+- 2fb2323: Sort the token manifest numerically, so each color ramp runs from 50 to 900 (and `black` from 5 to its darkest step) rather than placing 50 between 400 and 500. Only the order of the exported `tokens` array changes; no token's name or value does.
+
 ## 1.0.0
 
 ### Major Changes
