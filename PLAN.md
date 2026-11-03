@@ -53,7 +53,7 @@ Toolchain: Node v25.2.0, pnpm 11.5.3, npm 11.19.0.
 | Release | npm via Changesets |
 | Scope | `@quieto/*` — `@quieto/design-tokens`, `@quieto/ui`, private `docs` |
 | Token package | Self-contained Style Dictionary build (no dependency on the published `@quieto/tokens` CLI) |
-| Figma direction | Tokens Studio **single-file** format is the source; the plugin syncs `tokens.json` from Git bidirectionally (folder mode needs Pro — see *Deviations*) |
+| Figma direction | `tokens.json` (Tokens Studio single-file format) is the source; `figma/build.js` syncs it into Figma one way, code → Figma (see *Deviations*) |
 | Global prefix | `--qds-` for CSS vars, `qds-` for element names |
 | Category vocabularies | Per-tier as written in the spec; primitive and semantic lists stay intentionally different |
 
@@ -287,6 +287,9 @@ always beats the OS setting.
 
 ### 1g. Figma wiring (manual, one-time)
 
+> **Superseded (2026-11).** Figma is now synced one way by `figma/build.js`; see
+> *Deviations → Figma variables come from a sync script*. Kept for history.
+
 Tokens Studio → Settings → Sync → GitHub, repo `dillonschultz93/qds`, file path
 `packages/design-tokens/tokens.json`, **Single file** mode, format **W3C DTCG**.
 Bidirectional from then on.
@@ -510,6 +513,22 @@ shim and trips over it, crashing the Eleventy SSR worker.
 `--no-experimental-webstorage` makes the global `undefined`, which the shim handles,
 and is cleaner than pointing at a scratch database file. CI pins Node 22, which
 does not have the global at all. Remove the flag once the shim guards the access.
+
+### Figma variables come from a sync script, not Tokens Studio
+
+Exporting from the free Tokens Studio plugin (2026-11) produced one variable
+collection per token set — 34 in all — with `semantic/light` and `semantic/dark`
+as two separate collections instead of one collection with Light and Dark modes.
+Component variables aliased the light set only, so nothing in Figma could switch
+theme. Every variable also had `ALL_SCOPES` and no code syntax, and the shadow
+styles came out empty. Exporting themes as modes needs Pro.
+
+`packages/design-tokens/figma/build.js` replaces the export. It reads
+`tokens.json` and generates Plugin API scripts (run through the Figma MCP server)
+that upsert three collections — Primitives, Semantic (Light/Dark), Component —
+with scopes, `var(--qds-…)` code syntax asserted against `name/qds`, text styles,
+and elevation effect styles. The sync is **one way, code → Figma**: edits made to
+variables in Figma do not flow back. §1g's two-way plugin sync is retired.
 
 ### Multi-file sync needs a Tokens Studio Pro licence, so the source is one file
 
