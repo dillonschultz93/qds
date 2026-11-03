@@ -4,6 +4,7 @@ import { customElement, property, query } from 'lit/decorators.js';
 import { QdsElement } from '../../internal/qds-element.js';
 
 export type QdsModalSize = 'sm' | 'md' | 'lg';
+export type QdsModalPlacement = 'center' | 'start' | 'end' | 'bottom';
 
 /**
  * A modal dialog.
@@ -16,6 +17,11 @@ export type QdsModalSize = 'sm' | 'md' | 'lg';
  *
  * Escape always closes the dialog. Clicking the backdrop does only with
  * `light-dismiss`, since a stray click should not throw away a half-filled form.
+ *
+ * `placement` makes it a drawer: a side sheet against the start or end edge,
+ * the full height of the screen, or a sheet rising from the bottom. It is the
+ * same modal dialog — inert page, focus handling, Escape — in another position,
+ * and `size` sets a side sheet's width.
  *
  * @element qds-modal
  *
@@ -48,7 +54,7 @@ export type QdsModalSize = 'sm' | 'md' | 'lg';
  * @cssprop [--qds-component-modal-header-line-height] - Heading line height.
  * @cssprop [--qds-component-modal-backdrop-color-background-rest] - Backdrop color.
  * @cssprop [--qds-component-modal-backdrop-opacity] - Backdrop opacity.
- * @cssprop [--qds-component-modal-{size}-max-width] - Maximum width per size.
+ * @cssprop [--qds-component-modal-{size}-max-width] - Maximum width per size, and a side sheet's width.
  */
 @customElement('qds-modal')
 export class QdsModal extends QdsElement {
@@ -184,8 +190,86 @@ export class QdsModal extends QdsElement {
         padding: 0 var(--_padding) var(--_padding);
       }
 
+      /*
+       * Drawers. The dialog is fixed to the viewport in the top layer, so an edge
+       * is a margin of 0 on that side and auto on the other. Only the corners
+       * away from the edge are rounded.
+       */
+      :host([placement='start']) dialog,
+      :host([placement='end']) dialog {
+        height: 100%;
+        max-height: 100%;
+        margin-block: 0;
+        border-block: 0;
+      }
+
+      :host([placement='start']) dialog {
+        margin-inline: 0 auto;
+        border-inline-start: 0;
+        border-start-start-radius: 0;
+        border-end-start-radius: 0;
+      }
+
+      :host([placement='end']) dialog {
+        margin-inline: auto 0;
+        border-inline-end: 0;
+        border-start-end-radius: 0;
+        border-end-end-radius: 0;
+      }
+
+      :host([placement='bottom']) dialog {
+        width: 100%;
+        max-width: 100%;
+        max-height: 85%;
+        margin: auto 0 0;
+        border-inline: 0;
+        border-block-end: 0;
+        border-end-start-radius: 0;
+        border-end-end-radius: 0;
+      }
+
+      :host([placement='start']) dialog[open] {
+        animation-name: enter-start;
+      }
+
+      :host([placement='end']) dialog[open] {
+        animation-name: enter-end;
+      }
+
+      :host([placement='bottom']) dialog[open] {
+        animation-name: enter-bottom;
+      }
+
+      @keyframes enter-start {
+        from {
+          translate: -100% 0;
+        }
+      }
+
+      @keyframes enter-end {
+        from {
+          translate: 100% 0;
+        }
+      }
+
+      @keyframes enter-bottom {
+        from {
+          translate: 0 100%;
+        }
+      }
+
+      /* Right to left, the start edge is on the right. */
+      :host([placement='start']:dir(rtl)) dialog[open] {
+        animation-name: enter-end;
+      }
+
+      :host([placement='end']:dir(rtl)) dialog[open] {
+        animation-name: enter-start;
+      }
+
       @media (prefers-reduced-motion: reduce) {
-        dialog[open] {
+        dialog[open],
+        :host([placement]) dialog[open] {
           animation: none;
         }
       }
@@ -206,9 +290,13 @@ export class QdsModal extends QdsElement {
   @property()
   heading = '';
 
-  /** Maximum width. */
+  /** Maximum width. For a side sheet, its width. */
   @property({ reflect: true })
   size: QdsModalSize = 'md';
+
+  /** `center` for a dialog; `start`, `end`, or `bottom` for a drawer against that edge. */
+  @property({ reflect: true })
+  placement: QdsModalPlacement = 'center';
 
   /** Closes the dialog when the backdrop is clicked, as well as on Escape. */
   @property({ type: Boolean, reflect: true, attribute: 'light-dismiss' })

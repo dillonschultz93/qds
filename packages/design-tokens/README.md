@@ -128,11 +128,12 @@ Load Inter and JetBrains Mono yourself, or accept the system fallbacks.
 
 ## Versioning
 
-This package is pre-1.0, so **token names can change in any minor release.** On `0.x`, npm's
-caret range does not cross a minor version: `^0.1.0` installs `0.1.x` but never `0.2.0`, so a
-rename will not reach you without an explicit upgrade. The
+This package follows [semantic versioning](https://semver.org). A token's name is its API:
+removing or renaming a token waits for a major version, and new tokens arrive in minor versions. A
+token's value can change in a minor version, since that is a design change rather than an API one —
+a step of the palette retuned for contrast, say — and the
 [changelog](https://github.com/dillonschultz93/qds/blob/main/packages/design-tokens/CHANGELOG.md)
-lists every rename.
+says so whenever one does.
 
 ## License
 

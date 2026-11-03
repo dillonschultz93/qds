@@ -195,4 +195,50 @@ describe('qds-text-field', () => {
       expect(new FormData(form).get('name')).to.be.null;
     });
   });
+
+  describe('multiline', () => {
+    it('is a labelled textarea of the given rows, with the hint and errors of the field', async () => {
+      const element = await fixture<QdsTextField>(html`
+        <qds-text-field label="Comment" hint="Markdown works." multiline rows="5" required></qds-text-field>
+      `);
+      const textarea = part<HTMLTextAreaElement>(element, 'textarea')!;
+
+      expect(part(element, 'input') === null, 'no input').to.be.true;
+      expect(textarea.rows).to.equal(5);
+      expect(textarea.labels[0]?.textContent).to.include('Comment');
+      expect(textarea.getAttribute('aria-describedby')).to.equal('hint');
+      await expect(element).to.be.accessible();
+
+      expect(element.reportValidity()).to.be.false;
+      await elementUpdated(element);
+      expect(part(element, '.error')?.textContent).to.not.be.empty;
+    });
+
+    it('keeps line breaks in its value, submits it, and resets', async () => {
+      const form = await fixture<HTMLFormElement>(html`
+        <form><qds-text-field label="Address" name="address" multiline value="1 Main St"></qds-text-field></form>
+      `);
+      const element = form.querySelector<QdsTextField>('qds-text-field')!;
+      const textarea = part<HTMLTextAreaElement>(element, 'textarea')!;
+
+      textarea.value = '1 Main St\nSpringfield';
+      setTimeout(() => textarea.dispatchEvent(new Event('input', { bubbles: true })));
+      const { detail } = await oneEvent(element, 'qds-input');
+      expect(detail.value).to.equal('1 Main St\nSpringfield');
+      expect(new FormData(form).get('address')).to.equal('1 Main St\nSpringfield');
+
+      form.reset();
+      await elementUpdated(element);
+      expect(textarea.value).to.equal('1 Main St');
+    });
+
+    it('resizes only vertically, and not at all while disabled', async () => {
+      const element = await fixture<QdsTextField>(html`<qds-text-field label="Notes" multiline></qds-text-field>`);
+      expect(getComputedStyle(part(element, 'textarea')!).resize).to.equal('vertical');
+
+      element.disabled = true;
+      await elementUpdated(element);
+      expect(getComputedStyle(part(element, 'textarea')!).resize).to.equal('none');
+    });
+  });
 });

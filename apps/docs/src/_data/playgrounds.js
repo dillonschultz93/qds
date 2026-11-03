@@ -170,7 +170,7 @@ const CONFIG = {
   },
   'qds-text-field': {
     initial: { label: 'Email', hint: 'We never share it.', type: 'email' },
-    hide: ['minlength', 'maxlength', 'pattern', 'autocomplete'],
+    hide: ['minlength', 'maxlength', 'pattern', 'autocomplete', 'rows'],
   },
   'qds-toggle': { content: 'Notifications', hide: ['value'] },
 };

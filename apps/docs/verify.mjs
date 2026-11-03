@@ -1021,6 +1021,32 @@ const avatars = await page.evaluate(() =>
 check('avatars show initials, fall back from a broken image, and show a person without a name',
   avatars.join() === 'AL,GH,AT,user', avatars.join(', '));
 
+// ── The variants: a textarea, and drawers ──────────────────────────────────
+await gotoReady('/components/text-field/');
+const textarea = await page.evaluate(() => {
+  const field = [...document.querySelectorAll('.example qds-text-field')].find((each) => each.multiline);
+  const area = field?.shadowRoot.querySelector('textarea');
+  return { rows: area?.rows, label: area?.labels[0]?.textContent.trim(), hint: area?.getAttribute('aria-describedby') };
+});
+check('a multiline text field is a labelled, described textarea',
+  textarea.rows === 4 && textarea.label === 'Delivery instructions' && textarea.hint === 'hint', JSON.stringify(textarea));
+
+await gotoReady('/components/modal/');
+await page.locator('.example qds-button', { hasText: 'Filters' }).click();
+await page.waitForTimeout(400);
+const drawer = await page.evaluate(() => {
+  const dialog = document.getElementById('filters-drawer').shadowRoot.querySelector('dialog');
+  const box = dialog.getBoundingClientRect();
+  return {
+    modal: dialog.matches(':modal'),
+    right: Math.round(box.right) === document.documentElement.clientWidth,
+    fullHeight: Math.round(box.height) === window.innerHeight,
+  };
+});
+await page.keyboard.press('Escape');
+check('a drawer is a modal dialog against the end edge, full height',
+  drawer.modal && drawer.right && drawer.fullHeight, JSON.stringify(drawer));
+
 // Every component page, on every tab, and the Components landing page name the
 // package they ship in.
 const uiPackage = JSON.parse(await readFile(new URL('../../packages/ui/package.json', import.meta.url), 'utf8'));

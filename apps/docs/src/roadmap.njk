@@ -156,8 +156,11 @@ description: The components QDS has, the ones it needs next, and the ones it lea
     <tbody>
       {% for variant in roadmap.variants %}
         <tr>
-          <th scope="row">{{ variant.name }}</th>
-          <td><code>{{ variant.as }}</code></td>
+          <th scope="row">
+            {{ variant.name }}
+            {% if variant.built %}<br /><qds-chip variant="success">Built in {{ variant.built }}</qds-chip>{% endif %}
+          </th>
+          <td>{% if variant.url %}<a href="{{ variant.url }}"><code>{{ variant.as }}</code></a>{% else %}<code>{{ variant.as }}</code>{% endif %}</td>
           <td>{{ variant.why }}</td>
         </tr>
       {% endfor %}

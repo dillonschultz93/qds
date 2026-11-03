@@ -92,6 +92,7 @@ export { QdsTabPanel } from './components/qds-tab-panel/qds-tab-panel.js';
 export { QdsModal } from './components/qds-modal/qds-modal.js';
 export type {
   QdsModalSize,
+  QdsModalPlacement,
 } from './components/qds-modal/qds-modal.js';
 
 export { QdsIcon, registerIcons } from './components/qds-icon/qds-icon.js';
