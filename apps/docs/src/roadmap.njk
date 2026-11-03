@@ -100,7 +100,10 @@ description: The components QDS has, the ones it needs next, and the ones it lea
 {% for tier in roadmap.tiers %}
   <h2>{{ tier.title }}</h2>
 
-  <p><qds-chip variant="info">Planned</qds-chip> {{ tier.summary }}</p>
+  <p>
+    {% if tier.components | length %}<qds-chip variant="info">Planned</qds-chip>{% else %}<qds-chip variant="success">Shipped</qds-chip>{% endif %}
+    {{ tier.summary }}
+  </p>
 
   {% if tier.components | length %}
     <div class="table-scroll">

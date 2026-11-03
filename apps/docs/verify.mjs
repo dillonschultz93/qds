@@ -944,13 +944,82 @@ const roadmapTier1 = await page.evaluate(() => {
   const shipped = [...document.querySelectorAll('table')][0];
   return {
     shipped: ['Icon', 'Select', 'Alert', 'Tooltip', 'Menu'].every((name) => shipped.textContent.includes(name)),
-    tierDone: document.body.textContent.includes('Everything in this tier has shipped'),
+    tierDone: (document.body.textContent.match(/Everything in this tier has shipped/g)?.length ?? 0) === 2,
     built: document.body.textContent.match(/Built in 0\.2\.0/g)?.length ?? 0,
   };
 });
-check('the roadmap lists Tier 1 as shipped, and its foundations as built',
+check('the roadmap lists Tiers 1 and 2 as shipped, and the foundations as built',
   roadmapTier1.shipped && roadmapTier1.tierDone && roadmapTier1.built === 3,
   JSON.stringify(roadmapTier1));
+
+// ── The Tier 2 components, server-rendered and hydrated ─────────────────────
+await gotoReady('/components/toast/');
+await page.locator('.example qds-button', { hasText: 'Save' }).click();
+await page.waitForTimeout(300);
+const toastShown = await page.evaluate(() => {
+  const stack = document.querySelector('[data-qds-toast-stack]');
+  const shown = stack?.querySelector('qds-toast[open]');
+  return {
+    onTop: stack?.matches(':popover-open') ?? false,
+    text: shown?.textContent?.trim(),
+    announced: document.querySelector('[data-qds-announcer="polite"]')?.textContent ?? '',
+  };
+});
+check('toast() shows a toast in the stack, on top, and announces it',
+  toastShown.onTop && toastShown.text === 'Changes saved.' && toastShown.announced === 'Changes saved.',
+  JSON.stringify(toastShown));
+
+await gotoReady('/components/checkbox-group/');
+const groupBefore = await page.evaluate(() => {
+  const group = document.querySelector('.example qds-checkbox-group');
+  return { names: group.checkboxes.map((box) => box.getAttribute('name')), value: group.value };
+});
+await page.locator('.example qds-checkbox-group qds-checkbox', { hasText: 'Mentions' }).click();
+await page.waitForTimeout(100);
+const groupAfter = await page.evaluate(() => {
+  const group = document.querySelector('.example qds-checkbox-group');
+  return { valid: group.checkValidity(), error: group.shadowRoot.querySelector('.error')?.textContent ?? '' };
+});
+check('a server-rendered checkbox group names its boxes, and requires one after hydration',
+  groupBefore.names.every((name) => name === 'notify') && groupBefore.value.join() === 'mentions' &&
+    !groupAfter.valid && groupAfter.error === 'Select at least one option.',
+  `${JSON.stringify(groupBefore)} → ${JSON.stringify(groupAfter)}`);
+
+await gotoReady('/components/pagination/');
+await page.locator('#results-pages').evaluate((element) =>
+  element.shadowRoot.querySelector('[aria-label="Page 11"]').click());
+await page.waitForTimeout(100);
+const paged = await page.evaluate(() => ({
+  current: document.getElementById('results-pages').current,
+  status: document.getElementById('results-page').textContent,
+  links: [...document.querySelectorAll('.example qds-pagination')[1].shadowRoot.querySelectorAll('a[href]')].length,
+}));
+check('pagination moves in place as buttons, and renders links from an href template',
+  paged.current === 11 && paged.status === 'Showing page 11 of 20' && paged.links > 5,
+  JSON.stringify(paged));
+
+await gotoReady('/components/breadcrumbs/');
+const crumbs = await page.evaluate(() => {
+  const items = [...document.querySelectorAll('.example qds-breadcrumbs qds-breadcrumb-item')];
+  return {
+    current: items.map((item) => item.current),
+    marked: [...document.querySelectorAll('.example qds-breadcrumbs [aria-current="page"]')].map((el) => el.textContent.trim()),
+    separators: items.map((item) => getComputedStyle(item.shadowRoot.querySelector('.separator')).display !== 'none'),
+  };
+});
+check('server-rendered breadcrumbs mark the last item as the current page',
+  crumbs.current.join() === 'false,false,true' && crumbs.marked.join() === 'Breadcrumbs' &&
+    crumbs.separators.join() === 'true,true,false',
+  JSON.stringify(crumbs));
+
+await gotoReady('/components/avatar/');
+await page.waitForTimeout(300);
+const avatars = await page.evaluate(() =>
+  [...document.querySelectorAll('.example qds-avatar')].slice(0, 4).map((avatar) =>
+    avatar.shadowRoot.querySelector('[part="initials"]')?.textContent ??
+      (avatar.shadowRoot.querySelector('img') ? 'img' : avatar.shadowRoot.querySelector('qds-icon')?.getAttribute('name'))));
+check('avatars show initials, fall back from a broken image, and show a person without a name',
+  avatars.join() === 'AL,GH,AT,user', avatars.join(', '));
 
 // Every component page, on every tab, and the Components landing page name the
 // package they ship in.
