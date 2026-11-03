@@ -8,6 +8,7 @@ import litPlugin from '@lit-labs/eleventy-plugin-lit';
 import { createSearchIndex } from './search-index.js';
 
 const require = createRequire(import.meta.url);
+const HERE = dirname(new URL(import.meta.url).pathname);
 
 /** Directory of the design-tokens package, resolved through the workspace link. */
 const TOKENS_PKG = dirname(require.resolve('@quieto/design-tokens/nomenclature'));
@@ -50,7 +51,8 @@ export default async function (eleventyConfig) {
    */
   eleventyConfig.addPlugin(litPlugin, {
     mode: 'worker',
-    componentModules: [join(UI_DIST, 'index.js')],
+    // link-icons.js registers the icons the package links draw: GitHub, npm, Figma, history.
+    componentModules: [join(UI_DIST, 'index.js'), join(HERE, 'link-icons.js')],
   });
 
   eleventyConfig.addPassthroughCopy({ 'src/assets': 'assets' });

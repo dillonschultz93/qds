@@ -18,6 +18,7 @@
 import '@lit-labs/ssr-client/lit-element-hydrate-support.js';
 
 import { announce, toast } from '@quieto/ui';
+import './link-icons.js';
 
 /**
  * The library's functions, for the examples' inline handlers:

@@ -164,11 +164,12 @@ const readTheme = () =>
     // can land at the start of the transition and still see the old theme.
     await Promise.all(btn.getAnimations().map((animation) => animation.finished));
     return {
-      theme: document.documentElement.dataset.theme ?? 'system',
+      theme: document.documentElement.dataset.theme ?? 'none',
       bodyBg: getComputedStyle(document.body).backgroundColor,
       bodyFg: getComputedStyle(document.body).color,
       buttonBg: getComputedStyle(btn).backgroundColor,
-      label: document.getElementById('theme-toggle').textContent.trim(),
+      pressed: document.getElementById('theme-toggle').getAttribute('aria-pressed'),
+      name: document.getElementById('theme-toggle').getAttribute('aria-label'),
     };
   });
 
@@ -180,17 +181,25 @@ const settle = () =>
     () => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))),
   );
 
-const before = await readTheme();
-await page.click('#theme-toggle'); // system → light
+// Light is the default, whatever the OS prefers, so start from a dark OS setting.
+await page.emulateMedia({ colorScheme: 'dark' });
+await page.reload();
 await settle();
 const light = await readTheme();
 await page.click('#theme-toggle'); // light → dark
 await settle();
 const dark = await readTheme();
+await page.click('#theme-toggle'); // dark → light
+await settle();
+const back = await readTheme();
+await page.click('#theme-toggle'); // and dark again, for the checks below
+await settle();
+await page.emulateMedia({ colorScheme: 'light' });
 
-check('theme toggle cycles system → light → dark',
-  light.theme === 'light' && dark.theme === 'dark',
-  `${before.theme} → ${light.theme} → ${dark.theme}  (label: "${dark.label}")`);
+check('theme starts light, even on a dark OS, and toggles light ↔ dark',
+  light.theme === 'light' && light.pressed === 'false' &&
+    dark.theme === 'dark' && dark.pressed === 'true' && back.theme === 'light' && dark.name === 'Dark theme',
+  `${light.theme} → ${dark.theme} → ${back.theme}  (pressed ${light.pressed} → ${dark.pressed}; name "${dark.name}")`);
 
 check('dark mode changes page colors',
   light.bodyBg !== dark.bodyBg && light.bodyFg !== dark.bodyFg,
@@ -1101,10 +1110,12 @@ for (const path of componentPages) {
   const links = await page.evaluate(() => ({
     text: document.querySelector('.package-links')?.textContent.replace(/\s+/g, ' ').trim() ?? '',
     npm: [...document.querySelectorAll('.package-links a')].some((a) => a.href === 'https://www.npmjs.com/package/@quieto/ui'),
+    // The links are icon-only; each takes its name from the qds-tooltip around it.
+    unnamed: [...document.querySelectorAll('.package-links a')].filter((a) => !a.getAttribute('aria-label')).length,
   }));
-  if (!links.text.includes(`@quieto/ui ${uiPackage.version}`) || !links.npm) missingPackage.push(path);
+  if (!links.text.includes(`@quieto/ui ${uiPackage.version}`) || !links.npm || links.unnamed) missingPackage.push(path);
 }
-check('every component page links to @quieto/ui on npm and GitHub',
+check('every component page links to @quieto/ui on npm and GitHub, each icon link named',
   componentPages.length > 0 && missingPackage.length === 0,
   missingPackage.join(', ') || `${componentPages.length} pages, version ${uiPackage.version}`);
 check('every page\'s content column is full width, not collapsed',
