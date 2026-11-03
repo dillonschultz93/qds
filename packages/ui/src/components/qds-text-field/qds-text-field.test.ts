@@ -197,7 +197,7 @@ describe('qds-text-field', () => {
   });
 
   describe('multiline', () => {
-    it('is a labelled textarea of the given rows, with the hint and errors of the field', async () => {
+    it('is a labeled textarea of the given rows, with the hint and errors of the field', async () => {
       const element = await fixture<QdsTextField>(html`
         <qds-text-field label="Comment" hint="Markdown works." multiline rows="5" required></qds-text-field>
       `);

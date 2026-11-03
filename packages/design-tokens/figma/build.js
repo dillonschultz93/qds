@@ -24,7 +24,7 @@
  *
  * - `typography` composites → text styles (font family, size and weight bound).
  * - `shadow` composites → effect styles, each field bound to a variable. The
- *   elevation colour differs per mode, so each shadow gets a Figma-only Semantic
+ *   elevation color differs per mode, so each shadow gets a Figma-only Semantic
  *   helper (`elevation/<name>/color`) that the style binds to.
  * - Line heights are unitless and letter spacing is in `em`; Figma reads a bound
  *   variable as pixels for both. Those variables are code-only (no scopes) and the
@@ -70,7 +70,7 @@ function normalizeHex(hex) {
   let h = hex.slice(1).toLowerCase();
   if (h.length === 3 || h.length === 4) h = [...h].map((c) => c + c).join('');
   if (h.length === 6) h += 'ff';
-  if (!/^[0-9a-f]{8}$/.test(h)) throw new Error(`bad colour ${hex}`);
+  if (!/^[0-9a-f]{8}$/.test(h)) throw new Error(`bad color ${hex}`);
   return `#${h}`;
 }
 
@@ -200,7 +200,7 @@ for (const mode of ['semantic/light', 'semantic/dark']) {
   }
 }
 
-// Elevation: one Figma-only colour helper per shadow, switching with the mode.
+// Elevation: one Figma-only color helper per shadow, switching with the mode.
 const shadows = {};
 for (const mode of ['semantic/light', 'semantic/dark']) {
   for (const t of tokensOf(mode).filter((x) => x.type === 'shadow')) {
@@ -217,7 +217,7 @@ for (const [name, byMode] of Object.entries(shadows)) {
   vars.semantic.set(helper, {
     name: helper, type: 'C', scopes: ['EFFECT_COLOR'], figmaOnly: true, tier: 'semantic',
     values: [`@${figmaName(refPath(light.color))}`, `@${figmaName(refPath(dark.color))}`],
-    description: `Figma-only: the colour of the ${name.replaceAll('/', '.')} shadow, split out so the effect style follows Light/Dark. In CSS the whole shadow is var(--${PREFIX}-semantic-${name.replaceAll('/', '-')}).`,
+    description: `Figma-only: the color of the ${name.replaceAll('/', '.')} shadow, split out so the effect style follows Light/Dark. In CSS the whole shadow is var(--${PREFIX}-semantic-${name.replaceAll('/', '-')}).`,
   });
   index.set(helper, { tier: 'semantic', type: 'C' });
 }
@@ -286,7 +286,7 @@ const effectStyles = Object.entries(shadows).map(([name, byMode]) => {
   const v = byMode['semantic/light'].value;
   return {
     name,
-    description: `var(--${PREFIX}-semantic-${name.replaceAll('/', '-')}). Colour follows the Semantic collection's mode.`,
+    description: `var(--${PREFIX}-semantic-${name.replaceAll('/', '-')}). Color follows the Semantic collection's mode.`,
     bind: {
       color: `${name}/color`,
       offsetX: figmaName(refPath(v.offsetX)),
@@ -308,7 +308,7 @@ const tuple = (v) => {
   return t;
 };
 
-// Scopes must be fully indexed before any payload is serialised.
+// Scopes must be fully indexed before any payload is serialized.
 for (const map of Object.values(vars)) for (const v of map.values()) scopeIndex(v.scopes);
 
 const base = { prefix: PREFIX, allCollections, scopeSets };

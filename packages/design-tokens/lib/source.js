@@ -5,7 +5,7 @@
  * top-level key (`semantic/light`), alongside `$themes` and `$metadata`.
  *
  * That format is used because multi-file (folder) sync requires a Tokens Studio
- * Pro licence, while single-file sync does not. The cost is paid here: the set
+ * Pro license, while single-file sync does not. The cost is paid here: the set
  * layer has to be flattened before Style Dictionary can resolve anything, and
  * flattening is what destroys each token's tier.
  */

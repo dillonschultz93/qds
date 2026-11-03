@@ -1,5 +1,5 @@
 /**
- * Component playgrounds, as Spectrum's component pages have: a live preview,
+ * Component playgrounds: a live preview,
  * controls for its attributes, and the markup for the current settings.
  *
  * The controls are generated, not written. Each attribute of the family's
@@ -36,7 +36,7 @@ const CONFIG = {
     Returns are free for 30 days.
   </qds-accordion-item>
   <qds-accordion-item heading="Is there a warranty?">
-    Two years, parts and labour.
+    Two years, parts and labor.
   </qds-accordion-item>
 `,
   },

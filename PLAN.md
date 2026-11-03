@@ -248,7 +248,7 @@ resolution order; `$themes` defines Light and Dark as one `mode` group so
 without being exported as Figma variables; `"enabled"` sets are exported.
 
 This started as the multi-file folder layout and changed once multi-file sync turned
-out to require a Pro licence — see *Deviations*.
+out to require a Pro license — see *Deviations*.
 
 Because light/dark differ *only* at the semantic tier, adding a mode never touches
 primitives or components.
@@ -530,7 +530,7 @@ with scopes, `var(--qds-…)` code syntax asserted against `name/qds`, text styl
 and elevation effect styles. The sync is **one way, code → Figma**: edits made to
 variables in Figma do not flow back. §1g's two-way plugin sync is retired.
 
-### Multi-file sync needs a Tokens Studio Pro licence, so the source is one file
+### Multi-file sync needs a Tokens Studio Pro license, so the source is one file
 
 The largest deviation, and it invalidated a decision made during planning.
 
@@ -647,7 +647,7 @@ running. It asserts:
 1. `qds-button` is upgraded and its shadow root was **adopted** from the SSR'd declarative shadow DOM
 2. Hydration does not duplicate — exactly one inner button per host
 3. The button's background resolves through the token chain rather than a hardcoded fallback
-4. The theme toggle cycles system → light → dark, and dark changes colours both on the page and inside shadow DOM
+4. The theme toggle cycles system → light → dark, and dark changes colors both on the page and inside shadow DOM
 5. API tables are populated from `custom-elements.json`
 6. `qds-click` fires normally and is suppressed while loading or disabled
 7. A loading button keeps its accessible name

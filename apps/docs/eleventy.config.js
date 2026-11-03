@@ -62,11 +62,10 @@ export default async function (eleventyConfig) {
   eleventyConfig.on('eleventy.after', search.write);
 
   /**
-   * "On this page": the page's h2s, listed beside the content, as Material and
-   * Spectrum show them. Built here rather than in the layout, because the layout
-   * renders before the content's headings exist. Runs after search-anchors, so
-   * every h2 already has the id it links to. Pages with fewer than two h2s get no
-   * list.
+   * "On this page": the page's h2s, listed beside the content. Built here
+   * rather than in the layout, because the layout renders before the content's
+   * headings exist. Runs after search-anchors, so every h2 already has the id it
+   * links to. Pages with fewer than two h2s get no list.
    */
   eleventyConfig.addTransform('page-contents', function (content) {
     if (!this.page.outputPath?.endsWith('.html')) return content;
@@ -196,7 +195,7 @@ export default async function (eleventyConfig) {
     const svg = anatomy[tier];
     if (!svg) throw new Error(`No anatomy diagram for tier "${tier}"`);
     // Inlined rather than referenced with <img>, so the diagram sees the page's
-    // data-theme attribute. An <img> only ever sees the OS colour scheme, which
+    // data-theme attribute. An <img> only ever sees the OS color scheme, which
     // would leave it light-on-dark whenever the reader overrides the OS setting.
     return `<div class="anatomy">${svg}</div>`;
   });

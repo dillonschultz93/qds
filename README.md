@@ -25,7 +25,7 @@ export step and designer edits arrive as pull requests. Style Dictionary's job i
 narrower than usual: it builds the CSS custom properties and a typed JS manifest.
 
 Single-file rather than the folder layout because multi-file sync requires a Tokens
-Studio Pro licence.
+Studio Pro license.
 
 Three tiers, each referencing only the one beneath it:
 

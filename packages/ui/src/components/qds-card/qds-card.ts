@@ -96,7 +96,7 @@ export class QdsCard extends QdsElement {
        */
       ::slotted([slot='media']) {
         display: block;
-        /* Bleed to the card edges by cancelling the padding around it. */
+        /* Bleed to the card edges by canceling the padding around it. */
         margin: calc(-1 * var(--_padding)) calc(-1 * var(--_padding)) 0;
         width: calc(100% + 2 * var(--_padding));
         max-width: none;

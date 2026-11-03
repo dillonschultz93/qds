@@ -70,7 +70,7 @@ describe('qds-pagination', () => {
     expect(element.current).to.equal(12);
   });
 
-  it('stays put when qds-change is cancelled', async () => {
+  it('stays put when qds-change is canceled', async () => {
     const element = await fixture<QdsPagination>(html`<qds-pagination total="5" current="2"></qds-pagination>`);
     element.addEventListener('qds-change', (event) => event.preventDefault());
 
@@ -91,7 +91,7 @@ describe('qds-pagination', () => {
     const before = location.hash;
     element.addEventListener('qds-change', (event) => event.preventDefault(), { once: true });
     link.click();
-    expect(location.hash, 'navigation was cancelled').to.equal(before);
+    expect(location.hash, 'navigation was canceled').to.equal(before);
     expect(element.current, 'links do not move current themselves').to.equal(2);
   });
 

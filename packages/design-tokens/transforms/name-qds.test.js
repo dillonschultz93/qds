@@ -100,8 +100,8 @@ test('segments are normalized to kebab-case', () => {
     'qds-typography-font-size-400',
   );
   assert.equal(
-    buildTokenName({ tier: 'primitive', path: ['color', 'Blue Grey', '400'] }),
-    'qds-color-blue-grey-400',
+    buildTokenName({ tier: 'primitive', path: ['color', 'Blue Gray', '400'] }),
+    'qds-color-blue-gray-400',
   );
 });
 

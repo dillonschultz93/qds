@@ -44,7 +44,7 @@ import '@quieto/ui/qds-text-field.js';
 | `qds-button` | A button: four variants, three sizes, a loading state. Submits forms. |
 | `qds-card` | A container with media, header, body, and footer regions. |
 | `qds-checkbox` | A checkbox, including the indeterminate state. |
-| `qds-checkbox-group` | A labelled set of checkboxes, with a hint and "choose at least one". |
+| `qds-checkbox-group` | A labeled set of checkboxes, with a hint and "choose at least one". |
 | `qds-chip` | A compact status or category label. Removable, or `selectable` as a filter chip. |
 | `qds-icon` | An icon from Lucide's set, sized by tokens. Decorative unless given a `label`. |
 | `qds-input` | A bare single-line text input, named by its `label` attribute. |

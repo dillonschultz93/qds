@@ -9,7 +9,7 @@ const faq = (exclusive = false) => html`
   <qds-accordion ?exclusive=${exclusive}>
     <qds-accordion-item heading="Shipping">Ships in 3 to 5 days.</qds-accordion-item>
     <qds-accordion-item heading="Returns">Free returns for 30 days.</qds-accordion-item>
-    <qds-accordion-item heading="Warranty">Two years, parts and labour.</qds-accordion-item>
+    <qds-accordion-item heading="Warranty">Two years, parts and labor.</qds-accordion-item>
   </qds-accordion>
 `;
 
@@ -30,7 +30,7 @@ const press = (key: string): void => {
 };
 
 describe('qds-accordion-item', () => {
-  it('is a heading wrapping a button that controls a labelled region', async () => {
+  it('is a heading wrapping a button that controls a labeled region', async () => {
     const item = await fixture<QdsAccordionItem>(
       html`<qds-accordion-item heading="Shipping" heading-level="2">Details</qds-accordion-item>`,
     );

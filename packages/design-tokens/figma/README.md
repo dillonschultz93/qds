@@ -34,13 +34,13 @@ are kept, and so is every binding on the canvas.
   `var(--qds-semantic-color-background-primary-rest)`. `build.js` asserts this for every token.
 - **Units:** `rem` × 16 → px; `ms` → seconds (Figma's timing type); cubic-bézier → Figma easing.
 - **Scopes** come from the token type and path: backgrounds → fills, content → text and shape
-  fills, borders → stroke colour, spacing → gap/size, and so on. Primitive colours are hidden from
-  pickers, so designers reach for semantic colours.
+  fills, borders → stroke color, spacing → gap/size, and so on. Primitive colors are hidden from
+  pickers, so designers reach for semantic colors.
 - **Line height and letter spacing** are unitless and `em` in code, but Figma reads a bound
   variable as pixels. Those variables are code-only (no scopes); the text styles carry them as
   percentages instead.
 - **Typography composites** become text styles, with family, size and weight bound to variables.
-- **Shadows** become effect styles with every field bound. The shadow colour differs between
+- **Shadows** become effect styles with every field bound. The shadow color differs between
   Light and Dark, so each shadow has a Figma-only Semantic helper, `elevation/<name>/color`, with
   no CSS counterpart. Component `box-shadow` tokens all reference `elevation.*`, so components
   use the `elevation/*` styles directly.

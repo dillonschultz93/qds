@@ -164,7 +164,7 @@ describe('qds-modal', () => {
     const form = modal.querySelector('form') as HTMLFormElement;
 
     // One listener on the form (runs before the modal's) and one on the document
-    // (runs after it): either cancelling must keep the dialog open.
+    // (runs after it): either canceling must keep the dialog open.
     for (const target of [form, document] as EventTarget[]) {
       const cancel = (event: Event) => event.preventDefault();
       target.addEventListener('submit', cancel);
@@ -172,7 +172,7 @@ describe('qds-modal', () => {
       await new Promise((resolve) => setTimeout(resolve, 20));
       target.removeEventListener('submit', cancel);
 
-      expect(dialogOf(modal).open, `cancelled on ${target === form ? 'the form' : 'the document'}`)
+      expect(dialogOf(modal).open, `canceled on ${target === form ? 'the form' : 'the document'}`)
         .to.be.true;
     }
   });

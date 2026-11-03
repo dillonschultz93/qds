@@ -405,7 +405,7 @@ Each token set is a top-level key, alongside the plugin's own `$themes` and `$me
 ```
 
 Single-file rather than the folder layout because **multi-file sync requires a Tokens Studio Pro
-licence.** The cost of that choice is paid in the build, not in the grammar: the sets have to be
+license.** The cost of that choice is paid in the build, not in the grammar: the sets have to be
 merged into one tree before Style Dictionary can resolve a cross-set reference like
 `{color.blue.600}`, and merging erases the only record of which tier a token belongs to. So
 `lib/source.js` stamps each token with the set it came from as it merges, and

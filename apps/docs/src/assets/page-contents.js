@@ -1,7 +1,6 @@
 /**
- * "On this page": marks the section being read, as Spectrum's and Material's
- * page contents do. The list itself is built at build time; this only moves
- * aria-current as the reader scrolls.
+ * "On this page": marks the section being read. The list itself is built
+ * at build time; this only moves aria-current as the reader scrolls.
  *
  * The current section is the last one whose heading has scrolled past the top
  * fifth of the window — so a short final section still becomes current once

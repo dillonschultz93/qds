@@ -54,7 +54,7 @@ describe('qds-alert', () => {
     }
   });
 
-  it('hides itself when dismissed, unless the event is cancelled', async () => {
+  it('hides itself when dismissed, unless the event is canceled', async () => {
     const element = await fixture<QdsAlert>(html`<qds-alert dismissible>Message</qds-alert>`);
     const button = element.shadowRoot!.querySelector<HTMLButtonElement>('.dismiss')!;
     expect(button.getAttribute('aria-label')).to.equal('Dismiss');

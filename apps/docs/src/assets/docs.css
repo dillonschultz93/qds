@@ -707,9 +707,9 @@ p > qds-chip:first-child {
 /* ── Page layout ──────────────────────────────────────────────────────────── */
 
 /*
- * Three columns where there is room, as Material and Spectrum lay out their
- * docs: the section's pages, the content, and the page's own contents. The
- * sidebar and contents columns only exist on pages that have them.
+ * Three columns where there is room: the section's pages, the content, and
+ * the page's own contents. The sidebar and contents columns only exist on
+ * pages that have them.
  */
 .page {
   display: grid;
@@ -890,7 +890,7 @@ p > qds-chip:first-child {
 }
 
 /*
- * Overview / API, as Material's component tabs: links between two pages, drawn
+ * Overview / API tabs: links between two pages, drawn
  * with qds-tabs' own component tokens so they match the component exactly.
  */
 .page-tabs {
@@ -1248,7 +1248,7 @@ p > qds-chip:first-child {
 /* ── Playground ───────────────────────────────────────────────────────────── */
 
 /*
- * As Spectrum lays out its component previews: the component and its code on
+ * The component and its code on
  * one side, its controls on the other; stacked where the column is narrow.
  */
 .playground {
@@ -1422,7 +1422,7 @@ p > qds-chip:first-child {
 /* ── Home bands ───────────────────────────────────────────────────────────── */
 
 /*
- * Mantine's home page rhythm: a hero with the numbers that matter, then one
+ * The home page rhythm: a hero with the numbers that matter, then one
  * band per idea, each with a short lede and something live to look at.
  */
 .prose p.hero__eyebrow {
@@ -1475,7 +1475,7 @@ p > qds-chip:first-child {
   color: var(--qds-semantic-color-content-subtle);
 }
 
-/* The AI band sits on its own surface, as Mantine sets theirs apart. */
+/* The AI band sits on its own surface, set apart from the others. */
 .home-band--ai {
   padding: var(--qds-spacing-400);
   background: var(--qds-semantic-color-background-subtle);

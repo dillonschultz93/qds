@@ -36,7 +36,7 @@ export function pageRange(total: number, current: number, siblings: number): Arr
  *     moves `current` there and fires `qds-change`, for a list that pages
  *     itself in place.
  *
- * Either way `qds-change` fires first and can be cancelled, so an app with its
+ * Either way `qds-change` fires first and can be canceled, so an app with its
  * own router can take over a link's navigation.
  *
  * Follows the usual accessible pattern: a navigation landmark around a list,

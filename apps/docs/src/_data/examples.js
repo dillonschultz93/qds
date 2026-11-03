@@ -14,7 +14,7 @@ export default function () {
     'qds-button': [
       {
         title: 'Variants',
-        description: 'Four levels of emphasis. Every colour resolves through the component tier.',
+        description: 'Four levels of emphasis. Every color resolves through the component tier.',
         html: `<qds-button variant="primary">Primary</qds-button>
 <qds-button variant="secondary">Secondary</qds-button>
 <qds-button variant="ghost">Ghost</qds-button>
@@ -447,7 +447,7 @@ export default function () {
     Yes — returns are free for 30 days from delivery.
   </qds-accordion-item>
   <qds-accordion-item heading="Is there a warranty?">
-    Every product carries a two-year warranty covering parts and labour.
+    Every product carries a two-year warranty covering parts and labor.
   </qds-accordion-item>
   <qds-accordion-item heading="Gift cards (coming soon)" disabled>
     Not available yet.
@@ -572,7 +572,7 @@ export default function () {
 </qds-stack>`,
       },
       {
-        title: 'Decorative or labelled',
+        title: 'Decorative or labeled',
         description:
           'Beside text, an icon is decorative and hidden from assistive technology. Standing alone, it needs a label, which makes it an image with that name.',
         html: `<p style="margin: 0; display: flex; align-items: center; gap: 0.5rem;">

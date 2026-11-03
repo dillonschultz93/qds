@@ -192,11 +192,11 @@ check('theme toggle cycles system → light → dark',
   light.theme === 'light' && dark.theme === 'dark',
   `${before.theme} → ${light.theme} → ${dark.theme}  (label: "${dark.label}")`);
 
-check('dark mode changes page colours',
+check('dark mode changes page colors',
   light.bodyBg !== dark.bodyBg && light.bodyFg !== dark.bodyFg,
   `bg ${light.bodyBg} → ${dark.bodyBg}   fg ${light.bodyFg} → ${dark.bodyFg}`);
 
-check('dark mode reaches inside shadow DOM (button recoloured)',
+check('dark mode reaches inside shadow DOM (button recolored)',
   light.buttonBg !== dark.buttonBg,
   `button bg ${light.buttonBg} → ${dark.buttonBg}`);
 
@@ -1029,7 +1029,7 @@ const textarea = await page.evaluate(() => {
   const area = field?.shadowRoot.querySelector('textarea');
   return { rows: area?.rows, label: area?.labels[0]?.textContent.trim(), hint: area?.getAttribute('aria-describedby') };
 });
-check('a multiline text field is a labelled, described textarea',
+check('a multiline text field is a labeled, described textarea',
   textarea.rows === 4 && textarea.label === 'Delivery instructions' && textarea.hint === 'hint', JSON.stringify(textarea));
 
 await gotoReady('/components/modal/');

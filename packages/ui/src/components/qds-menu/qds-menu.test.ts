@@ -132,7 +132,7 @@ describe('qds-menu', () => {
     expect(menu.querySelector('button')!.getAttribute('aria-expanded')).to.equal('false');
   });
 
-  it('stays open when qds-select is cancelled', async () => {
+  it('stays open when qds-select is canceled', async () => {
     const menu = await makeMenu();
     menu.addEventListener('qds-select', (event) => event.preventDefault());
     menu.show();
