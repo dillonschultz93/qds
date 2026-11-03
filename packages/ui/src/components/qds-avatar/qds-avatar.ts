@@ -112,6 +112,13 @@ export class QdsAvatar extends QdsElement {
     return words.length > 1 ? first(words[0]) + first(words.at(-1)) : first(words[0]);
   }
 
+  protected override firstUpdated(): void {
+    // A server-rendered image can fail before the element hydrates, when no
+    // error listener is attached yet, so check whether it already has.
+    const image = this.renderRoot.querySelector('img');
+    if (image?.complete && image.naturalWidth === 0) this.failed = true;
+  }
+
   protected override willUpdate(changed: PropertyValues<this>): void {
     if (changed.has('src')) this.failed = false;
   }
