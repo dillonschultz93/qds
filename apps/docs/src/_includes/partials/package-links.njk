@@ -1,17 +1,33 @@
 {#
   A package's name and version, where to get it, and how to install it.
   Expects `pkg`, from _data/packages.js. A package without a version, an npm
-  page, a changelog, or an install command leaves that part out.
+  page, a changelog, a Figma file, or an install command leaves that part out.
+
+  The links are icon-only, each wrapped in a qds-tooltip. The link has no text
+  of its own, so the tooltip's text becomes its accessible name as well as the
+  label shown on hover and focus. The icons are registered by link-icons.js.
+
+  `figmaPage`, when set, names the page inside the Figma file that documents
+  this component. Community file links open the whole file, so the page name is
+  how a reader finds the component once it is open.
 #}
+{% macro iconLink(href, icon, text) %}
+  <li>
+    <qds-tooltip text="{{ text }}" placement="bottom">
+      <a class="icon-link" href="{{ href }}" rel="noopener"><qds-icon name="{{ icon }}"></qds-icon></a>
+    </qds-tooltip>
+  </li>
+{% endmacro %}
 <div class="package-links">
   <p class="package-links__name">
     <code>{{ pkg.name }}</code>
     {% if pkg.version %}<qds-chip>{{ pkg.version }}</qds-chip>{% endif %}
   </p>
-  <ul class="package-links__list">
-    {% if pkg.npm %}<li><a href="{{ pkg.npm }}" rel="noopener">npm</a></li>{% endif %}
-    <li><a href="{{ pkg.source }}" rel="noopener">Source on GitHub</a></li>
-    {% if pkg.changelog %}<li><a href="{{ pkg.changelog }}" rel="noopener">Changelog</a></li>{% endif %}
+  <ul class="package-links__list" aria-label="{{ pkg.name }} links">
+    {% if pkg.npm %}{{ iconLink(pkg.npm, 'npm', pkg.name + ' on npm') }}{% endif %}
+    {{ iconLink(pkg.source, 'github', 'Source on GitHub') }}
+    {% if pkg.changelog %}{{ iconLink(pkg.changelog, 'history', 'Changelog') }}{% endif %}
+    {% if pkg.figma %}{{ iconLink(pkg.figma, 'figma', ('Figma: the ' + figmaPage + ' page') if figmaPage else 'Figma file') }}{% endif %}
   </ul>
   {% if pkg.install %}<pre class="package-links__install"><code>{{ pkg.install }}</code></pre>{% endif %}
 </div>

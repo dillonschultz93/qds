@@ -20,7 +20,9 @@
     "@lit-labs/eleventy-plugin-lit": "^1.0.6",
     "@lit-labs/ssr-client": "^1.1.8",
     "esbuild": "^0.28.1",
+    "lucide": "1.59.0",
     "playwright": "^1.62.1",
+    "simple-icons": "^16.36.0",
     "wrangler": "4.151.1"
   }
 }

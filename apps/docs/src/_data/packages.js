@@ -11,6 +11,8 @@
 
 import { readFile } from 'node:fs/promises';
 
+import site from './site.js';
+
 const OWNER = 'https://github.com/dillonschultz93';
 const REPO = `${OWNER}/qds`;
 
@@ -42,9 +44,10 @@ async function published(name) {
 }
 
 export default async function () {
+  const { figma } = site();
   return {
-    tokens: await local('design-tokens'),
-    ui: await local('ui'),
+    tokens: { ...(await local('design-tokens')), figma: figma.tokens },
+    ui: { ...(await local('ui')), figma: figma.components },
     skills: {
       name: '@quieto/skills',
       version: await published('@quieto/skills'),

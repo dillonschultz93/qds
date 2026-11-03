@@ -14,7 +14,10 @@
 </div>
 
 {% set pkg = packages.ui %}
+{# The Figma file names each page after its family, except Radio group, whose page is "Radio". #}
+{% set figmaPage = 'Radio' if family.name == 'Radio group' else family.name %}
 {% include "partials/package-links.njk" %}
+{% set figmaPage = null %}
 
 <nav class="page-tabs" aria-label="{{ family.name }} documentation">
   <a href="{{ family.url }}"{% if page.url == family.url %} aria-current="page"{% endif %}>Overview</a>

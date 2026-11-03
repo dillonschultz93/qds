@@ -23,7 +23,7 @@ toc: false
     space, and type style is a token; every component is styled by nothing else.
   </p>
   <qds-stack direction="inline" gap="300" wrap>
-    <a class="hero__action" href="/components/">Browse components</a>
+    <a class="hero__action hero__action--primary" href="/components/">Browse components</a>
     <a class="hero__action" href="/foundations/tokens/">Read about tokens</a>
   </qds-stack>
 
@@ -135,6 +135,36 @@ toc: false
   {% endexample %}
 
   <p><a href="/foundations/tokens/">How the three token tiers fit together</a></p>
+</section>
+
+<section class="home-band">
+  <h2>Design in Figma</h2>
+  <p class="home-band__lede">
+    The tokens and components are on Figma Community as two files, built on the
+    same variables as the code: the same names, the same Light and Dark modes.
+    Duplicate them to design with QDS.
+  </p>
+  <ul class="card-grid">
+    <li>
+      <qds-card class="link-card" variant="elevated">
+        <h3 slot="header"><a href="{{ site.figma.tokens }}" rel="noopener">Quieto Tokens</a></h3>
+        <p>
+          Every token as a Figma variable, in primitive, semantic, and component
+          collections, with text and effect styles and a page for each foundation.
+        </p>
+      </qds-card>
+    </li>
+    <li>
+      <qds-card class="link-card" variant="elevated">
+        <h3 slot="header"><a href="{{ site.figma.components }}" rel="noopener">Quieto Components</a></h3>
+        <p>
+          The {{ docs.families | length }} components, each on its own page with
+          examples, usage, the code API, and its component tokens.
+        </p>
+      </qds-card>
+    </li>
+  </ul>
+  <p><a href="{{ site.figma.profile }}" rel="noopener">Quieto on Figma Community</a></p>
 </section>
 
 <section class="home-band">

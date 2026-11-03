@@ -1,25 +1,30 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{% if title %}{{ title }} · {{ site.shortTitle }}{% else %}{{ site.title }}{% endif %}</title>
     <meta name="description" content="{{ description or site.description }}" />
+    {# The Quieto mark. The SVG switches to a lighter blue in a dark browser theme; the PNGs are fallbacks. #}
+    <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/assets/favicon-32.png" type="image/png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" />
 
     {#
       The theme must be resolved BEFORE first paint, or a reader whose stored
       preference is dark sees a white flash while the stylesheet and script load.
-      Inline and synchronous in the head is the only place that works.
+      Inline and synchronous in the head is the only place that works. The root
+      ships data-theme="light", so light is the default and the OS setting is
+      ignored; this only switches to a stored dark.
     #}
     <script>
       (function () {
         try {
-          var stored = localStorage.getItem('qds-theme');
-          if (stored === 'light' || stored === 'dark') {
-            document.documentElement.dataset.theme = stored;
+          if (localStorage.getItem('qds-theme') === 'dark') {
+            document.documentElement.dataset.theme = 'dark';
           }
         } catch (error) {
-          /* Private mode: fall back to prefers-color-scheme. */
+          /* Private mode: stay light. */
         }
       })();
     </script>
@@ -41,7 +46,7 @@
     {% set section = docs.sections | sectionFor(page.url) %}
 
     <header class="site-header">
-      <a class="site-header__brand" href="/">{{ site.shortTitle }}</a>
+      <a class="site-header__brand" href="/" aria-label="{{ site.title }}, home">{% include "partials/logo.svg.njk" %}</a>
 
       <nav class="site-nav" aria-label="Main">
         <ul>
@@ -68,13 +73,14 @@
           aria-keyshortcuts="/ Control+K Meta+K"
           hidden
         >Search <kbd>/</kbd></button>
-        <button
-          id="theme-toggle"
-          class="theme-toggle"
-          type="button"
-          aria-live="polite"
-        >Theme</button>
-        <a href="{{ site.repo }}" rel="noopener">GitHub</a>
+        {# Hidden until theme-toggle.js loads; the tooltip names it, and aria-pressed says whether dark is on. #}
+        <qds-tooltip text="Dark theme" placement="bottom">
+          <button id="theme-toggle" class="icon-link" type="button" aria-pressed="false" hidden><qds-icon name="moon"></qds-icon></button>
+        </qds-tooltip>
+        {# Icon-only; the tooltip's text becomes the link's name. The icon is registered by link-icons.js. #}
+        <qds-tooltip text="QDS on GitHub" placement="bottom">
+          <a class="icon-link" href="{{ site.repo }}" rel="noopener"><qds-icon name="github"></qds-icon></a>
+        </qds-tooltip>
       </div>
     </header>
 
@@ -136,6 +142,14 @@
           <h2 class="site-footer__heading">Packages</h2>
           <ul>
             {% for key in ['ui', 'tokens', 'skills'] %}<li><a href="{{ packages[key].npm }}" rel="noopener">{{ packages[key].name }}</a></li>{% endfor %}
+          </ul>
+        </div>
+        <div>
+          <h2 class="site-footer__heading">Figma</h2>
+          <ul>
+            <li><a href="{{ site.figma.tokens }}" rel="noopener">Quieto Tokens</a></li>
+            <li><a href="{{ site.figma.components }}" rel="noopener">Quieto Components</a></li>
+            <li><a href="{{ site.figma.profile }}" rel="noopener">Figma Community</a></li>
           </ul>
         </div>
         <div>

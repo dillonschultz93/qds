@@ -57,40 +57,90 @@ body {
   background: var(--qds-semantic-color-background-subtle);
 }
 
+/* The Quieto mark, in the primary content color so it follows the theme. */
 .site-header__brand {
-  font-family: var(--qds-semantic-typography-title-font-family);
-  font-size: var(--qds-semantic-typography-title-font-size);
-  font-weight: var(--qds-semantic-typography-title-font-weight);
-  color: var(--qds-semantic-color-content-default);
-  text-decoration: none;
+  display: inline-flex;
+  color: var(--qds-semantic-color-content-primary-rest);
+  border-radius: var(--qds-semantic-radius-default);
+}
+
+.site-header__brand:hover {
+  color: var(--qds-semantic-color-content-primary-hover);
+}
+
+.site-header__brand .logo {
+  width: var(--qds-spacing-600);
+  height: var(--qds-spacing-600);
+}
+
+@media (forced-colors: active) {
+  .site-header__brand {
+    color: LinkText;
+  }
 }
 
 .site-nav ul {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--qds-spacing-400);
+  gap: var(--qds-spacing-100);
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.site-nav a,
+/*
+ * Section links as buttons, sized and colored from qds-button's ghost tokens, with
+ * the radius.default corners (border.radius.md): a fill on hover, and a tint for
+ * the section being read (aria-current is
+ * "page" on a section's landing page and "true" anywhere inside it).
+ */
+.site-nav a {
+  display: inline-block;
+  padding: var(--qds-component-button-md-padding-block) var(--qds-component-button-md-padding-inline);
+  font-size: var(--qds-component-button-md-font-size);
+  font-weight: var(--qds-component-button-font-weight);
+  line-height: var(--qds-component-button-line-height);
+  color: var(--qds-semantic-color-content-default);
+  text-decoration: none;
+  border-radius: var(--qds-semantic-radius-default);
+  transition:
+    background-color var(--qds-component-button-duration),
+    color var(--qds-component-button-duration);
+}
+
+.site-nav a:hover {
+  background-color: var(--qds-component-button-ghost-color-background-hover);
+}
+
+.site-nav a:active {
+  background-color: var(--qds-component-button-ghost-color-background-active);
+}
+
+/* The info pair, as alerts use it, so the text meets contrast on the tint in both modes. */
+.site-nav a[aria-current] {
+  color: var(--qds-semantic-color-content-info);
+  background-color: var(--qds-semantic-color-background-info);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-nav a {
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .site-nav a[aria-current] {
+    outline: 1px solid LinkText;
+  }
+}
+
 .site-header__actions a {
   color: var(--qds-semantic-color-content-primary-rest);
   text-decoration: none;
 }
 
-.site-nav a:hover,
 .site-header__actions a:hover {
   color: var(--qds-semantic-color-content-primary-hover);
-  text-decoration: underline;
-}
-
-.site-nav a[aria-current='page'] {
-  color: var(--qds-semantic-color-content-default);
-  font-weight: var(--qds-typography-font-weight-semibold);
-  text-decoration: underline;
-  text-underline-offset: 0.25em;
 }
 
 .site-header__actions {
@@ -100,7 +150,6 @@ body {
   margin-inline-start: auto;
 }
 
-.theme-toggle,
 .search-button {
   padding: var(--qds-spacing-100) var(--qds-spacing-300);
   font: inherit;
@@ -112,7 +161,6 @@ body {
   cursor: pointer;
 }
 
-.theme-toggle:hover,
 .search-button:hover {
   background: var(--qds-semantic-color-background-neutral);
 }
@@ -977,6 +1025,22 @@ p > qds-chip:first-child {
   color: var(--qds-component-button-secondary-color-content-rest);
 }
 
+/* The main call to action, drawn as a primary button. */
+.prose .hero__action--primary,
+.prose .hero__action--primary:visited {
+  color: var(--qds-component-button-primary-color-content-rest);
+  background: var(--qds-component-button-primary-color-background-rest);
+  border-color: var(--qds-component-button-primary-color-border-rest);
+}
+
+.prose .hero__action--primary:hover {
+  background: var(--qds-component-button-primary-color-background-hover);
+}
+
+.prose .hero__action--primary:active {
+  background: var(--qds-component-button-primary-color-background-active);
+}
+
 .card-grid--sections {
   grid-template-columns: repeat(auto-fill, minmax(min(13rem, 100%), 1fr));
 }
@@ -1397,18 +1461,67 @@ p > qds-chip:first-child {
   margin: 0;
 }
 
-.package-links__list {
+/* `.prose ul` here, to outrank the bottom margin `.prose ul` gives every list. */
+.prose ul.package-links__list {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--qds-spacing-400);
+  gap: var(--qds-spacing-100);
   margin: 0;
   padding: 0;
   list-style: none;
-  font-size: var(--qds-typography-font-size-200);
 }
 
 .prose .package-links__list li {
   margin: 0;
+}
+
+/*
+ * An icon-only link drawn as a ghost icon button, from qds-button's own tokens,
+ * so it matches the component without being one: a qds-button is a button, and
+ * these navigate. Used by the package links and the header's GitHub link, and by
+ * the header's theme toggle, a native button reset to the same look below.
+ */
+.prose a.icon-link,
+.site-header__actions .icon-link {
+  display: inline-grid;
+  place-items: center;
+  padding: var(--qds-component-button-md-padding-block);
+  color: var(--qds-semantic-color-content-subtle);
+  border-radius: var(--qds-component-button-border-radius);
+  transition:
+    background-color var(--qds-component-button-duration),
+    color var(--qds-component-button-duration);
+}
+
+.prose a.icon-link:hover,
+.site-header__actions .icon-link:hover {
+  color: var(--qds-semantic-color-content-default);
+  background-color: var(--qds-component-button-ghost-color-background-hover);
+}
+
+.prose a.icon-link:active,
+.site-header__actions .icon-link:active {
+  background-color: var(--qds-component-button-ghost-color-background-active);
+}
+
+/* The theme toggle is a native button: clear its own chrome. [hidden] must still win. */
+.site-header__actions button.icon-link {
+  margin: 0;
+  font: inherit;
+  background-color: transparent;
+  border: 0;
+  cursor: pointer;
+}
+
+.site-header__actions button.icon-link[hidden] {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .prose a.icon-link,
+  .site-header__actions .icon-link {
+    transition: none;
+  }
 }
 
 /* The install command fills the row's last line. */

@@ -39,9 +39,15 @@ importers:
       esbuild:
         specifier: ^0.28.1
         version: 0.28.1
+      lucide:
+        specifier: 1.59.0
+        version: 1.59.0
       playwright:
         specifier: ^1.62.1
         version: 1.62.1
+      simple-icons:
+        specifier: ^16.36.0
+        version: 16.36.0
       wrangler:
         specifier: 4.151.1
         version: 4.151.1
@@ -3057,6 +3063,10 @@ packages:
   signal-exit@4.1.0:
     resolution: {integrity: sha512-bzyZ1e88w9O1iNJbKnOlvYTrWPDl46O1bG0D3XInv+9tkPrxrN8jUUTiFlDkkmKWgn1M6CfIA13SuGqOa9Korw==}
     engines: {node: '>=14'}
+
+  simple-icons@16.36.0:
+    resolution: {integrity: sha512-+VNPPkqSOLidFeSgBKUWX4n50WPpDC09hav+BgS26anIF1oQOlGBb8LvwGR+6fYRjo+B6CiKzNBceMPkSVXANQ==}
+    engines: {node: '>=0.12.18'}
 
   slash@3.0.0:
     resolution: {integrity: sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==}
@@ -6480,6 +6490,8 @@ snapshots:
   signal-exit@3.0.7: {}
 
   signal-exit@4.1.0: {}
+
+  simple-icons@16.36.0: {}
 
   slash@3.0.0: {}
 
