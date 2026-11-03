@@ -1,6 +1,6 @@
 {
   "name": "@quieto/ui",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "QDS web components — Lit elements styled entirely by @quieto/design-tokens.",
   "type": "module",
   "license": "MIT",
