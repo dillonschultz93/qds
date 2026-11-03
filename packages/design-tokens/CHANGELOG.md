@@ -1,5 +1,15 @@
 # @quieto/design-tokens
 
+## 1.0.0
+
+### Major Changes
+
+- ceb2d11: 1.0.0: the first stable release. Nothing is removed or renamed in this release; the major version marks the start of semantic versioning's promise. From here, removing or renaming a token, element, attribute, event, slot, or CSS part waits for the next major version, and the READMEs set out exactly what is public API.
+
+### Minor Changes
+
+- f67627c: Add component token sets for the Tier 2 components: `qds-toast`, `qds-checkbox-group`, `qds-spinner`, `qds-avatar`, `qds-breadcrumbs`, and `qds-pagination`.
+
 ## 0.3.0
 
 ### Minor Changes

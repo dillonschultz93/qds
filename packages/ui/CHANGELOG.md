@@ -1,5 +1,32 @@
 # @quieto/ui
 
+## 1.0.0
+
+### Major Changes
+
+- ceb2d11: 1.0.0: the first stable release. Nothing is removed or renamed in this release; the major version marks the start of semantic versioning's promise. From here, removing or renaming a token, element, attribute, event, slot, or CSS part waits for the next major version, and the READMEs set out exactly what is public API.
+
+### Minor Changes
+
+- f67627c: Add the Tier 2 components from the roadmap:
+
+  - `qds-toast`, a temporary message in the corner of the screen, announced to screen readers, with `toast()` to show one from code.
+  - `qds-checkbox-group`, a labelled set of checkboxes with a hint, "choose at least one" validation, and one `qds-change` for the set.
+  - `qds-spinner`, a standalone loading indicator.
+  - `qds-avatar`, a person's image, with their initials as the fallback.
+  - `qds-breadcrumbs` and `qds-breadcrumb-item`, the trail of pages above the current one.
+  - `qds-pagination`, page links or buttons with the gaps collapsed.
+
+  The built-in icons gain `chevron-left` and `user`.
+
+- ceb2d11: Add the two variants from the roadmap: `multiline` (and `rows`) on `qds-text-field`, for a textarea with the field's label, hint, errors, and validation; and `placement` on `qds-modal` — `start`, `end`, or `bottom` — for a drawer against that edge.
+
+### Patch Changes
+
+- Updated dependencies [ceb2d11]
+- Updated dependencies [f67627c]
+  - @quieto/design-tokens@1.0.0
+
 ## 0.2.0
 
 ### Minor Changes
