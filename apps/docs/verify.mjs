@@ -17,6 +17,7 @@
  */
 
 import { createServer } from 'node:http';
+import { existsSync } from 'node:fs';
 import { readdir, readFile, stat } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { dirname, join, normalize, extname } from 'node:path';
@@ -1046,6 +1047,25 @@ const drawer = await page.evaluate(() => {
 await page.keyboard.press('Escape');
 check('a drawer is a modal dialog against the end edge, full height',
   drawer.modal && drawer.right && drawer.fullHeight, JSON.stringify(drawer));
+
+// ── llms.txt and llms-full.txt ────────────────────────────────────────────────
+// Plain Markdown for AI assistants: an index of every page, and the full API.
+const llmsIndex = await readFile(join(SITE, 'llms.txt'), 'utf8');
+const llmsFull = await readFile(join(SITE, 'llms-full.txt'), 'utf8');
+const componentManifest = JSON.parse(
+  await readFile(require.resolve('@quieto/ui/custom-elements.json'), 'utf8'),
+);
+const allTags = componentManifest.modules.flatMap((module) =>
+  (module.declarations ?? []).filter((declaration) => declaration.tagName).map((declaration) => declaration.tagName));
+const llmsLinks = [...llmsIndex.matchAll(/\]\((https:\/\/quieto\.dev[^)]*)\)/g)].map(([, url]) => new URL(url).pathname);
+const llmsMissingPages = llmsLinks.filter((path) => !builtPages.includes(path) && !existsSync(join(SITE, path)));
+const llmsMissingTags = allTags.filter((tag) => !llmsFull.includes(`### \`<${tag}>\``));
+check('llms.txt links only to pages that exist, and llms-full.txt documents every element',
+  llmsIndex.startsWith('# Quieto Design System') && llmsLinks.length > 30 && llmsMissingPages.length === 0 &&
+    llmsMissingTags.length === 0 && !/&(#\d+|quot|lt|gt|amp);/.test(llmsIndex + llmsFull),
+  `${llmsLinks.length} links, ${allTags.length} elements` +
+    (llmsMissingPages.length ? `; missing pages: ${llmsMissingPages.join(', ')}` : '') +
+    (llmsMissingTags.length ? `; missing elements: ${llmsMissingTags.join(', ')}` : ''));
 
 // Every component page, on every tab, and the Components landing page name the
 // package they ship in.

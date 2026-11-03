@@ -130,6 +130,7 @@
           <h2 class="site-footer__heading">AI</h2>
           <ul>
             {% for item in (docs.sections | sectionFor('/ai/')).groups[0].pages %}<li><a href="{{ item.url }}">{{ item.title }}</a></li>{% endfor %}
+            <li><a href="/llms.txt">llms.txt</a></li>
           </ul>
         </div>
         <div>

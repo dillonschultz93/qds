@@ -18,17 +18,10 @@
  * differ from the component's defaults, and attributes not worth a control.
  */
 
-import { readFile, readdir } from 'node:fs/promises';
-import { createRequire } from 'node:module';
-import { dirname, join } from 'node:path';
-
+import { optionsOf, typeAliases } from '../../lib/type-aliases.js';
 import { renderPlayground } from '../assets/playground-markup.js';
 import loadDocs from './docs.js';
 import icons from './icons.js';
-
-const require = createRequire(import.meta.url);
-// The package's exports do not include its source, so go from its entry point.
-const UI_SRC = join(dirname(require.resolve('@quieto/ui')), '..', 'src');
 
 /** Never a control: form plumbing set by the page, not a look to try. */
 const ALWAYS_HIDDEN = new Set(['name']);
@@ -174,43 +167,6 @@ const CONFIG = {
   },
   'qds-toggle': { content: 'Notifications', hide: ['value'] },
 };
-
-/** Every `export type X = …;` in the component source, by name. */
-async function typeAliases() {
-  const files = (await readdir(UI_SRC, { recursive: true })).filter(
-    (file) => file.endsWith('.ts') && !file.endsWith('.test.ts'),
-  );
-  const aliases = new Map();
-  for (const file of files) {
-    const source = await readFile(join(UI_SRC, file), 'utf8');
-    for (const [, name, body] of source.matchAll(/export type (\w+)\s*=\s*([^;]+);/g)) {
-      aliases.set(name, body.trim());
-    }
-  }
-  return aliases;
-}
-
-/**
- * The options of a union of literals, following aliases (including an alias of
- * an alias), or null if the type is not one. `undefined` and `null` are dropped:
- * an optional property's type is `QdsStackAlign | undefined`.
- */
-function optionsOf(type, aliases, seen = new Set()) {
-  const options = [];
-  for (const part of type.split('|').map((piece) => piece.trim())) {
-    if (part === 'undefined' || part === 'null') continue;
-    if (aliases.has(part) && !seen.has(part)) {
-      const expanded = optionsOf(aliases.get(part), aliases, new Set([...seen, part]));
-      if (!expanded) return null;
-      options.push(...expanded);
-      continue;
-    }
-    const literal = /^'([^']*)'$/.exec(part)?.[1] ?? (/^\d+$/.test(part) ? part : null);
-    if (literal === null) return null;
-    options.push(literal);
-  }
-  return options.length > 1 ? options : null;
-}
 
 /** A manifest default as the string an attribute would hold: "'primary'" → "primary", "null" → "". */
 const unquote = (value) => {
