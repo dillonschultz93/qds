@@ -32,6 +32,22 @@ const isPublicMember = (member) =>
   !member.name.startsWith('_') &&
   !INTERNAL_MEMBERS.has(member.name);
 
+/**
+ * Lifecycle and form callbacks the browser or Lit calls. Public in the manifest,
+ * since they are public on the class, but nothing an author calls.
+ */
+const CALLBACKS = /^(connected|disconnected|adopted|attributeChanged|form[A-Z]\w*)Callback$|^(firstUpdated|updated|willUpdate|update|shouldUpdate|createRenderRoot)$/;
+
+const isPublicMethod = (member) =>
+  member.kind === 'method' &&
+  member.privacy !== 'private' &&
+  member.privacy !== 'protected' &&
+  !member.static &&
+  !member.name.startsWith('#') &&
+  !member.name.startsWith('_') &&
+  !INTERNAL_MEMBERS.has(member.name) &&
+  !CALLBACKS.test(member.name);
+
 export default async function () {
   const manifestPath = require.resolve('@quieto/ui/custom-elements.json');
   const manifest = JSON.parse(await readFile(manifestPath, 'utf8'));
@@ -65,6 +81,14 @@ export default async function () {
           attribute: attributeFor(member.name)?.name ?? null,
           type: member.type?.text ?? 'unknown',
           default: member.default ?? null,
+          description: (member.description ?? '').trim(),
+        })),
+        /** Methods an author calls, such as show() and close(), with their signatures. */
+        methods: (declaration.members ?? []).filter(isPublicMethod).map((member) => ({
+          name: member.name,
+          signature: `${member.name}(${(member.parameters ?? [])
+            .map((parameter) => `${parameter.name}${parameter.optional ? '?' : ''}${parameter.type ? `: ${parameter.type.text}` : ''}`)
+            .join(', ')})${member.return?.type ? `: ${member.return.type.text}` : ''}`,
           description: (member.description ?? '').trim(),
         })),
         slots: (declaration.slots ?? []).map((slot) => ({

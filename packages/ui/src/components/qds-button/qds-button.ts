@@ -327,6 +327,7 @@ export class QdsButton extends QdsElement {
   @property({ attribute: 'aria-haspopup' })
   popup: string | null = null;
 
+  /** `aria-expanded` on the host, passed to the inner button: whether the popup it opens is open. */
   @property({ attribute: 'aria-expanded' })
   expanded: string | null = null;
 
