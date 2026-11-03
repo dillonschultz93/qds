@@ -1,5 +1,11 @@
 # @quieto/ui
 
+## 1.0.1
+
+### Patch Changes
+
+- 1443b92: Document `qds-button`'s `expanded` property (`aria-expanded`) in the custom elements manifest.
+
 ## 1.0.0
 
 ### Major Changes
