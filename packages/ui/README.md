@@ -38,18 +38,29 @@ import '@quieto/ui/qds-text-field.js';
 | Element | What it is |
 | --- | --- |
 | `qds-accordion`, `qds-accordion-item` | Collapsible sections. Optionally `exclusive`, so only one is open. |
+| `qds-alert` | An inline info, success, warning, or error message. Optionally dismissible. |
+| `qds-avatar` | A person's image, with their initials as the fallback. |
+| `qds-breadcrumbs`, `qds-breadcrumb-item` | The trail of pages above the current one. |
 | `qds-button` | A button: four variants, three sizes, a loading state. Submits forms. |
 | `qds-card` | A container with media, header, body, and footer regions. |
 | `qds-checkbox` | A checkbox, including the indeterminate state. |
+| `qds-checkbox-group` | A labelled set of checkboxes, with a hint and "choose at least one". |
 | `qds-chip` | A compact status or category label. Removable, or `selectable` as a filter chip. |
+| `qds-icon` | An icon from Lucide's set, sized by tokens. Decorative unless given a `label`. |
 | `qds-input` | A bare single-line text input, named by its `label` attribute. |
-| `qds-modal` | A modal dialog, built on the native `<dialog>`. |
+| `qds-menu`, `qds-menu-item` | A menu of actions opened by a button, with full keyboard support. |
+| `qds-modal` | A modal dialog, built on the native `<dialog>`. With `placement`, a drawer against an edge. |
+| `qds-pagination` | Page links or buttons, with the gaps collapsed. |
 | `qds-progress-bar` | Determinate or indeterminate progress. |
 | `qds-radio-group`, `qds-radio` | A set of options of which one is chosen. |
+| `qds-select` | A native select with a label, hint, and error message. |
+| `qds-spinner` | A loading indicator for a wait with no measurable progress. |
 | `qds-stack` | Lays its children out with gaps from the spacing scale. |
 | `qds-tabs`, `qds-tab`, `qds-tab-panel` | Tabs, each showing one panel. |
-| `qds-text-field` | A complete text field: visible label, input, hint, and error message. |
+| `qds-text-field` | A complete text field: visible label, input, hint, and error message. With `multiline`, a textarea. |
+| `qds-toast` | A temporary message in the corner of the screen, announced without moving focus. |
 | `qds-toggle` | An on/off switch, for settings that apply immediately. |
+| `qds-tooltip` | A short label on hover and focus, such as an icon-only button's name. |
 
 Every property, attribute, slot, event, CSS part, and CSS custom property is documented in
 `custom-elements.json`, a
@@ -58,8 +69,9 @@ in this package. Editors and tools that read the format use it for autocomplete.
 
 ## Forms
 
-The form controls — `qds-checkbox`, `qds-radio-group`, `qds-toggle`, `qds-input`,
-`qds-text-field`, and a `qds-button` with `type="submit"` or `"reset"` — take part in a surrounding
+The form controls — `qds-checkbox`, `qds-checkbox-group`, `qds-radio-group`, `qds-select`,
+`qds-toggle`, `qds-input`, `qds-text-field`, and a `qds-button` with `type="submit"` or `"reset"` —
+take part in a surrounding
 `<form>` like native controls do, even though their inputs are inside shadow DOM:
 
 - they submit their value under their `name`
@@ -74,6 +86,16 @@ The form controls — `qds-checkbox`, `qds-radio-group`, `qds-toggle`, `qds-inpu
   <qds-button type="submit">Sign up</qds-button>
 </form>
 ```
+
+## Functions
+
+Besides the elements, the package exports three functions:
+
+- **`toast(message, options)`** shows a `qds-toast` from code: `toast('Saved.', { variant: 'success' })`.
+- **`announce(message, politeness)`** has screen readers read a message aloud without moving focus,
+  through the same live regions the components use, so nothing is announced twice.
+- **`registerIcons(icons)`** adds Lucide icons for `qds-icon`, beyond the built-in set:
+  `registerIcons({ trash: Trash2 })`, with `Trash2` imported from `lucide`.
 
 ## Events
 
@@ -133,10 +155,14 @@ component renders twice.
 
 ## Versioning
 
-This package is pre-1.0, so **component APIs can change in any minor release.** On `0.x`, npm's
-caret range does not cross a minor version: `^0.1.0` installs `0.1.x` but never `0.2.0`. The
+This package follows [semantic versioning](https://semver.org). Its public API is everything in
+`custom-elements.json` — element names, attributes and properties, events and their `detail`, slots,
+CSS parts, and the component tokens each element reads — and the exported functions and types.
+Removing or renaming any of these waits for a major version; new components, attributes, and slots
+arrive in minor versions. A component's shadow DOM, beyond its parts, is not public and can change
+in any release. The
 [changelog](https://github.com/dillonschultz93/qds/blob/main/packages/ui/CHANGELOG.md) lists every
-breaking change.
+change.
 
 ## License
 

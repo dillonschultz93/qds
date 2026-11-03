@@ -156,11 +156,15 @@ const VARIANTS = [
   {
     name: 'Textarea',
     as: 'multiline on qds-text-field',
+    url: '/components/text-field/',
+    built: '1.0.0',
     why: 'It needs the same label, hint, and error as a text field, and can share the form logic the input and text field already share.',
   },
   {
     name: 'Drawer',
     as: 'placement on qds-modal',
+    url: '/components/modal/',
+    built: '1.0.0',
     why: 'A side sheet is the same modal dialog — inert page, focus handling, Escape — in a different position.',
   },
 ];

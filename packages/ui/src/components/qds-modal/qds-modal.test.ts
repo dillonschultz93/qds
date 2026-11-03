@@ -7,6 +7,11 @@ import type { QdsModal } from './qds-modal.js';
 const dialogOf = (modal: QdsModal): HTMLDialogElement =>
   modal.shadowRoot?.querySelector('dialog') as HTMLDialogElement;
 
+/** Waits out the open animation, so a drawer is measured where it comes to rest. */
+const settled = async (modal: QdsModal): Promise<void> => {
+  await Promise.all(dialogOf(modal).getAnimations().map((animation) => animation.finished));
+};
+
 const closeButton = (modal: QdsModal): HTMLButtonElement =>
   modal.shadowRoot?.querySelector('.close') as HTMLButtonElement;
 
@@ -260,5 +265,47 @@ describe('qds-modal', () => {
     } finally {
       document.documentElement.style.removeProperty('--qds-component-modal-lg-max-width');
     }
+  });
+
+  describe('placement', () => {
+    for (const placement of ['start', 'end'] as const) {
+      it(`sits against the ${placement} edge, full height, as a ${placement} drawer`, async () => {
+        const modal = await fixture<QdsModal>(
+          html`<qds-modal heading="Filters" placement=${placement} size="sm" open>Content</qds-modal>`,
+        );
+        await elementUpdated(modal);
+        await settled(modal);
+        const box = dialogOf(modal).getBoundingClientRect();
+
+        expect(Math.round(box.height)).to.equal(window.innerHeight);
+        if (placement === 'start') expect(Math.round(box.left)).to.equal(0);
+        else expect(Math.round(box.right)).to.equal(document.documentElement.clientWidth);
+        expect(Math.round(box.width)).to.equal(384);
+        modal.close();
+      });
+    }
+
+    it('rises from the bottom edge, full width, as a bottom sheet', async () => {
+      const modal = await fixture<QdsModal>(html`<qds-modal heading="Share" placement="bottom" open>Content</qds-modal>`);
+      await elementUpdated(modal);
+      await settled(modal);
+      const box = dialogOf(modal).getBoundingClientRect();
+
+      expect(Math.round(box.bottom)).to.equal(window.innerHeight);
+      expect(Math.round(box.width)).to.equal(document.documentElement.clientWidth);
+      modal.close();
+    });
+
+    it('is still a modal dialog: named, with the page inert, closed by Escape', async () => {
+      const modal = await fixture<QdsModal>(html`<qds-modal heading="Filters" placement="end" open>Content</qds-modal>`);
+      await elementUpdated(modal);
+
+      expect(dialogOf(modal).matches(':modal')).to.be.true;
+      await expect(modal).to.be.accessible();
+      setTimeout(() => dialogOf(modal).dispatchEvent(new Event('cancel', { cancelable: true })));
+      dialogOf(modal).close();
+      await oneEvent(modal, 'qds-close');
+      expect(modal.open).to.be.false;
+    });
   });
 });

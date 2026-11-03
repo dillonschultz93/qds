@@ -7,8 +7,10 @@ import { QdsElement } from './qds-element.js';
 export type QdsTextControlType = 'text' | 'email' | 'password' | 'search' | 'tel' | 'url' | 'number';
 
 /**
- * Shared base for the components that wrap one native `<input>`: `qds-input`
- * and `qds-text-field`.
+ * Shared base for the components that wrap one native text control:
+ * `qds-input`, and `qds-text-field`, whose control is an `<input>`, or a
+ * `<textarea>` when it is `multiline`. The two share every property and
+ * method used here.
  *
  * Holds everything about being a form control that the two would otherwise
  * duplicate — the native input's properties, form association, mirroring the
@@ -70,8 +72,8 @@ export class QdsTextControl extends QdsElement {
   @property()
   autocomplete?: string;
 
-  @query('input')
-  protected readonly input!: HTMLInputElement;
+  @query('input, textarea')
+  protected readonly input!: HTMLInputElement | HTMLTextAreaElement;
 
   /** Disabled by its own attribute or by an ancestor `<fieldset disabled>`. */
   @state()

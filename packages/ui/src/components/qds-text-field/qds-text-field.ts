@@ -9,7 +9,8 @@ export type QdsTextFieldType = QdsTextControlType;
 
 /**
  * A complete text field: a visible label, the input, an optional hint, and an
- * error message.
+ * error message. With `multiline` it is a textarea, for text longer than a line,
+ * with the same label, hint, errors, and validation.
  *
  * All four live in one shadow root, which is what makes the wiring possible.
  * `<label for>` and `aria-describedby` are ID references, and an ID reference
@@ -120,7 +121,8 @@ export class QdsTextField extends QdsTextControl {
         outline-offset: 0.0625rem;
       }
 
-      input {
+      input,
+      textarea {
         flex: 1;
         min-width: 0;
         margin: 0;
@@ -133,7 +135,24 @@ export class QdsTextField extends QdsTextControl {
         outline: none;
       }
 
-      input::placeholder {
+      textarea {
+        /* Resized by the reader, taller only: wider would break the layout. */
+        resize: vertical;
+        min-height: 1lh;
+      }
+
+      /* A tall control keeps its affixes level with the first line of text. */
+      :host([multiline]) .control {
+        align-items: flex-start;
+      }
+
+      :host([multiline]) ::slotted([slot='start']),
+      :host([multiline]) ::slotted([slot='end']) {
+        padding-block-start: var(--qds-component-text-field-control-padding-block, 0.5rem);
+      }
+
+      input::placeholder,
+      textarea::placeholder {
         color: var(--qds-component-text-field-placeholder-color-content-rest, #64748b);
         opacity: 1;
       }
@@ -168,8 +187,10 @@ export class QdsTextField extends QdsTextControl {
         cursor: not-allowed;
       }
 
-      :host(:disabled) input {
+      :host(:disabled) input,
+      :host(:disabled) textarea {
         cursor: not-allowed;
+        resize: none;
       }
 
       @media (prefers-reduced-motion: reduce) {
@@ -193,6 +214,18 @@ export class QdsTextField extends QdsTextControl {
   /** The visible label. Also the input's accessible name. */
   @property()
   label = '';
+
+  /**
+   * A textarea in place of the input, for text longer than a line: a comment, a
+   * description, an address. Enter starts a new line rather than committing the
+   * value, and `type` and `pattern` do not apply.
+   */
+  @property({ type: Boolean, reflect: true })
+  multiline = false;
+
+  /** The textarea's height in lines, when `multiline`. The reader can drag it taller. */
+  @property({ type: Number })
+  rows = 3;
 
   /** Help text shown under the input, and read out with it. */
   @property()
@@ -272,6 +305,51 @@ export class QdsTextField extends QdsTextControl {
     if (stale) this.requestUpdate();
   }
 
+  #renderInput(describedBy: string, error: string): TemplateResult {
+    return html`<input
+      id="input"
+      part="input"
+      type=${this.type}
+      .value=${live(this.value)}
+      name=${this.name || nothing}
+      placeholder=${this.placeholder || nothing}
+      aria-describedby=${describedBy || nothing}
+      aria-invalid=${error ? 'true' : nothing}
+      autocomplete=${this.autocomplete ?? nothing}
+      minlength=${this.minlength ?? nothing}
+      maxlength=${this.maxlength ?? nothing}
+      pattern=${this.pattern ?? nothing}
+      ?disabled=${this.disabled || this.formDisabled}
+      ?readonly=${this.readonly}
+      ?required=${this.required}
+      @input=${this.handleInput}
+      @change=${this.handleChange}
+      @blur=${() => (this.touched = true)}
+    />`;
+  }
+
+  #renderTextarea(describedBy: string, error: string): TemplateResult {
+    return html`<textarea
+      id="input"
+      part="input"
+      rows=${this.rows}
+      .value=${live(this.value)}
+      name=${this.name || nothing}
+      placeholder=${this.placeholder || nothing}
+      aria-describedby=${describedBy || nothing}
+      aria-invalid=${error ? 'true' : nothing}
+      autocomplete=${this.autocomplete ?? nothing}
+      minlength=${this.minlength ?? nothing}
+      maxlength=${this.maxlength ?? nothing}
+      ?disabled=${this.disabled || this.formDisabled}
+      ?readonly=${this.readonly}
+      ?required=${this.required}
+      @input=${this.handleInput}
+      @change=${this.handleChange}
+      @blur=${() => (this.touched = true)}
+    ></textarea>`;
+  }
+
   override render(): TemplateResult {
     const error = this.#shownError;
     const hasHint = Boolean(this.hint) || this.hasHintSlot;
@@ -285,26 +363,7 @@ export class QdsTextField extends QdsTextControl {
         </label>
         <div class="control" part="control" @click=${this.focusInput}>
           <slot name="start"></slot>
-          <input
-            id="input"
-            part="input"
-            type=${this.type}
-            .value=${live(this.value)}
-            name=${this.name || nothing}
-            placeholder=${this.placeholder || nothing}
-            aria-describedby=${describedBy || nothing}
-            aria-invalid=${error ? 'true' : nothing}
-            autocomplete=${this.autocomplete ?? nothing}
-            minlength=${this.minlength ?? nothing}
-            maxlength=${this.maxlength ?? nothing}
-            pattern=${this.pattern ?? nothing}
-            ?disabled=${this.disabled || this.formDisabled}
-            ?readonly=${this.readonly}
-            ?required=${this.required}
-            @input=${this.handleInput}
-            @change=${this.handleChange}
-            @blur=${() => (this.touched = true)}
-          />
+          ${this.multiline ? this.#renderTextarea(describedBy, error) : this.#renderInput(describedBy, error)}
           <slot name="end"></slot>
         </div>
         <div id="hint" class="hint" part="hint" ?hidden=${!hasHint}>

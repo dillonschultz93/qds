@@ -310,6 +310,18 @@ export default function () {
   </qds-stack>
 </form>`,
       },
+      {
+        title: 'Multiline',
+        description:
+          'A textarea, for text longer than a line, with the same label, hint, and validation. The reader can drag it taller.',
+        html: `<qds-text-field
+  label="Delivery instructions"
+  hint="Gate codes, where to leave the parcel."
+  multiline
+  rows="4"
+  maxlength="300"
+></qds-text-field>`,
+      },
     ],
 
     'qds-chip': [
@@ -524,6 +536,28 @@ export default function () {
 </qds-button>
 <qds-modal id="info-modal" heading="What's new in 0.2" light-dismiss>
   <p style="margin: 0;">Eleven new components, from checkboxes to tabs.</p>
+</qds-modal>`,
+      },
+      {
+        title: 'Drawers',
+        description:
+          'placement puts the same modal dialog against an edge: a side sheet for filters or details, or a sheet from the bottom on a phone.',
+        html: `<qds-stack direction="inline" gap="200" wrap>
+  <qds-button variant="secondary" onclick="document.getElementById('filters-drawer').show()">Filters</qds-button>
+  <qds-button variant="secondary" onclick="document.getElementById('share-sheet').show()">Share</qds-button>
+</qds-stack>
+<qds-modal id="filters-drawer" heading="Filters" placement="end" size="sm" light-dismiss>
+  <qds-checkbox-group label="Status">
+    <qds-checkbox checked>Open</qds-checkbox>
+    <qds-checkbox>Closed</qds-checkbox>
+  </qds-checkbox-group>
+  <qds-stack slot="footer" direction="inline" gap="200">
+    <qds-button variant="ghost" onclick="this.closest('qds-modal').close()">Cancel</qds-button>
+    <qds-button onclick="this.closest('qds-modal').close('apply')">Apply</qds-button>
+  </qds-stack>
+</qds-modal>
+<qds-modal id="share-sheet" heading="Share" placement="bottom" light-dismiss>
+  <p style="margin: 0;">Anyone with the link can view.</p>
 </qds-modal>`,
       },
     ],
