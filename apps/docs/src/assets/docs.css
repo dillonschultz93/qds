@@ -1543,3 +1543,29 @@ p > qds-chip:first-child {
 .site-footer__columns a {
   color: var(--qds-semantic-color-content-subtle);
 }
+
+/* ── Icon grid (Icons page) ───────────────────────────────────────────────── */
+
+.icon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(8rem, 1fr));
+  gap: var(--qds-spacing-300);
+  margin: 0 0 var(--qds-spacing-600);
+  padding: 0;
+  list-style: none;
+}
+
+.prose .icon-grid li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--qds-spacing-200);
+  margin: 0;
+  padding: var(--qds-spacing-400) var(--qds-spacing-200);
+  background: var(--qds-semantic-color-background-subtle);
+  border-radius: var(--qds-semantic-radius-default);
+}
+
+.icon-grid code {
+  font-size: var(--qds-typography-font-size-100);
+}

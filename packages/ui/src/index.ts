@@ -21,6 +21,8 @@
  */
 
 export { QdsElement } from './internal/qds-element.js';
+export { announce } from './internal/announcer.js';
+export type { QdsPoliteness } from './internal/announcer.js';
 
 export { QdsButton } from './components/qds-button/qds-button.js';
 export type {
@@ -91,3 +93,31 @@ export { QdsModal } from './components/qds-modal/qds-modal.js';
 export type {
   QdsModalSize,
 } from './components/qds-modal/qds-modal.js';
+
+export { QdsIcon, registerIcons } from './components/qds-icon/qds-icon.js';
+export type {
+  QdsIconSize,
+  QdsIconData,
+} from './components/qds-icon/qds-icon.js';
+
+export { QdsSelect } from './components/qds-select/qds-select.js';
+
+export { QdsAlert } from './components/qds-alert/qds-alert.js';
+export type {
+  QdsAlertVariant,
+} from './components/qds-alert/qds-alert.js';
+
+export { QdsTooltip } from './components/qds-tooltip/qds-tooltip.js';
+export type {
+  QdsTooltipPlacement,
+} from './components/qds-tooltip/qds-tooltip.js';
+
+export { QdsMenu } from './components/qds-menu/qds-menu.js';
+export type {
+  QdsMenuPlacement,
+} from './components/qds-menu/qds-menu.js';
+
+export { QdsMenuItem } from './components/qds-menu-item/qds-menu-item.js';
+export type {
+  QdsMenuItemVariant,
+} from './components/qds-menu-item/qds-menu-item.js';

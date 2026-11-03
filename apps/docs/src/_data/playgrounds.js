@@ -24,6 +24,7 @@ import { dirname, join } from 'node:path';
 
 import { renderPlayground } from '../assets/playground-markup.js';
 import loadDocs from './docs.js';
+import icons from './icons.js';
 
 const require = createRequire(import.meta.url);
 // The package's exports do not include its source, so go from its entry point.
@@ -46,7 +47,12 @@ const CONFIG = {
   </qds-accordion-item>
 `,
   },
-  'qds-button': { content: 'Button', hide: ['type', 'value', 'label'] },
+  'qds-alert': {
+    content: 'Your changes are live.',
+    initial: { heading: 'Changes saved' },
+    hide: ['dismiss-label', 'hidden'],
+  },
+  'qds-button': { content: 'Button', hide: ['type', 'value', 'label', 'aria-haspopup', 'aria-expanded'] },
   'qds-card': {
     content: 'Cards group related content and actions.',
     template: `
@@ -56,9 +62,23 @@ const CONFIG = {
   },
   'qds-checkbox': { content: 'Accept the terms', hide: ['value'] },
   'qds-chip': { content: 'Design', hide: ['remove-label'] },
+  'qds-icon': {
+    initial: { name: 'circle-check' },
+    // The name is free text in the manifest; offer the built-in icons.
+    options: { name: icons.builtIn },
+  },
   'qds-input': {
     initial: { label: 'Search', placeholder: 'Search' },
     hide: ['minlength', 'maxlength', 'pattern', 'autocomplete'],
+  },
+  'qds-menu': {
+    hide: ['open', 'label'],
+    template: `
+  <qds-button slot="trigger" variant="secondary">Actions</qds-button>
+  <qds-menu-item>Rename</qds-menu-item>
+  <qds-menu-item>Duplicate</qds-menu-item>
+  <qds-menu-item variant="danger">Delete</qds-menu-item>
+`,
   },
   'qds-modal': {
     initial: { heading: 'Delete this project?' },
@@ -86,6 +106,15 @@ const CONFIG = {
   <qds-radio value="pickup">Pick up in store</qds-radio>
 `,
   },
+  'qds-select': {
+    initial: { label: 'Country', placeholder: 'Choose a country' },
+    hide: ['value'],
+    template: `
+  <option value="ca">Canada</option>
+  <option value="mx">Mexico</option>
+  <option value="us">United States</option>
+`,
+  },
   'qds-stack': {
     initial: { direction: 'inline', gap: '300' },
     template: `
@@ -104,6 +133,12 @@ const CONFIG = {
   <qds-tab-panel>Your name, photo, and bio.</qds-tab-panel>
   <qds-tab-panel>Password and two-factor authentication.</qds-tab-panel>
   <qds-tab-panel>Plan, payment method, and invoices.</qds-tab-panel>
+`,
+  },
+  'qds-tooltip': {
+    initial: { text: 'More actions' },
+    template: `
+  <qds-button variant="secondary">Hover or focus me</qds-button>
 `,
   },
   'qds-text-field': {

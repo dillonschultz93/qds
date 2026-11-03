@@ -78,8 +78,15 @@ export default async function () {
             family.elements.some((tag) => token.name === `qds-component-${tag.replace(/^qds-/, '')}-color-background-rest`)) ??
           // …or any resting or checked background, or failing that any color.
           own(family).find((token) => /-color-background-(rest|checked)$/.test(token.name)) ??
-          own(family).find((token) => token.type === 'color')
+          own(family).find((token) => token.type === 'color') ??
+          // …or, for a family with no colors of its own (Icon), its first token.
+          own(family)[0]
         )?.name,
+        /** The value the restyle example sets: a color for a color token, a length otherwise. */
+        get sampleValue() {
+          const token = own(family).find((candidate) => candidate.name === this.sampleToken);
+          return token?.type === 'color' ? 'var(--qds-color-purple-600)' : '2rem';
+        },
         category: family.category,
         since: family.since,
         summary: family.what ?? family.summary,
@@ -136,8 +143,7 @@ export default async function () {
             {
               title: 'Icons',
               url: '/styles/icons/',
-              summary: 'Planned: the icon set and the qds-icon component.',
-              status: 'Planned',
+              summary: 'Lucide’s outlined icon set, its sizes, and adding the icons an app needs.',
             },
           ],
         },

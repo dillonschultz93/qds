@@ -872,6 +872,86 @@ const indexText = JSON.stringify(searchIndex);
 check('the AI pages are searchable, and the footer headings are not indexed as sections',
   indexText.includes('/ai/mcp/') && indexText.includes('/ai/skills/') && !indexText.includes('"Packages"'));
 
+// ── The Tier 1 components, server-rendered and hydrated ─────────────────────
+await gotoReady('/styles/icons/');
+const iconsPage = await page.evaluate(() => {
+  const icons = [...document.querySelectorAll('.icon-grid qds-icon')];
+  return {
+    count: icons.length,
+    empty: icons.filter((icon) => !icon.shadowRoot?.querySelector('svg')?.children.length).map((icon) => icon.getAttribute('name')),
+    sizes: [...document.querySelectorAll('tbody td:first-child qds-icon')].map((icon) => Math.round(icon.getBoundingClientRect().width)),
+  };
+});
+check('the Icons page draws every built-in icon, at the three token sizes',
+  iconsPage.count >= 14 && iconsPage.empty.length === 0 && iconsPage.sizes.join() === '16,20,24',
+  `${iconsPage.count} icons, empty: ${iconsPage.empty.join(', ') || 'none'}, sizes ${iconsPage.sizes.join('/')}`);
+
+await gotoReady('/components/select/');
+const selectPage = await page.evaluate(() => {
+  const select = document.querySelector('.example qds-select');
+  const native = select?.shadowRoot?.querySelector('select');
+  return { options: native ? [...native.options].map((option) => option.textContent) : [], value: select?.value };
+});
+check('a server-rendered select gets its options when it hydrates',
+  selectPage.options.join('|') === 'Choose a country|Canada|Mexico|United States' && selectPage.value === '',
+  selectPage.options.join(' | '));
+
+await gotoReady('/components/menu/');
+const menuPopup = await page.evaluate(() =>
+  document.querySelector('#file-menu qds-button').shadowRoot.querySelector('button').getAttribute('aria-haspopup'));
+const menuTrigger = page.locator('#file-menu qds-button');
+await menuTrigger.click();
+const menuOpened = await page.evaluate(() => ({
+  open: document.querySelector('#file-menu').shadowRoot.querySelector('.menu').matches(':popover-open'),
+  focused: document.activeElement?.textContent?.trim(),
+}));
+await page.keyboard.press('ArrowDown');
+await page.keyboard.press('Enter');
+const menuResult = await page.evaluate(() => ({
+  result: document.getElementById('file-menu-result').textContent,
+  closed: !document.querySelector('#file-menu').shadowRoot.querySelector('.menu').matches(':popover-open'),
+}));
+check('the menu example opens on click, moves with the keyboard, and reports the choice',
+  menuPopup === 'menu' && menuOpened.open && menuOpened.focused === 'Rename' &&
+    menuResult.result === 'Chose: duplicate' && menuResult.closed,
+  `haspopup=${menuPopup} opened=${menuOpened.open} focused=${menuOpened.focused} → ${menuResult.result}`);
+
+await gotoReady('/components/tooltip/');
+await page.locator('.example qds-tooltip qds-button').first().focus();
+const tooltipShown = await page.evaluate(() => {
+  const tooltip = document.querySelector('.example qds-tooltip');
+  const bubble = tooltip.shadowRoot.querySelector('.tooltip');
+  const button = tooltip.querySelector('qds-button').shadowRoot.querySelector('button');
+  return { open: bubble.matches(':popover-open'), text: bubble.textContent, name: button.getAttribute('aria-label') };
+});
+check('a tooltip shows on focus and names its icon-only button',
+  tooltipShown.open && tooltipShown.text === 'Add' && tooltipShown.name === 'Add',
+  `open=${tooltipShown.open} text=${tooltipShown.text} name=${tooltipShown.name}`);
+
+await gotoReady('/components/alert/');
+await page.locator('.example qds-button', { hasText: 'Save' }).click();
+await page.waitForTimeout(300);
+const alertShown = await page.evaluate(() => ({
+  visible: document.getElementById('save-alert').checkVisibility(),
+  announced: document.querySelector('[data-qds-announcer="polite"]')?.textContent ?? '',
+}));
+check('an alert shown after load is visible and announced',
+  alertShown.visible && alertShown.announced.includes('Your draft was saved'),
+  `visible=${alertShown.visible} announced="${alertShown.announced}"`);
+
+await gotoReady('/roadmap/');
+const roadmapTier1 = await page.evaluate(() => {
+  const shipped = [...document.querySelectorAll('table')][0];
+  return {
+    shipped: ['Icon', 'Select', 'Alert', 'Tooltip', 'Menu'].every((name) => shipped.textContent.includes(name)),
+    tierDone: document.body.textContent.includes('Everything in this tier has shipped'),
+    built: document.body.textContent.match(/Built in 0\.2\.0/g)?.length ?? 0,
+  };
+});
+check('the roadmap lists Tier 1 as shipped, and its foundations as built',
+  roadmapTier1.shipped && roadmapTier1.tierDone && roadmapTier1.built === 3,
+  JSON.stringify(roadmapTier1));
+
 // Every component page, on every tab, and the Components landing page name the
 // package they ship in.
 const uiPackage = JSON.parse(await readFile(new URL('../../packages/ui/package.json', import.meta.url), 'utf8'));

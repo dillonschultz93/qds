@@ -1,68 +1,119 @@
 ---
 layout: layouts/base.njk
 title: Icons
-description: The icon set and the qds-icon component are planned, and not built yet. Until then, this is how to use icons with QDS components.
+description: QDS draws Lucide's outlined icons with qds-icon, sized by tokens and colored like the text around them.
 ---
 
-<p><qds-chip variant="info">Planned</qds-chip> Tier 1 on the <a href="/roadmap/">roadmap</a>, and the first component on it.</p>
-
-<h2>What is coming</h2>
-
 <p>
-  Every icon in the library today is a typed character — <code>+</code>,
-  <code>→</code>, <code>✓</code>. Buttons, chips, inputs, and the planned alerts
-  and menus all need real icons, so the icon component comes before them.
+  QDS uses <a href="https://lucide.dev/icons/" rel="noopener">Lucide</a>
+  ({{ icons.lucideVersion }}, ISC license): over 1,500 icons drawn on one 24-pixel
+  grid in a 2-pixel outline, which suits QDS's quiet look and stays legible at
+  small sizes. <code>&lt;qds-icon&gt;</code> draws them.
 </p>
 
-<ul>
-  <li>
-    <strong>An icon set.</strong> One consistent set, chosen once, rather than
-    icons drawn per component. Not chosen yet.
-  </li>
-  <li>
-    <strong><code>&lt;qds-icon&gt;</code>.</strong> Renders an icon by name,
-    sized and colored by tokens, and hidden from assistive technology unless it is
-    given a label.
-  </li>
-  <li>
-    <strong>Icon size tokens.</strong> So an icon in a button and an icon in a
-    heading are sized from the same scale as the type around them.
-  </li>
+<h2>Built-in icons</h2>
+
+<p>
+  These are registered whenever <code>@quieto/ui</code> loads, because QDS's own
+  components draw them. Use any of them by name.
+</p>
+
+<ul class="icon-grid">
+  {% for name in icons.builtIn %}
+    <li>
+      <qds-icon name="{{ name }}" size="lg"></qds-icon>
+      <code>{{ name }}</code>
+    </li>
+  {% endfor %}
 </ul>
 
-<h2>Until then</h2>
+<h2>Adding icons</h2>
 
 <p>
-  Use inline SVG. Draw with <code>currentColor</code>, so the icon takes the color
-  of the text around it in either mode; size it in <code>em</code>, so it scales
-  with that text; and hide it with <code>aria-hidden="true"</code> when the text
-  next to it already says what it means.
+  Any other Lucide icon is one import and one call away. Find it on
+  <a href="https://lucide.dev/icons/" rel="noopener">lucide.dev</a>, import it from
+  the <code>lucide</code> package, and register it under the name you will use:
 </p>
 
-{% example "An inline SVG icon in a button's start slot" %}
-  <qds-button>
-    <svg slot="start" width="1em" height="1em" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
-      <path d="M8 3v10M3 8h10"></path>
-    </svg>
-    New item
-  </qds-button>
-  <qds-button variant="secondary">
-    Continue
-    <svg slot="end" width="1em" height="1em" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <path d="M3 8h10M9 4l4 4-4 4"></path>
-    </svg>
-  </qds-button>
+<pre><code>import { registerIcons } from '@quieto/ui';
+import { Trash2, Pencil } from 'lucide';
+
+registerIcons({ trash: Trash2, pencil: Pencil });</code></pre>
+
+<p>
+  Each icon is imported on its own, so an app ships only the icons it registers,
+  not the whole set. An icon already on the page that is waiting for its name
+  draws as soon as it is registered, so registering after the page loads is fine.
+  Registering a built-in name replaces that icon everywhere, including inside QDS
+  components.
+</p>
+
+<h2>Sizes</h2>
+
+<p>
+  Three sizes, from the icon size tokens. <code>md</code> is the default.
+</p>
+
+<div class="table-scroll">
+  <table>
+    <thead>
+      <tr><th scope="col">Size</th><th scope="col">Token</th><th scope="col">Value</th><th scope="col">Use</th></tr>
+    </thead>
+    <tbody>
+      {% for size in ['sm', 'md', 'lg'] %}
+        {% set token = tokens.all | findBy('name', 'qds-size-icon-' + size) %}
+        <tr>
+          <td><qds-icon name="search" size="{{ size }}"></qds-icon> <code>{{ size }}</code></td>
+          <td><code>--qds-size-icon-{{ size }}</code></td>
+          <td><code>{{ token.modes.light }}</code></td>
+          <td>{{ token.description | replace('Icon: ', '') | capitalize }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<h2>Color</h2>
+
+<p>
+  An icon is drawn in <code>currentColor</code>: it takes the color of the text
+  around it, so it follows the theme and every state of the component it sits in.
+  To color one on its own, set <code>color</code> on it, from a semantic token:
+</p>
+
+{% example "Icons in the color of their text, and colored on their own" %}
+  <qds-stack direction="inline" gap="400" align="center" wrap>
+    <qds-button variant="danger"><qds-icon slot="start" name="x" size="sm"></qds-icon>Delete</qds-button>
+    <qds-icon name="circle-check" label="Done" style="color: var(--qds-semantic-color-content-success)"></qds-icon>
+    <qds-icon name="triangle-alert" label="Warning" style="color: var(--qds-semantic-color-content-warning)"></qds-icon>
+  </qds-stack>
+{% endexample %}
+
+<h2>Accessibility</h2>
+
+<p>
+  An icon beside text is decorative: the text already says what it means, so the
+  icon is hidden from assistive technology. That is the default.
+</p>
+
+<p>
+  An icon that stands alone has to say what it means itself. Give it a
+  <code>label</code>, which makes it an image with that name. On an icon-only
+  button, name the button instead, with its <code>label</code> or a
+  <a href="/components/tooltip/">tooltip</a>, which also shows the name on hover
+  and focus:
+</p>
+
+{% example "A labelled icon, and an icon-only button named by a tooltip" %}
+  <qds-stack direction="inline" gap="400" align="center">
+    <qds-icon name="info" label="Information"></qds-icon>
+    <qds-tooltip text="Search">
+      <qds-button variant="ghost"><qds-icon name="search" size="sm"></qds-icon></qds-button>
+    </qds-tooltip>
+  </qds-stack>
 {% endexample %}
 
 <p>
-  An icon with no text beside it needs a name of its own. On a button, that is the
-  <code>label</code> attribute:
+  The <a href="/components/icon/">Icon component</a> page has its full API and a
+  playground.
 </p>
-
-{% example "An icon-only button" %}
-  <qds-button variant="ghost" label="Close">
-    <svg width="1em" height="1em" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
-      <path d="M4 4l8 8M12 4l-8 8"></path>
-    </svg>
-  </qds-button>
-{% endexample %}

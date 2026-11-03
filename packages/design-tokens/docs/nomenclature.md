@@ -59,7 +59,8 @@ The available category types are:
 - animation
 
 `spacing` is the space between things; `size` is the dimensions of things, such as container
-widths, which outgrow the spacing scale. `opacity` is transparency, as a number from 0 to 1.
+widths, which outgrow the spacing scale, and icon sizes, under the `icon` sub-category
+(`size.icon.md`). `opacity` is transparency, as a number from 0 to 1.
 
 ##### Sub-category (if needed)
 
@@ -68,6 +69,7 @@ The sub-category identifier signifies any deeper design choices that need to be 
 The available sub-category types are:
 
 - color or hue name (i.e. "blue" or "green")
+- icon
 - font-size
 - font-family
 - font-weight
@@ -207,6 +209,10 @@ primary button or the check mark in a checked box. It flips with the mode — li
 dark in dark — because filled surfaces lighten in dark mode, where light text on them would fall
 below 4.5:1.
 
+As a background, `inverse` is that filled surface itself: an element that stands out from the page
+in either mode, such as a tooltip. It is dark in light mode and light in dark mode, and is always
+paired with `inverse` content.
+
 The status roles also have **border** colors, tuned to reach 3:1 against the page. Because that is
 exactly the requirement for any non-text mark, they are also what solid status indicators use — a
 progress bar's fill, for example.
@@ -325,6 +331,10 @@ Three pairs of roles are easy to confuse:
 primary button or the check mark in a checked box. It flips with the mode — light in light mode,
 dark in dark — because filled surfaces lighten in dark mode, where light text on them would fall
 below 4.5:1.
+
+As a background, `inverse` is that filled surface itself: an element that stands out from the page
+in either mode, such as a tooltip. It is dark in light mode and light in dark mode, and is always
+paired with `inverse` content.
 
 The status roles also have **border** colors, tuned to reach 3:1 against the page. Because that is
 exactly the requirement for any non-text mark, they are also what solid status indicators use — a

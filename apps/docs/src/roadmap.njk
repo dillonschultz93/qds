@@ -164,7 +164,7 @@ description: The components QDS has, the ones it needs next, and the ones it lea
 
 <h2>Shared foundations</h2>
 
-<p>Built once, and used by several planned components.</p>
+<p>Built once, and used by several components.</p>
 
 <div class="table-scroll">
   <table class="roadmap-table">
@@ -178,7 +178,10 @@ description: The components QDS has, the ones it needs next, and the ones it lea
     <tbody>
       {% for item in roadmap.infrastructure %}
         <tr>
-          <th scope="row">{{ item.name }}</th>
+          <th scope="row">
+            {{ item.name }}
+            {% if item.built %}<br /><qds-chip variant="success">Built in {{ item.built }}</qds-chip>{% endif %}
+          </th>
           <td>{{ item.for | join(', ') }}</td>
           <td>{{ item.note }}</td>
         </tr>

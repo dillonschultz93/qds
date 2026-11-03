@@ -316,6 +316,20 @@ export class QdsButton extends QdsElement {
   @property({ attribute: 'label' })
   label: string | null = null;
 
+  /**
+   * `aria-haspopup` and `aria-expanded` on the host, passed to the inner button,
+   * which is the element assistive technology announces. A menu sets them on
+   * the button that opens it; on the host alone they would never be read.
+   *
+   * Named apart from the native `ariaHasPopup` and `ariaExpanded`, which the
+   * host already has and which reflect the same attributes.
+   */
+  @property({ attribute: 'aria-haspopup' })
+  popup: string | null = null;
+
+  @property({ attribute: 'aria-expanded' })
+  expanded: string | null = null;
+
   /** Submitted as the name of this button's entry when it submits a form. */
   @property()
   name = '';
@@ -398,6 +412,8 @@ export class QdsButton extends QdsElement {
         aria-disabled=${this.loading ? 'true' : nothing}
         aria-busy=${this.loading ? 'true' : nothing}
         aria-label=${this.label ?? nothing}
+        aria-haspopup=${this.popup ?? nothing}
+        aria-expanded=${this.expanded ?? nothing}
         @click=${this.#handleClick}
       >
         ${this.loading ? html`<span class="spinner" part="spinner"></span>` : nothing}
