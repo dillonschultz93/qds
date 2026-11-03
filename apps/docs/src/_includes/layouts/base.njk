@@ -79,11 +79,10 @@
     </header>
 
     {#
-      Three columns where there is room, as Material and Spectrum lay out their
-      docs: the section's pages, the content, and the page's own contents. The
-      contents list is filled in at build time from the page's h2s (see the
-      page-contents transform in eleventy.config.js), and dropped when there are
-      fewer than two.
+      Three columns where there is room: the section's pages, the content, and
+      the page's own contents. The contents list is filled in at build time from
+      the page's h2s (see the page-contents transform in eleventy.config.js), and
+      dropped when there are fewer than two.
     #}
     <div class="page{% if section %} page--sectioned{% endif %}{% if wide %} page--wide{% endif %}">
       {% if section %}{% include "partials/sidebar.njk" %}{% endif %}

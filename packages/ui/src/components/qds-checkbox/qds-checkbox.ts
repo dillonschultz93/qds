@@ -86,7 +86,7 @@ export class QdsCheckbox extends QdsElement {
         flex: none;
         width: var(--qds-component-checkbox-control-width, 1rem);
         height: var(--qds-component-checkbox-control-height, 1rem);
-        /* Centre the box on the first line of the label, however tall the text. */
+        /* Center the box on the first line of the label, however tall the text. */
         margin-block-start: calc((1lh - var(--qds-component-checkbox-control-height, 1rem)) / 2);
 
         color: var(--qds-component-checkbox-control-color-content-checked, #f8fafc);

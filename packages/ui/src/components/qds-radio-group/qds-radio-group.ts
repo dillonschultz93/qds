@@ -295,16 +295,16 @@ export class QdsRadioGroup extends QdsElement {
   };
 
   override render(): TemplateResult {
-    const labelled = this.label || this.hasLabelSlot;
+    const labeled = this.label || this.hasLabelSlot;
     return html`
       <div
         part="base"
         role="radiogroup"
-        aria-labelledby=${labelled ? 'label' : nothing}
+        aria-labelledby=${labeled ? 'label' : nothing}
         aria-required=${this.required ? 'true' : nothing}
         aria-disabled=${this.disabled || this.formDisabled ? 'true' : nothing}
       >
-        <div id="label" class="label" part="label" ?hidden=${!labelled}>
+        <div id="label" class="label" part="label" ?hidden=${!labeled}>
           <slot
             name="label"
             @slotchange=${(event: Event) => {

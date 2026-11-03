@@ -74,7 +74,7 @@ describe('qds-stack', () => {
     expect(getComputedStyle(element).flexWrap).to.equal('wrap');
   });
 
-  it('honours the hidden attribute despite setting display on :host', async () => {
+  it('honors the hidden attribute despite setting display on :host', async () => {
     const element = await fixture<QdsStack>(html`<qds-stack hidden><i>a</i></qds-stack>`);
     // :host sets display:flex, which would otherwise defeat [hidden] entirely.
     expect(getComputedStyle(element).display).to.equal('none');

@@ -19,7 +19,7 @@ const choose = (element: QdsSelect, value: string): void => {
 };
 
 describe('qds-select', () => {
-  it('copies its options and groups into the native select, labelled', async () => {
+  it('copies its options and groups into the native select, labeled', async () => {
     const element = await ready(
       await fixture<QdsSelect>(html`
         <qds-select label="Plan">

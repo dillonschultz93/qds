@@ -9,7 +9,7 @@ export type QdsAccordionItemHeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
  * One collapsible section of a `qds-accordion`.
  *
  * Follows the ARIA accordion pattern: a heading wrapping a button that reports
- * `aria-expanded`, and a panel labelled by that button. The heading level is
+ * `aria-expanded`, and a panel labeled by that button. The heading level is
  * configurable because it has to fit the outline of the page around it — an
  * accordion under an h2 needs h3 headings, not whatever the component assumed.
  *

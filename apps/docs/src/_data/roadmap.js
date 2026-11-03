@@ -18,7 +18,7 @@ const BUDGET = 30;
 
 /**
  * Every component, shipped or planned. `category` groups it in the docs'
- * component navigation, as Spectrum's and Material's sidebars group theirs.
+ * component navigation.
  * `since` is the @quieto/ui version a
  * component first shipped in, and `what` a one-line description for the
  * roadmap — the manifest's own descriptions open with API detail, not a
@@ -58,7 +58,7 @@ const COMPONENTS = [
   {
     name: 'Icon', category: 'Display',
     elements: ['qds-icon'], since: '0.2.0',
-    what: 'An icon from Lucide’s set, sized by tokens, decorative unless labelled.',
+    what: 'An icon from Lucide’s set, sized by tokens, decorative unless labeled.',
     tier: 1,
     why: 'Every icon in the library today is a typed character (+, →, ✓). Buttons, chips, inputs, alerts, and menus all need real icons, so this comes first.',
     needs: ['A choice of icon set', 'Icon size tokens'],
@@ -107,7 +107,7 @@ const COMPONENTS = [
   {
     name: 'Checkbox group', category: 'Inputs',
     elements: ['qds-checkbox-group'], since: '0.3.0',
-    what: 'A labelled set of checkboxes, with a hint and "choose at least one".',
+    what: 'A labeled set of checkboxes, with a hint and "choose at least one".',
     tier: 2,
     why: 'Radios have a group with a label and required; checkboxes do not. A set of checkboxes has no group label, no "pick at least one", and no group error.',
     needs: [],

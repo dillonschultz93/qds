@@ -1,7 +1,7 @@
 /**
  * llms.txt and llms-full.txt: the docs, for AI coding assistants.
  *
- * Follows the llmstxt.org format, as Mantine's docs do:
+ * Follows the llmstxt.org format:
  *
  *   /llms.txt       an index: what QDS is, how to set it up, and every page
  *                   with a one-line summary

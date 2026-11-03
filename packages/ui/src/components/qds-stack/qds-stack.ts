@@ -12,7 +12,7 @@ export type QdsStackJustify = 'start' | 'center' | 'end' | 'between' | 'around';
  * Layout primitive that spaces its children using the spacing scale.
  *
  * Deliberately the least visual component in the library: its whole job is to
- * prove that the non-color tiers flow through the pipeline. A colour token
+ * prove that the non-color tiers flow through the pipeline. A color token
  * failing is obvious on sight, whereas a broken spacing token just looks like
  * slightly-off design, so `gap` is constrained to scale steps and nothing else —
  * an arbitrary value cannot be passed in.

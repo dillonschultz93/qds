@@ -10,7 +10,7 @@
  * flow back into the repo as pull requests.
  *
  * Single-file rather than the folder layout because multi-file sync requires a
- * Tokens Studio Pro licence. The cost lands in `lib/source.js`: the sets must be
+ * Tokens Studio Pro license. The cost lands in `lib/source.js`: the sets must be
  * merged before Style Dictionary sees them, and merging is what erases each
  * token's tier, so provenance is stamped on during the merge.
  *

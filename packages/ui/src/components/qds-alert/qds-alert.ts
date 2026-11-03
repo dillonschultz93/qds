@@ -107,7 +107,7 @@ export class QdsAlert extends QdsElement {
       .icon {
         display: inline-flex;
         flex: none;
-        /* Centre a body-sized icon on the first line of text. */
+        /* Center a body-sized icon on the first line of text. */
         height: 1lh;
         align-items: center;
         color: var(--_accent);

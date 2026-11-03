@@ -3,7 +3,7 @@
  *
  * Doubles as a live check on the token pipeline: flipping `data-theme` on the
  * root swaps only the semantic tier's variables, so if the whole page changes
- * colour, the dark token set and `outputReferences` are both working. If nothing
+ * color, the dark token set and `outputReferences` are both working. If nothing
  * moves, the CSS was flattened to literals somewhere.
  *
  * Three states rather than two — light, dark, and "follow the OS" — because a

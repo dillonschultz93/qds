@@ -1,6 +1,6 @@
 /**
- * The site's information architecture: three sections, as Material 3 and
- * Spectrum organise theirs, and a fourth for the AI tools, as Mantine has.
+ * The site's information architecture: three sections, and a fourth for
+ * the AI tools.
  *
  *   Foundations  what the system is built from: the tokens and their grammar
  *   Styles       how it looks: color, typography, icons

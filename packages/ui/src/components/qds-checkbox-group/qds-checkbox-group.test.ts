@@ -26,7 +26,7 @@ async function makeGroup(): Promise<{ form: HTMLFormElement; group: QdsCheckboxG
 }
 
 describe('qds-checkbox-group', () => {
-  it('is a group labelled and described for every checkbox in it', async () => {
+  it('is a group labeled and described for every checkbox in it', async () => {
     const { group } = await makeGroup();
     const base = group.shadowRoot!.querySelector('[part="base"]')!;
 

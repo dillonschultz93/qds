@@ -82,7 +82,7 @@ export function createSearchIndex() {
     const description = decodeEntities(
       html.match(/<meta name="description" content="([^"]*)"/)?.[1] ?? '',
     );
-    // An h3 is labelled with the h2 it sits under: on the Tokens page, "toggle"
+    // An h3 is labeled with the h2 it sits under: on the Tokens page, "toggle"
     // alone does not say it is the component tier's toggle tokens.
     const sections = [];
     let parent = '';

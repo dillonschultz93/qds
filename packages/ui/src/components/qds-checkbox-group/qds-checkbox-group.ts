@@ -249,7 +249,7 @@ export class QdsCheckboxGroup extends QdsElement {
   }
 
   override render(): TemplateResult {
-    const labelled = Boolean(this.label) || this.hasLabelSlot;
+    const labeled = Boolean(this.label) || this.hasLabelSlot;
     const hasHint = Boolean(this.hint) || this.hasHintSlot;
     const error = this.error || (this.touched ? this.validationMessage : '');
     const describedBy = [hasHint ? 'hint' : '', error ? 'error' : ''].filter(Boolean).join(' ');
@@ -259,11 +259,11 @@ export class QdsCheckboxGroup extends QdsElement {
         class="base"
         part="base"
         role="group"
-        aria-labelledby=${labelled ? 'label' : nothing}
+        aria-labelledby=${labeled ? 'label' : nothing}
         aria-describedby=${describedBy || nothing}
         aria-invalid=${error ? 'true' : nothing}
       >
-        <div id="label" class="label" part="label" ?hidden=${!labelled}>
+        <div id="label" class="label" part="label" ?hidden=${!labeled}>
           <slot
             name="label"
             @slotchange=${(event: Event) => {
