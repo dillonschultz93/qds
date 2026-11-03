@@ -63,6 +63,7 @@
     "validate": "node validate.js",
     "docs:anatomy": "node docs/anatomy/generate.js",
     "build": "node docs/anatomy/generate.js && node build.js && tsc nomenclature.js --allowJs --declaration --emitDeclarationOnly --skipLibCheck --outDir dist/types",
+    "figma:build": "node figma/build.js",
     "prepack": "node validate.js && npm run build",
     "dev": "node build.js --watch",
     "test": "node --test",
