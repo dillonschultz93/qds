@@ -2,6 +2,7 @@ import {
   ArrowRight,
   Check,
   ChevronDown,
+  ChevronLeft,
   ChevronRight,
   CircleAlert,
   CircleCheck,
@@ -12,6 +13,7 @@ import {
   Plus,
   Search,
   TriangleAlert,
+  User,
   X,
 } from 'lucide';
 
@@ -34,6 +36,7 @@ const BUILT_IN: Record<string, QdsIconData> = {
   'arrow-right': ArrowRight,
   check: Check,
   'chevron-down': ChevronDown,
+  'chevron-left': ChevronLeft,
   'chevron-right': ChevronRight,
   'circle-alert': CircleAlert,
   'circle-check': CircleCheck,
@@ -44,6 +47,7 @@ const BUILT_IN: Record<string, QdsIconData> = {
   plus: Plus,
   search: Search,
   'triangle-alert': TriangleAlert,
+  user: User,
   x: X,
 };
 

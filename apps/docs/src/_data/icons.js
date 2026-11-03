@@ -13,6 +13,7 @@ export default {
     'arrow-right',
     'check',
     'chevron-down',
+    'chevron-left',
     'chevron-right',
     'circle-alert',
     'circle-check',
@@ -23,6 +24,7 @@ export default {
     'plus',
     'search',
     'triangle-alert',
+    'user',
     'x',
   ],
   /** The Lucide release @quieto/ui draws from, as its package.json pins it. */
