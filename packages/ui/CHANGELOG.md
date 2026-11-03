@@ -1,5 +1,12 @@
 # @quieto/ui
 
+## 1.0.2
+
+### Patch Changes
+
+- Updated dependencies [2fb2323]
+  - @quieto/design-tokens@1.0.1
+
 ## 1.0.1
 
 ### Patch Changes
