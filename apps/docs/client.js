@@ -17,4 +17,10 @@
  */
 import '@lit-labs/ssr-client/lit-element-hydrate-support.js';
 
-import '@quieto/ui';
+import { announce, toast } from '@quieto/ui';
+
+/**
+ * The library's functions, for the examples' inline handlers:
+ * onclick="qds.toast('Saved.')". An app would import them instead.
+ */
+globalThis.qds = { announce, toast };

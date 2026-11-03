@@ -47,10 +47,18 @@ const CONFIG = {
   </qds-accordion-item>
 `,
   },
+  'qds-avatar': { initial: { name: 'Ada Lovelace' }, hide: ['src'] },
   'qds-alert': {
     content: 'Your changes are live.',
     initial: { heading: 'Changes saved' },
     hide: ['dismiss-label', 'hidden'],
+  },
+  'qds-breadcrumbs': {
+    template: `
+  <qds-breadcrumb-item><a href="/">Home</a></qds-breadcrumb-item>
+  <qds-breadcrumb-item><a href="/components/">Components</a></qds-breadcrumb-item>
+  <qds-breadcrumb-item>Breadcrumbs</qds-breadcrumb-item>
+`,
   },
   'qds-button': { content: 'Button', hide: ['type', 'value', 'label', 'aria-haspopup', 'aria-expanded'] },
   'qds-card': {
@@ -58,6 +66,15 @@ const CONFIG = {
     template: `
   <h3 slot="header">Card title</h3>
   {content}
+`,
+  },
+  'qds-checkbox-group': {
+    initial: { label: 'Notify me about' },
+    hide: ['name'],
+    template: `
+  <qds-checkbox value="mentions" checked>Mentions</qds-checkbox>
+  <qds-checkbox value="replies">Replies</qds-checkbox>
+  <qds-checkbox value="digest">Weekly digest</qds-checkbox>
 `,
   },
   'qds-checkbox': { content: 'Accept the terms', hide: ['value'] },
@@ -95,6 +112,7 @@ const CONFIG = {
     wrap: `<qds-button variant="secondary" onclick="this.nextElementSibling.show()">Open the modal</qds-button>
 {element}`,
   },
+  'qds-pagination': { initial: { total: '12', current: '5' }, hide: ['href', 'label'] },
   'qds-progress-bar': { initial: { label: 'Uploading', value: '40' } },
   'qds-radio-group': {
     initial: { label: 'Delivery', value: 'standard' },
@@ -115,6 +133,7 @@ const CONFIG = {
   <option value="us">United States</option>
 `,
   },
+  'qds-spinner': {},
   'qds-stack': {
     initial: { direction: 'inline', gap: '300' },
     template: `
@@ -140,6 +159,14 @@ const CONFIG = {
     template: `
   <qds-button variant="secondary">Hover or focus me</qds-button>
 `,
+  },
+  'qds-toast': {
+    content: 'Changes saved.',
+    initial: { heading: 'Saved' },
+    hide: ['open', 'dismiss-label', 'duration'],
+    // A toast is not visible until shown, so the preview needs a way to show it.
+    wrap: `<qds-button variant="secondary" onclick="this.nextElementSibling.show()">Show the toast</qds-button>
+{element}`,
   },
   'qds-text-field': {
     initial: { label: 'Email', hint: 'We never share it.', type: 'email' },

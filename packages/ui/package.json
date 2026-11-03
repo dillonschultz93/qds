@@ -1,7 +1,7 @@
 {
   "name": "@quieto/ui",
   "version": "0.2.0",
-  "description": "QDS web components — Lit elements styled entirely by @quieto/design-tokens.",
+  "description": "QDS web components \u2014 Lit elements styled entirely by @quieto/design-tokens.",
   "type": "module",
   "license": "MIT",
   "author": "Dillon Schultz",
@@ -113,6 +113,34 @@
       "types": "./dist/components/qds-menu-item/qds-menu-item.d.ts",
       "default": "./dist/components/qds-menu-item/qds-menu-item.js"
     },
+    "./qds-toast.js": {
+      "types": "./dist/components/qds-toast/qds-toast.d.ts",
+      "default": "./dist/components/qds-toast/qds-toast.js"
+    },
+    "./qds-checkbox-group.js": {
+      "types": "./dist/components/qds-checkbox-group/qds-checkbox-group.d.ts",
+      "default": "./dist/components/qds-checkbox-group/qds-checkbox-group.js"
+    },
+    "./qds-spinner.js": {
+      "types": "./dist/components/qds-spinner/qds-spinner.d.ts",
+      "default": "./dist/components/qds-spinner/qds-spinner.js"
+    },
+    "./qds-avatar.js": {
+      "types": "./dist/components/qds-avatar/qds-avatar.d.ts",
+      "default": "./dist/components/qds-avatar/qds-avatar.js"
+    },
+    "./qds-breadcrumbs.js": {
+      "types": "./dist/components/qds-breadcrumbs/qds-breadcrumbs.d.ts",
+      "default": "./dist/components/qds-breadcrumbs/qds-breadcrumbs.js"
+    },
+    "./qds-breadcrumb-item.js": {
+      "types": "./dist/components/qds-breadcrumb-item/qds-breadcrumb-item.d.ts",
+      "default": "./dist/components/qds-breadcrumb-item/qds-breadcrumb-item.js"
+    },
+    "./qds-pagination.js": {
+      "types": "./dist/components/qds-pagination/qds-pagination.d.ts",
+      "default": "./dist/components/qds-pagination/qds-pagination.js"
+    },
     "./custom-elements.json": "./custom-elements.json"
   },
   "files": [
@@ -120,7 +148,7 @@
     "custom-elements.json"
   ],
   "customElements": "custom-elements.json",
-  "//sideEffects": "Defining a custom element IS a side effect, so every module that calls customElements.define must be listed — including the index barrel, which registers everything by re-exporting the component modules. Omitting index.js lets a bundler tree-shake `import '@quieto/ui'` down to nothing: no error, no elements registered, and the page shows un-upgraded markup.",
+  "//sideEffects": "Defining a custom element IS a side effect, so every module that calls customElements.define must be listed \u2014 including the index barrel, which registers everything by re-exporting the component modules. Omitting index.js lets a bundler tree-shake `import '@quieto/ui'` down to nothing: no error, no elements registered, and the page shows un-upgraded markup.",
   "sideEffects": [
     "./dist/index.js",
     "./dist/**/qds-*.js"

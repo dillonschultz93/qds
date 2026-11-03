@@ -121,3 +121,30 @@ export { QdsMenuItem } from './components/qds-menu-item/qds-menu-item.js';
 export type {
   QdsMenuItemVariant,
 } from './components/qds-menu-item/qds-menu-item.js';
+
+export { QdsToast, toast } from './components/qds-toast/qds-toast.js';
+export type {
+  QdsToastVariant,
+  QdsToastOptions,
+} from './components/qds-toast/qds-toast.js';
+
+export { QdsCheckboxGroup } from './components/qds-checkbox-group/qds-checkbox-group.js';
+export type {
+  QdsCheckboxGroupOrientation,
+} from './components/qds-checkbox-group/qds-checkbox-group.js';
+
+export { QdsSpinner } from './components/qds-spinner/qds-spinner.js';
+export type {
+  QdsSpinnerSize,
+} from './components/qds-spinner/qds-spinner.js';
+
+export { QdsAvatar } from './components/qds-avatar/qds-avatar.js';
+export type {
+  QdsAvatarSize,
+} from './components/qds-avatar/qds-avatar.js';
+
+export { QdsBreadcrumbs } from './components/qds-breadcrumbs/qds-breadcrumbs.js';
+
+export { QdsBreadcrumbItem } from './components/qds-breadcrumb-item/qds-breadcrumb-item.js';
+
+export { QdsPagination } from './components/qds-pagination/qds-pagination.js';

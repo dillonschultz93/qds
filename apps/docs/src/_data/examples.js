@@ -664,5 +664,123 @@ export default function () {
 </qds-menu>`,
       },
     ],
+    'qds-toast': [
+      {
+        title: 'From code',
+        description:
+          'toast() shows a message in the corner and removes it after five seconds — longer while the pointer or focus is on it.',
+        html: `<qds-stack direction="inline" gap="200" wrap>
+  <qds-button variant="secondary" onclick="qds.toast('Link copied.')">Copy link</qds-button>
+  <qds-button variant="secondary" onclick="qds.toast('Changes saved.', { variant: 'success' })">Save</qds-button>
+  <qds-button variant="secondary" onclick="qds.toast('Could not reach the server.', { variant: 'error', heading: 'Offline', duration: 0 })">Fail</qds-button>
+</qds-stack>`,
+      },
+      {
+        title: 'In the page, with an action',
+        description:
+          'A qds-toast written in the page can hold markup, such as an Undo button. With an action, keep it until it is dismissed: duration="0".',
+        html: `<qds-button variant="secondary" onclick="document.getElementById('archived').show()">Archive</qds-button>
+<qds-toast id="archived" heading="Conversation archived" duration="0">
+  You can find it under Archive.
+  <qds-button slot="actions" size="sm" variant="secondary" onclick="this.closest('qds-toast').hide()">Undo</qds-button>
+</qds-toast>`,
+      },
+    ],
+    'qds-checkbox-group': [
+      {
+        title: 'Required, with a hint',
+        description:
+          'The group names the set, and requires at least one choice. Uncheck every box to see the message.',
+        html: `<qds-checkbox-group label="Notify me about" name="notify" hint="We send at most one email a day." required>
+  <qds-checkbox value="mentions" checked>Mentions</qds-checkbox>
+  <qds-checkbox value="replies">Replies to my posts</qds-checkbox>
+  <qds-checkbox value="digest">A weekly digest</qds-checkbox>
+</qds-checkbox-group>`,
+      },
+      {
+        title: 'Inline',
+        html: `<qds-checkbox-group label="Sizes" orientation="inline">
+  <qds-checkbox value="s">S</qds-checkbox>
+  <qds-checkbox value="m" checked>M</qds-checkbox>
+  <qds-checkbox value="l">L</qds-checkbox>
+  <qds-checkbox value="xl" disabled>XL</qds-checkbox>
+</qds-checkbox-group>`,
+      },
+    ],
+    'qds-spinner': [
+      {
+        title: 'Sizes',
+        description: 'Each is named for what is loading, so a screen reader can say so.',
+        html: `<qds-stack direction="inline" gap="400" align="center">
+  <qds-spinner size="sm" label="Loading comments"></qds-spinner>
+  <qds-spinner label="Loading results"></qds-spinner>
+  <qds-spinner size="lg" label="Loading the report"></qds-spinner>
+</qds-stack>`,
+      },
+      {
+        title: 'Beside text',
+        description: 'It takes no color from the text around it: the arc is the primary color, on a subtle track.',
+        html: `<p style="display: flex; align-items: center; gap: 0.5rem; margin: 0;">
+  <qds-spinner size="sm" label="Syncing"></qds-spinner> Syncing your files…
+</p>`,
+      },
+    ],
+    'qds-avatar': [
+      {
+        title: 'Initials and images',
+        description:
+          'Initials come from the first and last words of the name. The image falls back to them if it fails to load, as the third does. With no name at all, a person icon stands in.',
+        html: `<qds-stack direction="inline" gap="300" align="center">
+  <qds-avatar name="Ada Lovelace"></qds-avatar>
+  <qds-avatar name="Grace Brewster Murray Hopper"></qds-avatar>
+  <qds-avatar name="Alan Turing" src="data:,"></qds-avatar>
+  <qds-avatar></qds-avatar>
+</qds-stack>`,
+      },
+      {
+        title: 'Sizes',
+        html: `<qds-stack direction="inline" gap="300" align="center">
+  <qds-avatar size="sm" name="Ada Lovelace"></qds-avatar>
+  <qds-avatar size="md" name="Ada Lovelace"></qds-avatar>
+  <qds-avatar size="lg" name="Ada Lovelace"></qds-avatar>
+</qds-stack>`,
+      },
+      {
+        title: 'Beside the name',
+        description: 'When the name is written beside it, leave the avatar unnamed, so a screen reader does not say the name twice.',
+        html: `<p style="display: flex; align-items: center; gap: 0.75rem; margin: 0;">
+  <qds-avatar></qds-avatar> Katherine Johnson
+</p>`,
+      },
+    ],
+    'qds-breadcrumbs': [
+      {
+        title: 'A trail',
+        description: 'The last item is the current page: marked for assistive technology, and not a link.',
+        html: `<qds-breadcrumbs>
+  <qds-breadcrumb-item><a href="/">Home</a></qds-breadcrumb-item>
+  <qds-breadcrumb-item><a href="/components/">Components</a></qds-breadcrumb-item>
+  <qds-breadcrumb-item>Breadcrumbs</qds-breadcrumb-item>
+</qds-breadcrumbs>`,
+      },
+    ],
+    'qds-pagination': [
+      {
+        title: 'Buttons, paging in place',
+        description: 'Without href, each page is a button. Choosing one moves current and fires qds-change.',
+        html: `<qds-pagination id="results-pages" total="20" current="10"></qds-pagination>
+<p id="results-page" role="status" style="margin: 0.75rem 0 0;">Showing page 10 of 20</p>
+<script>
+  document.getElementById('results-pages').addEventListener('qds-change', (event) => {
+    document.getElementById('results-page').textContent = 'Showing page ' + event.detail.page + ' of 20';
+  });
+</script>`,
+      },
+      {
+        title: 'Links',
+        description: 'With an href template, each page is a link, so every page has its own address.',
+        html: `<qds-pagination total="8" current="3" href="#page-{page}" siblings="2"></qds-pagination>`,
+      },
+    ],
   };
 }
