@@ -1,5 +1,11 @@
 # @quieto/design-tokens
 
+## 1.1.0
+
+### Minor Changes
+
+- 9db8c92: Add component token sets for the Tier 3 components: `qds-combobox`, `qds-popover`, `qds-skeleton`, `qds-slider`, `qds-file-upload`, and `qds-segmented-control`.
+
 ## 1.0.2
 
 ### Patch Changes
