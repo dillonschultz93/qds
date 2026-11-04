@@ -80,12 +80,13 @@ in this package. Editors and tools that read the format use it for autocomplete.
 
 ## Forms
 
-The form controls — `qds-checkbox`, `qds-checkbox-group`, `qds-radio-group`, `qds-select`,
-`qds-toggle`, `qds-input`, `qds-text-field`, and a `qds-button` with `type="submit"` or `"reset"` —
+The form controls — `qds-checkbox`, `qds-checkbox-group`, `qds-combobox`, `qds-file-upload`,
+`qds-input`, `qds-radio-group`, `qds-segmented-control`, `qds-select`, `qds-slider`,
+`qds-text-field`, `qds-toggle`, and a `qds-button` with `type="submit"` or `"reset"` —
 take part in a surrounding
 `<form>` like native controls do, even though their inputs are inside shadow DOM:
 
-- they submit their value under their `name`
+- they submit their value under their `name` (`qds-file-upload` submits each chosen file)
 - `required`, and the input types' own rules such as `type="email"`, block submission
 - `form.reset()` restores the value the markup declared
 - a `<fieldset disabled>` disables them
@@ -141,8 +142,14 @@ For anything the tokens do not cover, components expose CSS parts:
 Each component follows the matching ARIA pattern: keyboard support, focus management, and the
 right roles and states. A few things are still up to you:
 
-- **Name the controls that have no visible label.** `qds-input` and `qds-progress-bar` take a
-  `label` attribute, and an icon-only `qds-button` takes `label` too.
+- **Name the controls that have no visible label.** `qds-input`, `qds-progress-bar`, and
+  `qds-segmented-control` take a `label` attribute, and an icon-only `qds-button` or `qds-segment`
+  takes `label` too.
+- **Mark what is loading.** `qds-skeleton` is hidden from assistive technology, so set
+  `aria-busy="true"` on the region it stands in for, or pair it with a `qds-spinner` that names
+  what is loading.
+- **Mark the field to focus in a popover.** `qds-popover` focuses the content marked `autofocus`
+  when it opens, or else the panel itself.
 - **Group filter chips.** Wrap a set of `selectable` chips in an element with `role="group"` and an
   `aria-label`, so they are announced together.
 - **Choose heading levels.** Set `heading-level` on `qds-accordion-item` to fit the outline of your
