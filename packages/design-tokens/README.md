@@ -3,6 +3,10 @@
 Design tokens for the Quieto Design System, shipped as CSS custom properties and a typed
 JavaScript manifest. Light and dark modes are included.
 
+Browse every token at [quieto.dev](https://quieto.dev/foundations/tokens/), or as Figma variables
+in the [Quieto Tokens](https://www.figma.com/community/file/1699544445824217443/quieto-tokens)
+Community file.
+
 ```bash
 npm install @quieto/design-tokens
 ```
@@ -96,7 +100,7 @@ Each token has `name`, `path`, `type`, `tier`, `set`, `description`, its resolve
 mode (`modes`), what it references (`references`, `referenceNames`), and `modeInvariant`. Types
 are included.
 
-The manifest is a single 294 kB module, and importing anything from it includes all of it. If you
+The manifest is a single 385 kB module, and importing anything from it includes all of it. If you
 only need the CSS variables, you don't need to import JavaScript at all.
 
 ## Everything the package exports

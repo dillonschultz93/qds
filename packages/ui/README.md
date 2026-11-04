@@ -4,6 +4,11 @@ Web components for the Quieto Design System, built with [Lit](https://lit.dev) a
 by [`@quieto/design-tokens`](https://www.npmjs.com/package/@quieto/design-tokens). They work in any
 framework, or none.
 
+Live examples and the full API for each component are at [quieto.dev](https://quieto.dev/components/),
+and the matching Figma components are in the
+[Quieto Components](https://www.figma.com/community/file/1699543134216117599/quieto-components)
+Community file.
+
 ```bash
 npm install @quieto/ui
 ```

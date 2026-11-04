@@ -2,11 +2,16 @@
 
 A design system in three parts: design tokens, web components, and documentation.
 
+- **Docs:** [quieto.dev](https://quieto.dev)
+- **Figma:** [Quieto Tokens](https://www.figma.com/community/file/1699544445824217443/quieto-tokens)
+  and [Quieto Components](https://www.figma.com/community/file/1699543134216117599/quieto-components)
+  on [Figma Community](https://www.figma.com/@quieto)
+
 | Package | What it is | Published |
 | --- | --- | --- |
-| [`packages/design-tokens`](packages/design-tokens) | `@quieto/design-tokens` — three-tier DTCG tokens, Style Dictionary build, Token Studio sync | yes |
+| [`packages/design-tokens`](packages/design-tokens) | `@quieto/design-tokens` — three-tier DTCG tokens, Style Dictionary build, one-way Figma sync | yes |
 | [`packages/ui`](packages/ui) | `@quieto/ui` — Lit web components styled entirely by those tokens | yes |
-| [`apps/docs`](apps/docs) | Eleventy documentation site | no |
+| [`apps/docs`](apps/docs) | Eleventy documentation site, deployed to [quieto.dev](https://quieto.dev) | no |
 
 ```bash
 pnpm install
@@ -19,13 +24,11 @@ pnpm --filter docs dev    # http://localhost:8080
 
 Tokens are authored as DTCG JSON in
 [`packages/design-tokens/tokens.json`](packages/design-tokens/tokens.json), in
-**Tokens Studio's single-file format** — each token set is a top-level key. The
-Figma plugin syncs that file directly from Git, bidirectionally, so there is no
-export step and designer edits arrive as pull requests. Style Dictionary's job is
-narrower than usual: it builds the CSS custom properties and a typed JS manifest.
-
-Single-file rather than the folder layout because multi-file sync requires a Tokens
-Studio Pro license.
+**Tokens Studio's single-file format** — each token set is a top-level key. That
+file is the only source: Style Dictionary builds the CSS custom properties and a
+typed JS manifest from it, and [`figma/build.js`](packages/design-tokens/figma)
+pushes it into Figma variables and styles, one way. Token changes are made in code,
+never in Figma.
 
 Three tiers, each referencing only the one beneath it:
 
@@ -37,7 +40,7 @@ Three tiers, each referencing only the one beneath it:
 
 That structure survives into the shipped CSS rather than being flattened, which is
 what makes one stylesheet themeable: dark mode redeclares only the middle line —
-56 of 261 variables — and everything downstream follows.
+44 of 637 variables — and everything downstream follows.
 
 Because a component's own `--qds-component-*` variables are both its token
 definitions and its public styling API, restyling a component means overriding the
@@ -55,8 +58,8 @@ read:
 - the docs site renders the reference tables and anatomy diagrams
 
 So the documentation cannot describe a rule the build does not apply. `validate`
-gates `build` in `turbo.json`, which matters most for tokens arriving from Figma: a
-role invented in the plugin fails CI with the allowed values named.
+gates `build` in `turbo.json`, so a violation fails CI with the allowed values
+named, before the token reaches the CSS or Figma.
 
 It checks the grammar per tier, the reference direction (primitives raw, semantics
 → primitives, components → semantics or primitives), that light and dark define the
@@ -91,16 +94,22 @@ pnpm changeset       # describe the change
 
 Merging to `main` opens a "Version Packages" PR; merging that publishes
 `@quieto/design-tokens` and `@quieto/ui`. The `docs` app is in `ignore` and is
-never versioned.
+never versioned; it deploys to [quieto.dev](https://quieto.dev) on Cloudflare
+Workers (see [`apps/docs/wrangler.jsonc`](apps/docs/wrangler.jsonc)).
 
-## Figma setup (one-time)
+## Figma
 
-In Tokens Studio: **Settings → Sync → GitHub**, repo `dillonschultz93/qds`, file
-path `packages/design-tokens/tokens.json`, **Single file** mode, format
-**W3C DTCG**.
+`tokens.json` is synced into the Quieto Tokens file one way, code → Figma:
 
-The GitHub token needs write access to push back: a classic PAT needs `repo`
-scope, a fine-grained one needs **Contents: Read and write**.
+```bash
+pnpm --filter @quieto/design-tokens figma:build
+```
+
+That generates Plugin API scripts, run in order through the Figma MCP server's
+`use_figma` tool. They upsert Primitives, Semantic (Light and Dark modes), and
+Component variable collections, plus text and elevation styles. Every step upserts
+by name, so bindings survive a re-run. Details are in
+[`packages/design-tokens/figma/README.md`](packages/design-tokens/figma/README.md).
 
 ## License
 
