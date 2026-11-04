@@ -954,11 +954,11 @@ const roadmapTier1 = await page.evaluate(() => {
   const shipped = [...document.querySelectorAll('table')][0];
   return {
     shipped: ['Icon', 'Select', 'Alert', 'Tooltip', 'Menu'].every((name) => shipped.textContent.includes(name)),
-    tierDone: (document.body.textContent.match(/Everything in this tier has shipped/g)?.length ?? 0) === 2,
+    tierDone: (document.body.textContent.match(/Everything in this tier has shipped/g)?.length ?? 0) === 3,
     built: document.body.textContent.match(/Built in 0\.2\.0/g)?.length ?? 0,
   };
 });
-check('the roadmap lists Tiers 1 and 2 as shipped, and the foundations as built',
+check('the roadmap lists Tiers 1, 2, and 3 as shipped, and the foundations as built',
   roadmapTier1.shipped && roadmapTier1.tierDone && roadmapTier1.built === 3,
   JSON.stringify(roadmapTier1));
 
@@ -1030,6 +1030,106 @@ const avatars = await page.evaluate(() =>
       (avatar.shadowRoot.querySelector('img') ? 'img' : avatar.shadowRoot.querySelector('qds-icon')?.getAttribute('name'))));
 check('avatars show initials, fall back from a broken image, and show a person without a name',
   avatars.join() === 'AL,GH,AT,user', avatars.join(', '));
+
+// ── The Tier 3 components, server-rendered and hydrated ─────────────────────
+await gotoReady('/components/combobox/');
+await page.locator('#tz').click();
+await page.keyboard.type('lon');
+await page.waitForTimeout(100);
+const comboOpen = await page.evaluate(() => {
+  const combo = document.getElementById('tz');
+  return {
+    expanded: combo.shadowRoot.querySelector('input').getAttribute('aria-expanded'),
+    onTop: combo.shadowRoot.querySelector('.panel').matches(':popover-open'),
+    shown: [...combo.shadowRoot.querySelectorAll('[role="option"]')].map((option) => option.textContent.trim()),
+  };
+});
+await page.keyboard.press('Enter');
+await page.waitForTimeout(100);
+const comboChosen = await page.evaluate(() => ({
+  value: document.getElementById('tz').value,
+  status: document.getElementById('tz-chosen').textContent,
+}));
+check('a server-rendered combobox narrows its options as you type, and chooses with Enter',
+  comboOpen.expanded === 'true' && comboOpen.onTop && comboOpen.shown.join() === 'London' &&
+    comboChosen.value === 'Europe/London' && comboChosen.status === 'Chosen: Europe/London',
+  `${JSON.stringify(comboOpen)} → ${JSON.stringify(comboChosen)}`);
+
+await gotoReady('/components/popover/');
+await page.locator('.example qds-popover qds-button', { hasText: 'Rename' }).click();
+await page.waitForTimeout(150);
+const popover = await page.evaluate(() => {
+  const element = document.querySelector('.example qds-popover');
+  return {
+    onTop: element.shadowRoot.querySelector('.panel').matches(':popover-open'),
+    role: element.shadowRoot.querySelector('.panel').getAttribute('role'),
+    focused: document.activeElement?.localName,
+  };
+});
+await page.keyboard.press('Escape');
+await page.waitForTimeout(100);
+const popoverClosed = await page.evaluate(() => ({
+  open: document.querySelector('.example qds-popover').open,
+  focused: document.activeElement?.closest('qds-popover') ? document.activeElement.localName : 'outside',
+}));
+check('a popover opens on top with focus on its autofocus field, and Escape returns focus to the trigger',
+  popover.onTop && popover.role === 'dialog' && popover.focused === 'qds-text-field' &&
+    !popoverClosed.open && popoverClosed.focused === 'qds-button',
+  `${JSON.stringify(popover)} → ${JSON.stringify(popoverClosed)}`);
+
+await gotoReady('/components/segmented-control/');
+await page.locator('#view qds-segment', { hasText: 'Calendar' }).click();
+await page.waitForTimeout(100);
+await page.keyboard.press('ArrowLeft');
+await page.waitForTimeout(100);
+const segmented = await page.evaluate(() => {
+  const control = document.getElementById('view');
+  return {
+    roles: control.segments.map((segment) => segment.getAttribute('role')),
+    value: control.value,
+    tabbable: control.segments.map((segment) => segment.tabIndex),
+    status: document.getElementById('view-chosen').textContent,
+  };
+});
+check('a server-rendered segmented control chooses on click and with the arrow keys',
+  segmented.roles.every((role) => role === 'radio') && segmented.value === 'board' &&
+    segmented.tabbable.join() === '-1,0,-1,-1' && segmented.status === 'Showing the board',
+  JSON.stringify(segmented));
+
+await gotoReady('/components/slider/');
+await page.locator('.example qds-slider').first().focus();
+await page.keyboard.press('Home');
+await page.keyboard.press('ArrowRight');
+await page.waitForTimeout(100);
+const slider = await page.evaluate(() => {
+  const element = document.querySelector('.example qds-slider');
+  return { value: element.value, shown: element.shadowRoot.querySelector('[part="value"]')?.textContent };
+});
+check('a server-rendered slider moves with the keyboard and shows its value',
+  slider.value === 1 && slider.shown === '1', JSON.stringify(slider));
+
+await gotoReady('/components/file-upload/');
+await page.locator('.example qds-file-upload').first().locator('input[type="file"]').setInputFiles([
+  { name: 'report.pdf', mimeType: 'application/pdf', buffer: Buffer.alloc(2048) },
+  { name: 'photo.png', mimeType: 'image/png', buffer: Buffer.alloc(4096) },
+]);
+await page.waitForTimeout(100);
+const uploads = await page.evaluate(() => {
+  const element = document.querySelector('.example qds-file-upload');
+  return {
+    files: element.files.map((file) => file.name),
+    rows: [...element.shadowRoot.querySelectorAll('[part="file"] .name')].map((name) => name.textContent),
+  };
+});
+check('a server-rendered file upload lists the files chosen in its picker',
+  uploads.files.join() === 'report.pdf,photo.png' && uploads.rows.join() === 'report.pdf,photo.png',
+  JSON.stringify(uploads));
+
+await gotoReady('/components/skeleton/');
+const skeletons = await page.evaluate(() =>
+  [...document.querySelectorAll('.example qds-skeleton')].map((skeleton) => skeleton.shadowRoot.querySelectorAll('[part="shape"]').length));
+check('server-rendered skeletons draw their lines and shapes',
+  skeletons.slice(0, 4).join() === '1,1,3,1', skeletons.join(', '));
 
 // ── The variants: a textarea, and drawers ──────────────────────────────────
 await gotoReady('/components/text-field/');

@@ -1,7 +1,7 @@
 ---
 layout: layouts/base.njk
 title: Roadmap
-description: The components QDS has, the ones it needs next, and the ones it leaves out on purpose — within a budget of thirty.
+description: The components QDS has, and the ones it leaves out on purpose — within a budget of thirty.
 ---
 
 {#
@@ -219,13 +219,22 @@ description: The components QDS has, the ones it needs next, and the ones it lea
 
 <h2>Room left</h2>
 
-<p>
-  {{ roadmap.remaining }} components of budget remain once the planned ones ship.
-  Candidates, added only when a real need appears:
-</p>
+{% if roadmap.remaining > 0 %}
+  <p>
+    {{ roadmap.remaining }} components of budget remain once the planned ones ship.
+    Candidates, added only when a real need appears:
+  </p>
 
-<ul>
-  {% for item in roadmap.headroom %}
-    <li><strong>{{ item.name }}.</strong> {{ item.note }}</li>
-  {% endfor %}
-</ul>
+  <ul>
+    {% for item in roadmap.headroom %}
+      <li><strong>{{ item.name }}.</strong> {{ item.note }}</li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>
+    <qds-chip variant="success">Budget full</qds-chip>
+    All {{ roadmap.budget }} components have shipped. A new one now has to earn
+    its place by replacing one that exists, or be met as a
+    <a href="#variants-not-components">variant</a> of one.
+  </p>
+{% endif %}

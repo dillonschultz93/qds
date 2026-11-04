@@ -816,5 +816,156 @@ export default function () {
         html: `<qds-pagination total="8" current="3" href="#page-{page}" siblings="2"></qds-pagination>`,
       },
     ],
+    'qds-combobox': [
+      {
+        title: 'Searching a long list',
+        description:
+          'Type to narrow the options; the arrow keys move through them and Enter chooses. Leaving the field with text that is not an option puts the chosen one back.',
+        html: `<qds-combobox id="tz" label="Time zone" name="tz" placeholder="Search time zones" hint="Used for reminders and due dates.">
+  <option value="Pacific/Honolulu">Honolulu</option>
+  <option value="America/Anchorage">Anchorage</option>
+  <option value="America/Los_Angeles">Los Angeles</option>
+  <option value="America/Denver">Denver</option>
+  <option value="America/Chicago">Chicago</option>
+  <option value="America/New_York">New York</option>
+  <option value="America/Sao_Paulo">São Paulo</option>
+  <option value="Europe/London">London</option>
+  <option value="Europe/Paris">Paris</option>
+  <option value="Europe/Berlin">Berlin</option>
+  <option value="Africa/Nairobi">Nairobi</option>
+  <option value="Asia/Kolkata">Kolkata</option>
+  <option value="Asia/Singapore">Singapore</option>
+  <option value="Asia/Tokyo">Tokyo</option>
+  <option value="Australia/Sydney">Sydney</option>
+</qds-combobox>
+<p id="tz-chosen" role="status" style="margin: 0.75rem 0 0;">No time zone chosen</p>
+<script>
+  document.getElementById('tz').addEventListener('qds-change', (event) => {
+    document.getElementById('tz-chosen').textContent = event.detail.value ? 'Chosen: ' + event.detail.value : 'No time zone chosen';
+  });
+</script>`,
+      },
+      {
+        title: 'Required, with a value',
+        description: 'Clear the text and leave the field to see the message.',
+        html: `<qds-combobox label="Language" value="en" required>
+  <option value="de">Deutsch</option>
+  <option value="en">English</option>
+  <option value="es">Español</option>
+  <option value="fr">Français</option>
+  <option value="it">Italiano</option>
+  <option value="ja" disabled>日本語 (coming soon)</option>
+</qds-combobox>`,
+      },
+    ],
+    'qds-popover': [
+      {
+        title: 'A short form',
+        description:
+          'Focus moves to the field marked autofocus. Escape closes the popover and returns focus to the button; so does a click outside.',
+        html: `<qds-popover label="Rename file">
+  <qds-button slot="trigger" variant="secondary">Rename</qds-button>
+  <qds-stack gap="300">
+    <qds-text-field label="File name" value="quarterly-report.pdf" autofocus></qds-text-field>
+    <qds-stack direction="inline" gap="200" justify="end">
+      <qds-button size="sm" variant="secondary" onclick="this.closest('qds-popover').hide()">Cancel</qds-button>
+      <qds-button size="sm" onclick="this.closest('qds-popover').hide()">Save</qds-button>
+    </qds-stack>
+  </qds-stack>
+</qds-popover>`,
+      },
+      {
+        title: 'Placement',
+        description: 'Each side, flipped to the other when there is not room.',
+        html: `<qds-stack direction="inline" gap="300" wrap>
+  <qds-popover placement="top"><qds-button slot="trigger" variant="secondary">Top</qds-button>Above the button.</qds-popover>
+  <qds-popover placement="bottom-start"><qds-button slot="trigger" variant="secondary">Bottom start</qds-button>Below, aligned to its start.</qds-popover>
+  <qds-popover placement="right"><qds-button slot="trigger" variant="secondary">Right</qds-button>To the right.</qds-popover>
+</qds-stack>`,
+      },
+    ],
+    'qds-skeleton': [
+      {
+        title: 'Standing in for a card',
+        description:
+          'Shapes roughly the size of what is loading. The region they stand in for is marked aria-busy, so assistive technology waits for the real content.',
+        html: `<div aria-busy="true" aria-label="Loading profile" style="display: flex; gap: 1rem; align-items: flex-start; width: 100%; max-width: 28rem;">
+  <qds-skeleton shape="circle" style="width: 3rem; height: 3rem; flex: none;"></qds-skeleton>
+  <div style="flex: 1;">
+    <qds-skeleton style="width: 40%; margin-block-end: 0.75rem;"></qds-skeleton>
+    <qds-skeleton lines="3"></qds-skeleton>
+  </div>
+</div>`,
+      },
+      {
+        title: 'An image',
+        html: `<qds-skeleton shape="rect" style="width: 100%; max-width: 20rem; height: 10rem;"></qds-skeleton>`,
+      },
+    ],
+    'qds-slider': [
+      {
+        title: 'With its value',
+        description: 'The arrow keys move by one step; Page Up and Page Down, Home and End jump further.',
+        html: `<qds-stack gap="500" style="width: 100%; max-width: 24rem;">
+  <qds-slider label="Volume" value="40" show-value></qds-slider>
+  <qds-slider label="Price ceiling" min="0" max="500" step="25" value="250" show-value hint="In US dollars, per night."></qds-slider>
+  <qds-slider label="Brightness" value="70" disabled></qds-slider>
+</qds-stack>`,
+      },
+      {
+        title: 'Live updates',
+        description: 'qds-input fires while the thumb moves; qds-change once it is let go.',
+        html: `<qds-slider id="zoom" label="Zoom" min="50" max="200" step="10" value="100" style="width: 100%; max-width: 24rem;"></qds-slider>
+<p id="zoom-level" style="margin: 0.75rem 0 0;">100%</p>
+<script>
+  document.getElementById('zoom').addEventListener('qds-input', (event) => {
+    document.getElementById('zoom-level').textContent = event.detail.value + '%';
+  });
+</script>`,
+      },
+    ],
+    'qds-file-upload': [
+      {
+        title: 'Several files',
+        description:
+          'Drop files on the zone or choose them. Files of other types are left out when dropped, with a message saying which.',
+        html: `<qds-file-upload label="Attachments" name="attachments" accept=".pdf,image/*" multiple hint="PDF or images, up to 10 MB each." style="max-width: 32rem;"></qds-file-upload>`,
+      },
+      {
+        title: 'One file, required',
+        description: 'Without multiple, a new file replaces the last.',
+        html: `<form onsubmit="event.preventDefault()" style="max-width: 32rem;">
+  <qds-stack gap="300">
+    <qds-file-upload label="Resume" name="resume" accept=".pdf,.doc,.docx" required></qds-file-upload>
+    <div><qds-button type="submit">Apply</qds-button></div>
+  </qds-stack>
+</form>`,
+      },
+    ],
+    'qds-segmented-control': [
+      {
+        title: 'Switching a view',
+        html: `<qds-segmented-control id="view" label="View" value="board">
+  <qds-segment value="list">List</qds-segment>
+  <qds-segment value="board">Board</qds-segment>
+  <qds-segment value="calendar">Calendar</qds-segment>
+  <qds-segment value="timeline" disabled>Timeline</qds-segment>
+</qds-segmented-control>
+<p id="view-chosen" role="status" style="margin: 0.75rem 0 0;">Showing the board</p>
+<script>
+  document.getElementById('view').addEventListener('qds-change', (event) => {
+    document.getElementById('view-chosen').textContent = 'Showing the ' + event.detail.value;
+  });
+</script>`,
+      },
+      {
+        title: 'Icons only',
+        description: 'Each segment is named by its label for assistive technology. Keep icon-only segments to icons whose meaning is familiar.',
+        html: `<qds-segmented-control label="Sort order" value="asc">
+  <qds-segment value="asc" label="Ascending"><qds-icon name="arrow-right" style="rotate: -90deg"></qds-icon></qds-segment>
+  <qds-segment value="desc" label="Descending"><qds-icon name="arrow-right" style="rotate: 90deg"></qds-icon></qds-segment>
+</qds-segmented-control>`,
+      },
+    ],
   };
 }
