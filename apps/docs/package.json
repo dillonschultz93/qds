@@ -17,11 +17,15 @@
   },
   "devDependencies": {
     "@11ty/eleventy": "^3.1.6",
+    "@fontsource/inter": "^5.3.0",
+    "@fontsource/jetbrains-mono": "^5.3.0",
     "@lit-labs/eleventy-plugin-lit": "^1.0.6",
     "@lit-labs/ssr-client": "^1.1.8",
+    "@resvg/resvg-js": "^2.6.2",
     "esbuild": "^0.28.1",
     "lucide": "1.59.0",
     "playwright": "^1.62.1",
+    "satori": "^0.63.2",
     "simple-icons": "^16.36.0",
     "wrangler": "4.151.1"
   }

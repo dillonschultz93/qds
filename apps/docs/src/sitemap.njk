@@ -1,0 +1,18 @@
+---
+permalink: /sitemap.xml
+eleventyExcludeFromCollections: true
+---
+{#-
+  Every HTML page, for search engines. Pages left out of collections (the 404,
+  the text and redirect files) and pages marked `noindex` are not listed. No
+  lastmod: the build's file dates are when the site was built, not when a page
+  changed, and a wrong date is worse than none.
+-#}
+<?xml version="1.0" encoding="utf-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+{%- for entry in collections.all %}
+  {%- if entry.url and entry.url.endsWith('/') and not entry.data.noindex %}
+  <url><loc>{{ site.url }}{{ entry.url }}</loc></url>
+  {%- endif %}
+{%- endfor %}
+</urlset>

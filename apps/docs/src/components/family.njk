@@ -4,10 +4,11 @@ pagination:
   data: docs.families
   size: 1
   alias: family
+  addAllPagesToCollections: true
 permalink: "{{ family.url }}"
 eleventyComputed:
   title: "{{ family.name }}"
-  description: "{{ family.summary }}"
+  description: "{{ family.summary | safe }} Examples, accessibility notes, and a live playground."
 ---
 
 {#

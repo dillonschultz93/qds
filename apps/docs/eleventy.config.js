@@ -63,6 +63,21 @@ export default async function (eleventyConfig) {
   eleventyConfig.addTransform('search-anchors', search.transform);
   eleventyConfig.on('eleventy.after', search.write);
 
+  // Social cards: one PNG per page, written once the pages exist, from each
+  // page's own title and description. See og-images.js; base.njk links them
+  // through the ogImage filter, which gives the path the cards are written to.
+  //
+  // og-images.js is imported only when the hook runs: loading satori (and its
+  // WebAssembly layout engine) while the config loads stalls the build before
+  // any page is written.
+  eleventyConfig.addFilter('ogImage', (url) => `/og/${url.replace(/^\/|\/$/g, '')}.png`);
+  eleventyConfig.on('eleventy.after', async ({ results, dir }) => {
+    const started = performance.now();
+    const { writeOgImages } = await import('./og-images.js');
+    const count = await writeOgImages(results, dir.output, { suffix: ' · Quieto Design System' });
+    console.log(`[og] ${count} social cards in ${Math.round(performance.now() - started)}ms`);
+  });
+
   /**
    * "On this page": the page's h2s, listed beside the content. Built here
    * rather than in the layout, because the layout renders before the content's
