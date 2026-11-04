@@ -141,6 +141,34 @@
       "types": "./dist/components/qds-pagination/qds-pagination.d.ts",
       "default": "./dist/components/qds-pagination/qds-pagination.js"
     },
+    "./qds-combobox.js": {
+      "types": "./dist/components/qds-combobox/qds-combobox.d.ts",
+      "default": "./dist/components/qds-combobox/qds-combobox.js"
+    },
+    "./qds-popover.js": {
+      "types": "./dist/components/qds-popover/qds-popover.d.ts",
+      "default": "./dist/components/qds-popover/qds-popover.js"
+    },
+    "./qds-skeleton.js": {
+      "types": "./dist/components/qds-skeleton/qds-skeleton.d.ts",
+      "default": "./dist/components/qds-skeleton/qds-skeleton.js"
+    },
+    "./qds-slider.js": {
+      "types": "./dist/components/qds-slider/qds-slider.d.ts",
+      "default": "./dist/components/qds-slider/qds-slider.js"
+    },
+    "./qds-file-upload.js": {
+      "types": "./dist/components/qds-file-upload/qds-file-upload.d.ts",
+      "default": "./dist/components/qds-file-upload/qds-file-upload.js"
+    },
+    "./qds-segmented-control.js": {
+      "types": "./dist/components/qds-segmented-control/qds-segmented-control.d.ts",
+      "default": "./dist/components/qds-segmented-control/qds-segmented-control.js"
+    },
+    "./qds-segment.js": {
+      "types": "./dist/components/qds-segment/qds-segment.d.ts",
+      "default": "./dist/components/qds-segment/qds-segment.js"
+    },
     "./custom-elements.json": "./custom-elements.json"
   },
   "files": [

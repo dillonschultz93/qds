@@ -10,7 +10,7 @@ A design system in three parts: design tokens, web components, and documentation
 | Package | What it is | Published |
 | --- | --- | --- |
 | [`packages/design-tokens`](packages/design-tokens) | `@quieto/design-tokens` — three-tier DTCG tokens, Style Dictionary build, one-way Figma sync | yes |
-| [`packages/ui`](packages/ui) | `@quieto/ui` — Lit web components styled entirely by those tokens | yes |
+| [`packages/ui`](packages/ui) | `@quieto/ui` — 30 Lit web components styled entirely by those tokens | yes |
 | [`apps/docs`](apps/docs) | Eleventy documentation site, deployed to [quieto.dev](https://quieto.dev) | no |
 
 ```bash
@@ -40,11 +40,22 @@ Three tiers, each referencing only the one beneath it:
 
 That structure survives into the shipped CSS rather than being flattened, which is
 what makes one stylesheet themeable: dark mode redeclares only the middle line —
-44 of 637 variables — and everything downstream follows.
+44 of 770 variables — and everything downstream follows.
 
 Because a component's own `--qds-component-*` variables are both its token
 definitions and its public styling API, restyling a component means overriding the
 same variable the token source defines.
+
+## A fixed budget of components
+
+The library holds at most 30 components, and all 30 have shipped. Each one is
+something to keep accessible, documented, and consistent, so a new component has to
+replace one, or be met as a variant of one that exists (the textarea is
+`multiline` on `qds-text-field`; the drawer is `placement` on `qds-modal`). The
+[roadmap](https://quieto.dev/roadmap/) lists what shipped when, and what is left out
+on purpose. It is built from
+[`apps/docs/src/_data/roadmap.js`](apps/docs/src/_data/roadmap.js), and the docs
+checks fail if a shipped element is missing from it or the budget is exceeded.
 
 ## The naming grammar is enforced, not just documented
 
@@ -110,6 +121,11 @@ That generates Plugin API scripts, run in order through the Figma MCP server's
 Component variable collections, plus text and elevation styles. Every step upserts
 by name, so bindings survive a re-run. Details are in
 [`packages/design-tokens/figma/README.md`](packages/design-tokens/figma/README.md).
+
+The Quieto Components file draws every `@quieto/ui` component from the published
+Quieto Tokens library, with one page per component: its states, usage notes, code
+API, and component tokens. New component tokens reach it only after the Quieto
+Tokens library is published.
 
 ## License
 

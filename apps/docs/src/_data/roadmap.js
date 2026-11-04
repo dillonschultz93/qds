@@ -144,11 +144,61 @@ const COMPONENTS = [
     why: 'Moving through long lists and tables.',
     needs: [],
   },
+  // ── Shipped from Tier 3: the rest of the budget ───────────────────────────
+  {
+    name: 'Combobox', category: 'Inputs',
+    elements: ['qds-combobox'], since: '1.1.0',
+    what: 'A text field with a list of options that narrows as you type.',
+    tier: 3,
+    why: 'Choosing from a list too long to scan, such as countries or time zones. The hardest pattern on the list, so it came after Select and Menu.',
+    needs: ['Floating panels'],
+  },
+  {
+    name: 'Popover', category: 'Containment',
+    elements: ['qds-popover'], since: '1.1.0',
+    what: 'A panel of content opened by a button, beside it and above the page.',
+    tier: 3,
+    why: 'A short form, a filter, or details that do not need a whole dialog. Nearly free once the floating-panel foundation existed.',
+    needs: ['Floating panels'],
+  },
+  {
+    name: 'Skeleton', category: 'Feedback',
+    elements: ['qds-skeleton'], since: '1.1.0',
+    what: 'A placeholder shape shown where content is loading.',
+    tier: 3,
+    why: 'Placeholder shapes while content loads, so the page does not jump when it arrives.',
+    needs: [],
+  },
+  {
+    name: 'Slider', category: 'Inputs',
+    elements: ['qds-slider'], since: '1.1.0',
+    what: 'A slider, for choosing a number from a range.',
+    tier: 3,
+    why: 'A value people judge by eye: volume, a price ceiling, a zoom level. Wraps the native range input, keeping its keyboard support.',
+    needs: [],
+  },
+  {
+    name: 'File upload', category: 'Inputs',
+    elements: ['qds-file-upload'], since: '1.1.0',
+    what: 'A place to choose files, by browsing or dropping them, with the chosen files listed.',
+    tier: 3,
+    why: 'Picking and dropping files, with the chosen files listed and removable. The native file input cannot be styled or show more than a count.',
+    needs: [],
+  },
+  {
+    name: 'Segmented control', category: 'Inputs',
+    elements: ['qds-segmented-control', 'qds-segment'], since: '1.1.0',
+    what: 'A compact row of mutually exclusive options, one always chosen.',
+    tier: 3,
+    why: 'Switching a view or a unit in a toolbar, where a radio group is too tall.',
+    needs: [],
+  },
 ];
 
 const TIERS = [
   { tier: 1, title: 'Tier 1', summary: 'Gaps that block ordinary product screens. Build these first.' },
   { tier: 2, title: 'Tier 2', summary: 'Common, and cheap once Tier 1 exists.' },
+  { tier: 3, title: 'Tier 3', summary: 'The rest of the budget: the candidates held in reserve, built to fill it.' },
 ];
 
 /** Needs better met by an option on a component that exists, so they cost no budget. */
@@ -189,15 +239,11 @@ const OUT_OF_SCOPE = [
   },
 ];
 
-/** Candidates for the remaining budget, added only when a real need appears. */
-const HEADROOM = [
-  { name: 'Combobox', note: 'The hardest pattern on the list. After Select and Menu.' },
-  { name: 'Popover', note: 'Nearly free once the floating-panel foundation exists.' },
-  { name: 'Skeleton', note: 'Placeholder shapes while content loads.' },
-  { name: 'Slider', note: 'A range input.' },
-  { name: 'File upload', note: 'Picking and dropping files.' },
-  { name: 'Segmented control', note: 'A compact set of mutually exclusive options.' },
-];
+/**
+ * Candidates for the remaining budget, added only when a real need appears.
+ * Empty since Tier 3 filled the budget: a new component now has to replace one.
+ */
+const HEADROOM = [];
 
 /** Foundations several planned components share, worth building once. */
 const INFRASTRUCTURE = [

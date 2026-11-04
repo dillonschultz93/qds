@@ -51,14 +51,20 @@ import '@quieto/ui/qds-text-field.js';
 | `qds-checkbox` | A checkbox, including the indeterminate state. |
 | `qds-checkbox-group` | A labeled set of checkboxes, with a hint and "choose at least one". |
 | `qds-chip` | A compact status or category label. Removable, or `selectable` as a filter chip. |
+| `qds-combobox` | A text field with a list of options that narrows as you type. |
+| `qds-file-upload` | A place to choose files, by browsing or dropping them, with the chosen files listed. |
 | `qds-icon` | An icon from Lucide's set, sized by tokens. Decorative unless given a `label`. |
 | `qds-input` | A bare single-line text input, named by its `label` attribute. |
 | `qds-menu`, `qds-menu-item` | A menu of actions opened by a button, with full keyboard support. |
 | `qds-modal` | A modal dialog, built on the native `<dialog>`. With `placement`, a drawer against an edge. |
 | `qds-pagination` | Page links or buttons, with the gaps collapsed. |
+| `qds-popover` | A panel of content opened by a button, beside it and above the page. |
 | `qds-progress-bar` | Determinate or indeterminate progress. |
 | `qds-radio-group`, `qds-radio` | A set of options of which one is chosen. |
+| `qds-segmented-control`, `qds-segment` | A compact row of mutually exclusive options, one always chosen. |
 | `qds-select` | A native select with a label, hint, and error message. |
+| `qds-skeleton` | A placeholder shape shown where content is loading. |
+| `qds-slider` | A slider, for choosing a number from a range. |
 | `qds-spinner` | A loading indicator for a wait with no measurable progress. |
 | `qds-stack` | Lays its children out with gaps from the spacing scale. |
 | `qds-tabs`, `qds-tab`, `qds-tab-panel` | Tabs, each showing one panel. |
@@ -74,12 +80,13 @@ in this package. Editors and tools that read the format use it for autocomplete.
 
 ## Forms
 
-The form controls — `qds-checkbox`, `qds-checkbox-group`, `qds-radio-group`, `qds-select`,
-`qds-toggle`, `qds-input`, `qds-text-field`, and a `qds-button` with `type="submit"` or `"reset"` —
+The form controls — `qds-checkbox`, `qds-checkbox-group`, `qds-combobox`, `qds-file-upload`,
+`qds-input`, `qds-radio-group`, `qds-segmented-control`, `qds-select`, `qds-slider`,
+`qds-text-field`, `qds-toggle`, and a `qds-button` with `type="submit"` or `"reset"` —
 take part in a surrounding
 `<form>` like native controls do, even though their inputs are inside shadow DOM:
 
-- they submit their value under their `name`
+- they submit their value under their `name` (`qds-file-upload` submits each chosen file)
 - `required`, and the input types' own rules such as `type="email"`, block submission
 - `form.reset()` restores the value the markup declared
 - a `<fieldset disabled>` disables them
@@ -135,8 +142,14 @@ For anything the tokens do not cover, components expose CSS parts:
 Each component follows the matching ARIA pattern: keyboard support, focus management, and the
 right roles and states. A few things are still up to you:
 
-- **Name the controls that have no visible label.** `qds-input` and `qds-progress-bar` take a
-  `label` attribute, and an icon-only `qds-button` takes `label` too.
+- **Name the controls that have no visible label.** `qds-input`, `qds-progress-bar`, and
+  `qds-segmented-control` take a `label` attribute, and an icon-only `qds-button` or `qds-segment`
+  takes `label` too.
+- **Mark what is loading.** `qds-skeleton` is hidden from assistive technology, so set
+  `aria-busy="true"` on the region it stands in for, or pair it with a `qds-spinner` that names
+  what is loading.
+- **Mark the field to focus in a popover.** `qds-popover` focuses the content marked `autofocus`
+  when it opens, or else the panel itself.
 - **Group filter chips.** Wrap a set of `selectable` chips in an element with `role="group"` and an
   `aria-label`, so they are announced together.
 - **Choose heading levels.** Set `heading-level` on `qds-accordion-item` to fit the outline of your

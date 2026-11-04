@@ -1360,7 +1360,7 @@ p > qds-chip:first-child {
 }
 
 /* A block component (stack, card, tabs) takes the stage's width, as it would on a page. */
-.playground__preview > :is(qds-stack, qds-card, qds-tabs, qds-accordion, qds-progress-bar, qds-radio-group, qds-text-field) {
+.playground__preview > :is(qds-stack, qds-card, qds-tabs, qds-accordion, qds-progress-bar, qds-radio-group, qds-text-field, qds-combobox, qds-slider, qds-file-upload, qds-skeleton) {
   flex: 1 1 100%;
 }
 

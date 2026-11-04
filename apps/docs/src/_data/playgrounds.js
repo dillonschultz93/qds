@@ -71,6 +71,19 @@ const CONFIG = {
 `,
   },
   'qds-checkbox': { content: 'Accept the terms', hide: ['value'] },
+  'qds-combobox': {
+    initial: { label: 'Country', placeholder: 'Search countries' },
+    hide: ['value', 'error', 'open'],
+    template: `
+  <option value="ar">Argentina</option>
+  <option value="au">Australia</option>
+  <option value="br">Brazil</option>
+  <option value="ca">Canada</option>
+  <option value="jp">Japan</option>
+  <option value="mx">Mexico</option>
+  <option value="nz">New Zealand</option>
+`,
+  },
   'qds-chip': { content: 'Design', hide: ['remove-label'] },
   'qds-icon': {
     initial: { name: 'circle-check' },
@@ -81,6 +94,10 @@ const CONFIG = {
     initial: { label: 'Search', placeholder: 'Search' },
     hide: ['minlength', 'maxlength', 'pattern', 'autocomplete'],
   },
+  'qds-file-upload': {
+    initial: { label: 'Attachments', hint: 'PDF or images, up to 10 MB each.', multiple: true },
+    hide: ['error'],
+  },
   'qds-menu': {
     hide: ['open', 'label'],
     template: `
@@ -88,6 +105,13 @@ const CONFIG = {
   <qds-menu-item>Rename</qds-menu-item>
   <qds-menu-item>Duplicate</qds-menu-item>
   <qds-menu-item variant="danger">Delete</qds-menu-item>
+`,
+  },
+  'qds-popover': {
+    hide: ['open', 'label'],
+    template: `
+  <qds-button slot="trigger" variant="secondary">Details</qds-button>
+  <p style="margin: 0">Popovers hold a little content beside the button that opened them.</p>
 `,
   },
   'qds-modal': {
@@ -126,6 +150,17 @@ const CONFIG = {
   <option value="us">United States</option>
 `,
   },
+  'qds-segmented-control': {
+    initial: { label: 'View' },
+    hide: ['value'],
+    template: `
+  <qds-segment value="list">List</qds-segment>
+  <qds-segment value="board">Board</qds-segment>
+  <qds-segment value="calendar">Calendar</qds-segment>
+`,
+  },
+  'qds-skeleton': { initial: { lines: '3' } },
+  'qds-slider': { initial: { label: 'Volume', 'show-value': true } },
   'qds-spinner': {},
   'qds-stack': {
     initial: { direction: 'inline', gap: '300' },
