@@ -1127,6 +1127,59 @@ const footerGap = await page.evaluate(() =>
   Math.round(innerHeight - document.querySelector('.site-footer').getBoundingClientRect().bottom));
 check('on a short page the footer sits at the bottom of the window', footerGap === 0, `gap=${footerGap}px`);
 check('every page has the footer links', noFooter.length === 0, noFooter.join(', ') || `${builtPages.length} pages`);
+
+// ── Search and social metadata ─────────────────────────────────────────────────
+// Read from the built HTML, as a crawler sees it, before any script runs.
+const ORIGIN = 'https://quieto.dev';
+const meta = (html, attr, key) => html.match(new RegExp(`<meta ${attr}="${key}" content="([^"]*)"`))?.[1];
+const seo = [];
+const titles = new Map();
+for (const path of builtPages) {
+  const html = await readFile(join(SITE, path.endsWith('/') ? `${path}index.html` : path), 'utf8');
+  const problems = [];
+  const title = html.match(/<title>([^<]*)<\/title>/)?.[1] ?? '';
+  const description = meta(html, 'name', 'description') ?? '';
+  if (!title.includes('Quieto Design System')) problems.push('title');
+  if (description.length < 30 || description.length > 170) problems.push(`description length ${description.length}`);
+  if (path === '/404.html') {
+    if (!html.includes('<meta name="robots" content="noindex" />')) problems.push('404 not noindex');
+  } else {
+    titles.set(title, [...(titles.get(title) ?? []), path]);
+    if (!html.includes(`<link rel="canonical" href="${ORIGIN}${path}" />`)) problems.push('canonical');
+    if (meta(html, 'property', 'og:url') !== `${ORIGIN}${path}`) problems.push('og:url');
+    // The home page has the designed card; every other page its own generated one, 1200×630.
+    const card = path === '/' ? '/assets/og-image.png' : `/og/${path.replace(/^\/|\/$/g, '')}.png`;
+    if (meta(html, 'property', 'og:image') !== `${ORIGIN}${card}`) problems.push('og:image');
+    else if (!existsSync(join(SITE, card))) problems.push(`missing ${card}`);
+    else {
+      const png = await readFile(join(SITE, card));
+      if (png.readUInt32BE(16) !== 1200 || png.readUInt32BE(20) !== 630) problems.push(`${card} not 1200×630`);
+    }
+    if (meta(html, 'name', 'twitter:card') !== 'summary_large_image') problems.push('twitter:card');
+    for (const json of html.matchAll(/<script type="application\/ld\+json">([^<]*)<\/script>/g)) {
+      try { JSON.parse(json[1]); } catch { problems.push('json-ld'); }
+    }
+  }
+  if (problems.length) seo.push(`${path} (${problems.join(', ')})`);
+}
+const duplicateTitles = [...titles].filter(([, paths]) => paths.length > 1).map(([title]) => title);
+check('every page is titled, described, canonical, with Open Graph and Twitter tags and its own 1200×630 card',
+  seo.length === 0 && duplicateTitles.length === 0,
+  [...seo.slice(0, 5), ...duplicateTitles.map((t) => `duplicate title: ${t}`)].join('; ') || `${builtPages.length} pages`);
+
+const ogImage = await readFile(join(SITE, 'assets/og-image.png'));
+check('the home page’s designed social card is a 1200×630 PNG',
+  ogImage.readUInt32BE(16) === 1200 && ogImage.readUInt32BE(20) === 630,
+  `${ogImage.readUInt32BE(16)}×${ogImage.readUInt32BE(20)}`);
+
+const sitemap = await readFile(join(SITE, 'sitemap.xml'), 'utf8');
+const listed = [...sitemap.matchAll(/<loc>([^<]*)<\/loc>/g)].map((m) => m[1].replace(ORIGIN, ''));
+const indexable = builtPages.filter((path) => path !== '/404.html');
+const unlisted = indexable.filter((path) => !listed.includes(path));
+const robots = await readFile(join(SITE, 'robots.txt'), 'utf8');
+check('the sitemap lists every page but the 404, and robots.txt points to it',
+  unlisted.length === 0 && listed.length === indexable.length && robots.includes(`Sitemap: ${ORIGIN}/sitemap.xml`),
+  unlisted.join(', ') || `${listed.length} URLs`);
 check('no console errors on any page', consoleErrors.length === 0,
   consoleErrors.slice(0, 5).join('\n    ') || 'clean');
 

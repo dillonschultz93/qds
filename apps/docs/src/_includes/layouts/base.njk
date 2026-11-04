@@ -3,8 +3,63 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{% if title %}{{ title }} · {{ site.shortTitle }}{% else %}{{ site.title }}{% endif %}</title>
-    <meta name="description" content="{{ description or site.description }}" />
+    {#
+      Search and social metadata. Titles end with the full name, which is what
+      people search for; the home page gets a title that says what the site is.
+      URLs are absolute (site.url), as canonical and Open Graph require. A page
+      opts out of indexing with `noindex: true` in its front matter.
+    #}
+    {%- set isHome = page.url == '/' %}
+    {%- set fullTitle = (site.title + ': ' + site.tagline) if isHome else ((title + ' · ' + site.title) if title else site.title) %}
+    {%- set metaDescription = description or site.description %}
+    {%- set canonical = site.url + page.url %}
+    {#- The home and 404 pages share the designed card; every other page has its own, written by og-images.js. #}
+    {%- set pageCard = not isHome and not noindex %}
+    {%- set ogImageUrl = site.url + ((page.url | ogImage) if pageCard else site.ogImage.path) %}
+    {%- set ogImageAlt = (title + ' · ' + site.title + ': ' + metaDescription) if pageCard else site.ogImage.alt %}
+    <title>{{ fullTitle }}</title>
+    <meta name="description" content="{{ metaDescription }}" />
+    {%- if noindex %}<meta name="robots" content="noindex" />{% else %}<link rel="canonical" href="{{ canonical }}" />{% endif %}
+
+    {% if site.googleSiteVerification %}<meta name="google-site-verification" content="{{ site.googleSiteVerification }}" />{% endif %}
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="{{ site.title }}" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:title" content="{{ fullTitle }}" />
+    <meta property="og:description" content="{{ metaDescription }}" />
+    <meta property="og:url" content="{{ canonical }}" />
+    <meta property="og:image" content="{{ ogImageUrl }}" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="{{ ogImageAlt }}" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="{{ fullTitle }}" />
+    <meta name="twitter:description" content="{{ metaDescription }}" />
+    <meta name="twitter:image" content="{{ ogImageUrl }}" />
+    <meta name="twitter:image:alt" content="{{ ogImageAlt }}" />
+
+    {# Structured data: the site itself on the home page, and a breadcrumb trail on section pages. #}
+    {%- set crumbSection = docs.sections | sectionFor(page.url) %}
+    {%- if isHome %}
+      <script type="application/ld+json">{{ {
+        '@context': 'https://schema.org',
+        '@type': 'WebSite',
+        name: site.title,
+        alternateName: site.shortTitle,
+        url: site.url + '/',
+        description: site.description
+      } | dump | safe }}</script>
+    {%- elif crumbSection and not noindex %}
+      {%- set homeCrumb = { '@type': 'ListItem', position: 1, name: 'Home', item: site.url + '/' } %}
+      {%- set sectionCrumb = { '@type': 'ListItem', position: 2, name: crumbSection.title, item: site.url + crumbSection.url } %}
+      {%- if page.url == crumbSection.url %}
+        {%- set crumbs = [homeCrumb, sectionCrumb] %}
+      {%- else %}
+        {%- set crumbs = [homeCrumb, sectionCrumb, { '@type': 'ListItem', position: 3, name: title, item: canonical }] %}
+      {%- endif %}
+      <script type="application/ld+json">{{ { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: crumbs } | dump | safe }}</script>
+    {%- endif %}
     {# The Quieto mark. The SVG switches to a lighter blue in a dark browser theme; the PNGs are fallbacks. #}
     <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
     <link rel="icon" href="/assets/favicon-32.png" type="image/png" sizes="32x32" />

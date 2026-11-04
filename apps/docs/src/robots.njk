@@ -1,0 +1,11 @@
+---
+permalink: /robots.txt
+eleventyExcludeFromCollections: true
+---
+# Everything on quieto.dev is public documentation. /mcp and /sse are the MCP
+# server's endpoints, not pages.
+User-agent: *
+Disallow: /mcp
+Disallow: /sse
+
+Sitemap: {{ site.url }}/sitemap.xml
