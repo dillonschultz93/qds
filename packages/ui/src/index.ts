@@ -149,3 +149,23 @@ export { QdsBreadcrumbs } from './components/qds-breadcrumbs/qds-breadcrumbs.js'
 export { QdsBreadcrumbItem } from './components/qds-breadcrumb-item/qds-breadcrumb-item.js';
 
 export { QdsPagination } from './components/qds-pagination/qds-pagination.js';
+
+export { QdsCombobox } from './components/qds-combobox/qds-combobox.js';
+
+export { QdsPopover } from './components/qds-popover/qds-popover.js';
+export type {
+  QdsPopoverPlacement,
+} from './components/qds-popover/qds-popover.js';
+
+export { QdsSkeleton } from './components/qds-skeleton/qds-skeleton.js';
+export type {
+  QdsSkeletonShape,
+} from './components/qds-skeleton/qds-skeleton.js';
+
+export { QdsSlider } from './components/qds-slider/qds-slider.js';
+
+export { QdsFileUpload } from './components/qds-file-upload/qds-file-upload.js';
+
+export { QdsSegmentedControl } from './components/qds-segmented-control/qds-segmented-control.js';
+
+export { QdsSegment } from './components/qds-segment/qds-segment.js';

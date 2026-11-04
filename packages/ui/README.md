@@ -51,14 +51,20 @@ import '@quieto/ui/qds-text-field.js';
 | `qds-checkbox` | A checkbox, including the indeterminate state. |
 | `qds-checkbox-group` | A labeled set of checkboxes, with a hint and "choose at least one". |
 | `qds-chip` | A compact status or category label. Removable, or `selectable` as a filter chip. |
+| `qds-combobox` | A text field with a list of options that narrows as you type. |
+| `qds-file-upload` | A place to choose files, by browsing or dropping them, with the chosen files listed. |
 | `qds-icon` | An icon from Lucide's set, sized by tokens. Decorative unless given a `label`. |
 | `qds-input` | A bare single-line text input, named by its `label` attribute. |
 | `qds-menu`, `qds-menu-item` | A menu of actions opened by a button, with full keyboard support. |
 | `qds-modal` | A modal dialog, built on the native `<dialog>`. With `placement`, a drawer against an edge. |
 | `qds-pagination` | Page links or buttons, with the gaps collapsed. |
+| `qds-popover` | A panel of content opened by a button, beside it and above the page. |
 | `qds-progress-bar` | Determinate or indeterminate progress. |
 | `qds-radio-group`, `qds-radio` | A set of options of which one is chosen. |
+| `qds-segmented-control`, `qds-segment` | A compact row of mutually exclusive options, one always chosen. |
 | `qds-select` | A native select with a label, hint, and error message. |
+| `qds-skeleton` | A placeholder shape shown where content is loading. |
+| `qds-slider` | A slider, for choosing a number from a range. |
 | `qds-spinner` | A loading indicator for a wait with no measurable progress. |
 | `qds-stack` | Lays its children out with gaps from the spacing scale. |
 | `qds-tabs`, `qds-tab`, `qds-tab-panel` | Tabs, each showing one panel. |
