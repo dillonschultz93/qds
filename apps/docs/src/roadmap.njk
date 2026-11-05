@@ -1,7 +1,7 @@
 ---
 layout: layouts/base.njk
 title: Roadmap
-description: The components QDS has, and the ones it leaves out on purpose — within a budget of thirty.
+description: The components QDS has, the ones it needs next, and the ones it leaves out on purpose — within a budget of forty.
 ---
 
 {#
@@ -158,7 +158,7 @@ description: The components QDS has, and the ones it leaves out on purpose — w
         <tr>
           <th scope="row">
             {{ variant.name }}
-            {% if variant.built %}<br /><qds-chip variant="success">Built in {{ variant.built }}</qds-chip>{% endif %}
+            <br />{% if variant.built %}<qds-chip variant="success">Built in {{ variant.built }}</qds-chip>{% else %}<qds-chip variant="info">Planned</qds-chip>{% endif %}
           </th>
           <td>{% if variant.url %}<a href="{{ variant.url }}"><code>{{ variant.as }}</code></a>{% else %}<code>{{ variant.as }}</code>{% endif %}</td>
           <td>{{ variant.why }}</td>
@@ -186,7 +186,7 @@ description: The components QDS has, and the ones it leaves out on purpose — w
         <tr>
           <th scope="row">
             {{ item.name }}
-            {% if item.built %}<br /><qds-chip variant="success">Built in {{ item.built }}</qds-chip>{% endif %}
+            <br />{% if item.built %}<qds-chip variant="success">Built in {{ item.built }}</qds-chip>{% else %}<qds-chip variant="info">Planned</qds-chip>{% endif %}
           </th>
           <td>{{ item.for | join(', ') }}</td>
           <td>{{ item.note }}</td>
@@ -219,7 +219,7 @@ description: The components QDS has, and the ones it leaves out on purpose — w
 
 <h2>Room left</h2>
 
-{% if roadmap.remaining > 0 %}
+{% if roadmap.remaining > 0 and roadmap.headroom | length %}
   <p>
     {{ roadmap.remaining }} components of budget remain once the planned ones ship.
     Candidates, added only when a real need appears:
@@ -230,6 +230,13 @@ description: The components QDS has, and the ones it leaves out on purpose — w
       <li><strong>{{ item.name }}.</strong> {{ item.note }}</li>
     {% endfor %}
   </ul>
+{% elif roadmap.remaining > 0 %}
+  <p>
+    {{ roadmap.remaining }} components of budget remain once the planned ones ship.
+    They are held open, with no candidates named: one is added only when a real
+    need appears that no component or <a href="#variants-not-components">variant</a>
+    meets.
+  </p>
 {% else %}
   <p>
     <qds-chip variant="success">Budget full</qds-chip>

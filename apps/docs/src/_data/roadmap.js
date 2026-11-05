@@ -13,8 +13,11 @@
 
 import loadComponents from './components.js';
 
-/** The library stays slim: at most this many components. */
-const BUDGET = 30;
+/**
+ * The library stays slim: at most this many components. Raised from 30 to 40 in
+ * 1.1.0, once the first 30 had shipped, for the app-structure gaps in Tiers 4 and 5.
+ */
+const BUDGET = 40;
 
 /**
  * Every component, shipped or planned. `category` groups it in the docs'
@@ -193,12 +196,67 @@ const COMPONENTS = [
     why: 'Switching a view or a unit in a toolbar, where a radio group is too tall.',
     needs: [],
   },
+
+  // ── Tier 4: gaps in the structure of an app ──────────────────────────────
+  {
+    name: 'Number field', category: 'Inputs',
+    elements: ['qds-number-field'],
+    tier: 4,
+    why: 'Quantities and amounts, with step buttons, min and max, and number formatting in the reader’s language. The slider sends people to a number input when the exact figure matters, and there is none.',
+    needs: [],
+  },
+  {
+    name: 'Table', category: 'Display',
+    elements: ['qds-table'],
+    tier: 4,
+    why: 'Sortable headers, row selection, and a sticky header over a real table element. Not a data grid: no virtualization or editable cells.',
+    needs: [],
+  },
+  {
+    name: 'Side navigation', category: 'Navigation',
+    elements: ['qds-side-nav', 'qds-side-nav-item'],
+    tier: 4,
+    why: 'Every app shell needs one, and tabs, breadcrumbs, and pagination do not cover moving between the sections of an app.',
+    needs: [],
+  },
+  {
+    name: 'Date picker', category: 'Inputs',
+    elements: ['qds-date-picker'],
+    tier: 4,
+    why: 'A typed date with a calendar beside it. Left out until now as expensive to make accessible; the popover now supplies the panel, focus handling, and dismissal.',
+    needs: ['Floating panels', 'Date logic'],
+  },
+  {
+    name: 'Badge', category: 'Display',
+    elements: ['qds-badge'],
+    tier: 4,
+    why: 'A count on a navigation item, an avatar, or an icon button. The chip covers status labels, but once there is side navigation, unread counts need a place.',
+    needs: [],
+  },
+
+  // ── Tier 5: flows and layout ──────────────────────────────────────────────
+  {
+    name: 'Stepper', category: 'Navigation',
+    elements: ['qds-stepper', 'qds-step'],
+    tier: 5,
+    why: 'Progress through checkout, onboarding, or a long form: which steps are done, which is current, and what is left.',
+    needs: [],
+  },
+  {
+    name: 'Grid', category: 'Layout',
+    elements: ['qds-grid'],
+    tier: 5,
+    why: 'Responsive columns with gaps from the spacing scale, beside Stack. Anything past a single row or column is hand-written CSS today.',
+    needs: [],
+  },
 ];
 
 const TIERS = [
   { tier: 1, title: 'Tier 1', summary: 'Gaps that block ordinary product screens. Build these first.' },
   { tier: 2, title: 'Tier 2', summary: 'Common, and cheap once Tier 1 exists.' },
-  { tier: 3, title: 'Tier 3', summary: 'The rest of the budget: the candidates held in reserve, built to fill it.' },
+  { tier: 3, title: 'Tier 3', summary: 'The rest of the first budget: the candidates held in reserve, built to fill it.' },
+  { tier: 4, title: 'Tier 4', summary: 'Gaps in the structure of an app: navigating it, showing data, and entering numbers and dates.' },
+  { tier: 5, title: 'Tier 5', summary: 'Smaller additions for multi-step flows and page layout.' },
 ];
 
 /** Needs better met by an option on a component that exists, so they cost no budget. */
@@ -217,6 +275,30 @@ const VARIANTS = [
     built: '1.0.0',
     why: 'A side sheet is the same modal dialog — inert page, focus handling, Escape — in a different position.',
   },
+  {
+    name: 'Multi-select',
+    as: 'multiple on qds-combobox',
+    url: '/components/combobox/',
+    why: 'Choosing several values from a long list is the same combobox, with the chosen values shown as removable chips and submitted as a list.',
+  },
+  {
+    name: 'Choice cards',
+    as: 'appearance="card" on qds-radio-group',
+    url: '/components/radio-group/',
+    why: 'Plans and shipping options drawn as cards are still one choice from a set: the same radio group, keyboard, and validation, drawn larger.',
+  },
+  {
+    name: 'Banner',
+    as: 'a page-level placement on qds-alert',
+    url: '/components/alert/',
+    why: 'A message across the top of the page is an alert at full width. The status roles and announcements are the same.',
+  },
+  {
+    name: 'Split button',
+    as: 'qds-button beside a qds-menu',
+    url: '/components/menu/',
+    why: 'A main action with related ones behind a chevron is a composition of two components that exist, documented as a pattern rather than built as a third.',
+  },
 ];
 
 /** Left out on purpose, and why. */
@@ -226,22 +308,14 @@ const OUT_OF_SCOPE = [
     why: 'Plain HTML styled with the token CSS. A web component adds nothing here, and a link inside a shadow root makes things worse.',
   },
   {
-    name: 'Badge',
-    why: 'The chip covers status labels. A notification count is a few lines of CSS until there is a real need for more.',
-  },
-  {
-    name: 'Data table',
-    why: 'Token-styled native tables first. A full data grid is a product of its own.',
-  },
-  {
-    name: 'Date picker',
-    why: 'The native date input, through qds-input, until there is a strong need. A custom date picker is expensive to make accessible.',
+    name: 'Data grid',
+    why: 'Table covers sorting and selection over a real table element. Virtualized rows, editable cells, and column resizing make a full data grid a product of its own.',
   },
 ];
 
 /**
  * Candidates for the remaining budget, added only when a real need appears.
- * Empty since Tier 3 filled the budget: a new component now has to replace one.
+ * None are named yet: the room left after Tiers 4 and 5 is held open.
  */
 const HEADROOM = [];
 
@@ -264,6 +338,11 @@ const INFRASTRUCTURE = [
     for: ['Tooltip', 'Icon'],
     note: 'An inverse background role for tooltip surfaces, and icon size tokens.',
     built: '0.2.0',
+  },
+  {
+    name: 'Date logic',
+    for: ['Date picker'],
+    note: 'Parsing and formatting dates in the reader’s language with Intl, and the calendar grid: weeks starting on the locale’s first day, and keyboard movement by day, week, month, and year.',
   },
 ];
 

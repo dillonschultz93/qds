@@ -11,7 +11,7 @@ A design system in three parts: design tokens, web components, and documentation
 | --- | --- | --- |
 | [`packages/design-tokens`](packages/design-tokens) | `@quieto/design-tokens` — three-tier DTCG tokens, Style Dictionary build, one-way Figma sync | yes |
 | [`packages/ui`](packages/ui) | `@quieto/ui` — 30 Lit web components styled entirely by those tokens | yes |
-| [`apps/docs`](apps/docs) | Eleventy documentation site, deployed to [quieto.dev](https://quieto.dev) | no |
+| [`apps/docs`](apps/docs) | Eleventy documentation site, deployed to [quieto.dev](https://quieto.dev) | yes |
 
 ```bash
 pnpm install
@@ -48,12 +48,12 @@ same variable the token source defines.
 
 ## A fixed budget of components
 
-The library holds at most 30 components, and all 30 have shipped. Each one is
-something to keep accessible, documented, and consistent, so a new component has to
-replace one, or be met as a variant of one that exists (the textarea is
-`multiline` on `qds-text-field`; the drawer is `placement` on `qds-modal`). The
-[roadmap](https://quieto.dev/roadmap/) lists what shipped when, and what is left out
-on purpose. It is built from
+The library holds at most 40 components: 30 have shipped, 7 more are planned,
+and the last 3 are held open. Each one is something to keep accessible, documented,
+and consistent, so before a component is added, the need is checked against an
+option on one that exists (the textarea is `multiline` on `qds-text-field`; the
+drawer is `placement` on `qds-modal`). The [roadmap](https://quieto.dev/roadmap/)
+lists what shipped when, what is planned, and what is left out on purpose. It is built from
 [`apps/docs/src/_data/roadmap.js`](apps/docs/src/_data/roadmap.js), and the docs
 checks fail if a shipped element is missing from it or the budget is exceeded.
 
